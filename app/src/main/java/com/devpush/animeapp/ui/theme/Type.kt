@@ -1,4 +1,4 @@
-package com.devpush.weatherapp.ui.theme
+package com.devpush.animeapp.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

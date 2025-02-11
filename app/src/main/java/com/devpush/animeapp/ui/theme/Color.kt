@@ -1,4 +1,4 @@
-package com.devpush.weatherapp.ui.theme
+package com.devpush.animeapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

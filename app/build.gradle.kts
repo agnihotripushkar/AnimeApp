@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.devpush.weatherapp"
+    namespace = "com.devpush.animeapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.devpush.weatherapp"
+        applicationId = "com.devpush.animeapp"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

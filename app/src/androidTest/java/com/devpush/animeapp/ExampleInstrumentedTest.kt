@@ -1,4 +1,4 @@
-package com.devpush.weatherapp
+package com.devpush.animeapp
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

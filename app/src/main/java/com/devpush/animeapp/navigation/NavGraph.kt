@@ -1,4 +1,4 @@
-package com.devpush.weatherapp.navigation
+package com.devpush.animeapp.navigation
 
 sealed class NavGraph(val route: String) {
     data object Welcome: NavGraph(route = "welcome_screen")

@@ -1,8 +1,9 @@
-package com.devpush.weatherapp.screens
+package com.devpush.animeapp.screens
 
 import androidx.compose.runtime.Composable
 
 @Composable
-fun LoginScreen(){
+fun HomeScreen(){
+
 
 }

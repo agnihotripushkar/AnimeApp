@@ -1,4 +1,4 @@
-package com.devpush.weatherapp
+package com.devpush.animeapp
 
 import org.junit.Test
 

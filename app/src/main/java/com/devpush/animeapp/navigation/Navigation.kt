@@ -1,15 +1,13 @@
-package com.devpush.weatherapp.navigation
+package com.devpush.animeapp.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.devpush.weatherapp.screens.HomeScreen
-import com.devpush.weatherapp.screens.LoginScreen
-import com.devpush.weatherapp.screens.RegistrationScreen
-import com.devpush.weatherapp.screens.WelcomeScreen
+import com.devpush.animeapp.screens.HomeScreen
+import com.devpush.animeapp.screens.LoginScreen
+import com.devpush.animeapp.screens.RegistrationScreen
+import com.devpush.animeapp.screens.WelcomeScreen
 
 @Composable
 fun Navigation(){
