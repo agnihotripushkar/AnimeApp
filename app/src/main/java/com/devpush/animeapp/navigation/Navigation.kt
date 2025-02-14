@@ -18,11 +18,18 @@ fun Navigation(){
         startDestination = NavGraph.Welcome.route
     ){
         composable(NavGraph.Welcome.route){
-            WelcomeScreen()
+            WelcomeScreen(
+                onOpenLoginClicked = {
+                    navHost.navigate(NavGraph.Login.route)
+                }
+            )
         }
 
         composable(NavGraph.Login.route){
-            LoginScreen()
+            LoginScreen(onOpenRegistrationClicked = {
+                navHost.navigate(NavGraph.Registration.route)
+            }
+            )
         }
 
         composable(NavGraph.Registration.route){
