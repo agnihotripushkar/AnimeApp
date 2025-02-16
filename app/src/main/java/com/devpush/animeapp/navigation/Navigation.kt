@@ -10,14 +10,14 @@ import com.devpush.animeapp.screens.RegistrationScreen
 import com.devpush.animeapp.screens.WelcomeScreen
 
 @Composable
-fun Navigation(){
+fun Navigation() {
     val navHost = rememberNavController()
 
     NavHost(
         navController = navHost,
         startDestination = NavGraph.Welcome.route
-    ){
-        composable(NavGraph.Welcome.route){
+    ) {
+        composable(NavGraph.Welcome.route) {
             WelcomeScreen(
                 onOpenLoginClicked = {
                     navHost.navigate(NavGraph.Login.route)
@@ -25,7 +25,7 @@ fun Navigation(){
             )
         }
 
-        composable(NavGraph.Login.route){
+        composable(NavGraph.Login.route) {
             LoginScreen(onOpenRegistrationClicked = {
                 navHost.navigate(NavGraph.Registration.route)
             },
@@ -35,11 +35,18 @@ fun Navigation(){
             )
         }
 
-        composable(NavGraph.Registration.route){
-            RegistrationScreen()
+        composable(NavGraph.Registration.route) {
+            RegistrationScreen(
+                onRegisterClicked = {
+                    navHost.navigate(NavGraph.Home.route)
+                },
+                onLoginClicked = {
+                    navHost.navigate(NavGraph.Login.route)
+                }
+            )
         }
 
-        composable(NavGraph.Home.route){
+        composable(NavGraph.Home.route) {
             HomeScreen()
         }
 
