@@ -5,13 +5,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,9 +57,13 @@ fun WelcomeScreen(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        Image(painterResource(R.drawable.img_welcome),
+        Image(
+            painterResource(R.drawable.img_welcome),
             contentDescription = "Anime Logo",
-            modifier = Modifier.size(300.dp).padding(top = 32.dp))
+            modifier = Modifier
+                .size(300.dp)
+                .padding(top = 32.dp)
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -68,9 +78,9 @@ fun WelcomeScreen(
         )
         Text(
             text = "Build Awesome App With Clean Architecture using Kotlin, Jetpack Compose, and Material3",
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(vertical = 8.dp),
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.Gray,
+            color = Color.Black,
             fontSize = 18.sp
         )
 
@@ -78,15 +88,29 @@ fun WelcomeScreen(
 
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
+            FilledIconButton(
                 onClick = onOpenLoginClicked,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                contentPadding = PaddingValues(all = 16.dp),
-
-                ) {
-                Text(text = "continue")
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            ) {
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(text = "continue",
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp,
+                        color = Color.White
+                    )
+                    Icon(imageVector = Icons.Filled.ChevronRight,
+                        contentDescription = "Right",
+                        modifier = Modifier.size(24.dp))
+                }
             }
         }
 

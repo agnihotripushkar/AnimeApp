@@ -28,7 +28,10 @@ fun Navigation(){
         composable(NavGraph.Login.route){
             LoginScreen(onOpenRegistrationClicked = {
                 navHost.navigate(NavGraph.Registration.route)
-            }
+            },
+                onLoginClicked = {
+                    navHost.navigate(NavGraph.Home.route)
+                }
             )
         }
 

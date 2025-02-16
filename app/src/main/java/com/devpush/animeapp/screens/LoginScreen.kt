@@ -3,19 +3,24 @@ package com.devpush.animeapp.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,23 +39,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devpush.animeapp.R
+import com.devpush.animeapp.components.RoundedCornerTextField
+import com.devpush.animeapp.components.Separator
 import com.devpush.animeapp.ui.theme.Pink80
+import com.devpush.animeapp.ui.theme.PrimaryPink
+import com.devpush.animeapp.ui.theme.PrimaryPinkBlended
+import com.devpush.animeapp.ui.theme.PrimaryPinkDark
+import com.devpush.animeapp.ui.theme.PrimaryPinkLight
 import com.devpush.animeapp.ui.theme.Purple80
 import com.devpush.animeapp.ui.theme.PurpleGrey80
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    onOpenRegistrationClicked: () -> Unit
+    onOpenRegistrationClicked: () -> Unit,
+    onLoginClicked: () -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    0f to Purple80,
-                    0.6f to PurpleGrey80,
-                    1f to Pink80
+                    0f to PrimaryPinkBlended,
+                    1f to PrimaryPink
                 )
             ),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -76,55 +87,53 @@ fun LoginScreen(
             fontWeight = FontWeight.Bold, color = Color.White, fontSize = 32.sp,
         )
 
-        var filledText by remember {
-            mutableStateOf("")
-        }
-
-        TextField(
-            value = filledText,
-            onValueChange = { filledText = it },
-            enabled = true,
-            textStyle = LocalTextStyle.current.copy(
-                textAlign = TextAlign.Right,
-            ),
-            label = {
-                Text(text = "Enter your email")
-            }
+        RoundedCornerTextField(
+            leadingIconRes = R.drawable.ic_person,
+            placeholderText = "You email",
+            modifier = Modifier.padding(horizontal = 24.dp)
         )
 
-        var filledPass by remember {
-            mutableStateOf("")
-        }
-        var passwordVisible by remember { mutableStateOf(false) }
+        Spacer(modifier = Modifier.height(16.dp))
 
-        val visualTransformation = if (passwordVisible) {
-            VisualTransformation.None // Show the password
-        } else {
-            PasswordVisualTransformation() // Hide the password
-        }
-
-        OutlinedTextField(
-            value = filledPass,
-            modifier = Modifier.padding(all = 8.dp),
-            onValueChange = { filledPass = it },
-
-            textStyle = LocalTextStyle.current.copy(
-                color = Color.Black,
-                textAlign = TextAlign.Right,
-            ),
-            visualTransformation = visualTransformation,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            trailingIcon = {
-                val icon = if(passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(icon, contentDescription = "Visibility")
-                }
-            },
-            label = {
-                Text(text = "Enter your password")
-            }
-
+        RoundedCornerTextField(
+            leadingIconRes = R.drawable.ic_key,
+            placeholderText = "Your Password",
+            modifier = Modifier.padding(horizontal = 24.dp),
+            trailingIcon = Icons.Filled.VisibilityOff,
+            isPasswordTextField = true
         )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onLoginClicked,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = PrimaryPinkDark,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = "Login")
+        }
+
+        Separator(
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+        )
+
+        Button(
+            onClick = onOpenRegistrationClicked,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = PrimaryPinkLight,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = "Register Here")
+        }
 
 
     }
