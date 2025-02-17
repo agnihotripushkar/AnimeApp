@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devpush.animeapp.R
+import com.devpush.animeapp.ui.theme.DarkTextColor
 import com.devpush.animeapp.ui.theme.Pink80
 import com.devpush.animeapp.ui.theme.Purple80
 import com.devpush.animeapp.ui.theme.PurpleGrey80
@@ -42,9 +43,8 @@ fun WelcomeScreen(
 ) {
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .systemBarsPadding()
             .background(
                 Brush.verticalGradient(
                     0f to Purple80,
@@ -69,19 +69,17 @@ fun WelcomeScreen(
 
         Text(
             text = "Let's Start Coding!",
-            modifier = Modifier.padding(horizontal = 16.dp),
-            style = MaterialTheme.typography.displayMedium,
-            textAlign = TextAlign.Center,
-            color = Color.Black,
-            fontWeight = FontWeight.Bold,
-            fontSize = 28.sp
+            modifier = Modifier.padding(horizontal = 24.dp),
+            style = MaterialTheme.typography.headlineLarge,
+            color = DarkTextColor,
+            fontWeight = FontWeight.Black,
         )
         Text(
-            text = "Build Awesome App With Clean Architecture using Kotlin, Jetpack Compose, and Material3",
-            modifier = Modifier.padding(vertical = 8.dp),
+            text = "Create a beautiful Login App using\nKotlin, Jetpack Compose, and Material3",
+            modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp),
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.Black,
-            fontSize = 18.sp
+            textAlign = TextAlign.Center,
+            color = DarkTextColor,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -104,7 +102,7 @@ fun WelcomeScreen(
                     Text(text = "continue",
                         modifier = Modifier.padding(vertical = 8.dp),
                         textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
+                        fontSize = 18.sp,
                         color = Color.White
                     )
                     Icon(imageVector = Icons.Filled.ChevronRight,

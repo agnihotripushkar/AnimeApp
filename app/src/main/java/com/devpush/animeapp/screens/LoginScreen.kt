@@ -2,14 +2,20 @@ package com.devpush.animeapp.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -22,14 +28,17 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,6 +57,7 @@ import com.devpush.animeapp.ui.theme.PrimaryPinkDark
 import com.devpush.animeapp.ui.theme.PrimaryPinkLight
 import com.devpush.animeapp.ui.theme.Purple80
 import com.devpush.animeapp.ui.theme.PurpleGrey80
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -55,15 +65,28 @@ fun LoginScreen(
     onOpenRegistrationClicked: () -> Unit,
     onLoginClicked: () -> Unit
 ) {
+
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+    val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
+
+    LaunchedEffect(keyboardHeight) {
+        coroutineScope.launch {
+            scrollState.scrollBy(keyboardHeight.toFloat())
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .background(
                 Brush.verticalGradient(
                     0f to PrimaryPinkBlended,
                     1f to PrimaryPink
                 )
-            ),
+            )
+            .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
@@ -126,7 +149,8 @@ fun LoginScreen(
             onClick = onOpenRegistrationClicked,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 32.dp)
+                .padding(bottom = 24.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = PrimaryPinkLight,
                 contentColor = Color.White
