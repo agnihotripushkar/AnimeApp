@@ -19,7 +19,8 @@ val PrimaryVioletLight = Color(0xFFb0a7e2)
 val PrimaryViolet = Color(0xFF9e91e2)
 val PrimaryVioletDark = Color(0xFF52439a)
 
-val PrimaryGreen = Color(0xFFc29f)
+val PrimaryGreenLight = Color(0xFF80c5b6)
+val PrimaryGreen = Color(0xFF00c29f)
 val PrimaryGreenDark = Color(0xFF008b6c)
 
 val DarkTextColor = Color(0xFF132b4c)

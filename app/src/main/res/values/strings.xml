@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">AnimeApp</string>
+    <string name="onBoarding_title1">Shop Smart. Eat Fresh.</string>
+    <string name="onBoarding_title2">Groceries at Your Fingertips.</string>
+    <string name="onBoarding_title3">Fresh Delivered, Hassle Free.</string>
+
+    <string name="onBoarding_text1">Freshly delivered groceries at your fingertips.</string>
+    <string name="onBoarding_text2">Add your favourite groceries to your cart.</string>
+    <string name="onBoarding_text3">no notifications, no distractions.</string>
 </resources>

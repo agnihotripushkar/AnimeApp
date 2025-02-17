@@ -1,11 +1,18 @@
 package com.devpush.animeapp.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.devpush.animeapp.screens.HomeScreen
 import com.devpush.animeapp.screens.LoginScreen
+import com.devpush.animeapp.screens.OnBoardingScreen
 import com.devpush.animeapp.screens.RegistrationScreen
 import com.devpush.animeapp.screens.WelcomeScreen
 
@@ -30,7 +37,7 @@ fun Navigation() {
                 navHost.navigate(NavGraph.Registration.route)
             },
                 onLoginClicked = {
-                    navHost.navigate(NavGraph.Home.route)
+                    navHost.navigate(NavGraph.OnBoarding.route)
                 }
             )
         }
@@ -48,6 +55,10 @@ fun Navigation() {
 
         composable(NavGraph.Home.route) {
             HomeScreen()
+        }
+
+        composable(NavGraph.OnBoarding.route) {
+            OnBoardingScreen()
         }
 
     }

@@ -17,6 +17,9 @@ material = "1.12.0"
 material-icons-core = "1.7.8" # Or latest
 material-icons-extended = "1.7.8" # Or latest
 
+paging_version = "3.3.6"
+dataStore = "1.0.0"
+
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +43,9 @@ androidx-material3-window = { group = "androidx.compose.material3", name = "mate
 androidx-material3-nav = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite", version.ref="material3Nav"}
 material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "material-icons-core" }
 material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
+androidx-paging = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging_version" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging_version" }
+androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -48,4 +54,5 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 
 [bundles]
 material = ["material-icons-core","material-icons-extended","androidx-material","androidx-material3","androidx-material3-window","androidx-material3-nav"]
+paging = ["androidx-paging","androidx-paging-compose"]
 
