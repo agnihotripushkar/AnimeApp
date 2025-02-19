@@ -1,4 +1,4 @@
-package com.devpush.animeapp.screens
+package com.devpush.animeapp.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,12 +14,12 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,23 +30,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.devpush.animeapp.ui.theme.PrimaryViolet
+import com.devpush.animeapp.ui.theme.PrimaryVioletDark
 import com.devpush.animeapp.R
 import com.devpush.animeapp.components.RoundedCornerTextField
 import com.devpush.animeapp.components.Separator
-import com.devpush.animeapp.ui.theme.PrimaryPink
-import com.devpush.animeapp.ui.theme.PrimaryPinkBlended
-import com.devpush.animeapp.ui.theme.PrimaryPinkDark
-import com.devpush.animeapp.ui.theme.PrimaryPinkLight
+import com.devpush.animeapp.ui.theme.PrimaryVioletLight
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(
+fun RegistrationScreen(
     modifier: Modifier = Modifier,
-    onOpenRegistrationClicked: () -> Unit,
+    onRegisterClicked: () -> Unit,
     onLoginClicked: () -> Unit
 ) {
 
@@ -66,37 +62,38 @@ fun LoginScreen(
             .verticalScroll(scrollState)
             .background(
                 Brush.verticalGradient(
-                    0f to PrimaryPinkBlended,
-                    1f to PrimaryPink
+                    0f to PrimaryViolet,
+                    1f to PrimaryVioletDark
                 )
             )
             .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painterResource(R.drawable.img_coder_m),
-            contentDescription = "Login Image",
+            painter = painterResource(R.drawable.img_coder_w),
+            contentDescription = "Registration Image",
             modifier = Modifier
                 .size(300.dp)
                 .padding(top = 32.dp, bottom = 32.dp)
         )
 
         Text(
-            text = "Welcome back!",
-            modifier = Modifier.padding(all = 8.dp),
-            textAlign = TextAlign.Center,
-            fontSize = 16.sp,
-            color = Color.White
+            text = "Hi There!",
+            modifier = Modifier.padding(vertical = 8.dp),
+            color = Color.White,
+            style = MaterialTheme.typography.displaySmall
         )
 
         Text(
-            text = "Please Login", modifier = Modifier.padding(all = 8.dp),
-            fontWeight = FontWeight.Bold, color = Color.White, fontSize = 32.sp,
+            text = "Let's Get Started",
+            modifier = Modifier.padding(all = 8.dp),
+            color = Color.White,
+            style = MaterialTheme.typography.bodyMedium
         )
 
         RoundedCornerTextField(
             leadingIconRes = R.drawable.ic_person,
-            placeholderText = "You email",
+            placeholderText = "Your Email",
             modifier = Modifier.padding(horizontal = 24.dp)
         )
 
@@ -104,25 +101,24 @@ fun LoginScreen(
 
         RoundedCornerTextField(
             leadingIconRes = R.drawable.ic_key,
-            placeholderText = "Your Password",
+            placeholderText = "Password",
             modifier = Modifier.padding(horizontal = 24.dp),
-            trailingIcon = Icons.Filled.VisibilityOff,
-            isPasswordTextField = true
+            isPasswordTextField = true,
+            trailingIcon = Icons.Filled.Visibility
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
-
         Button(
-            onClick = onLoginClicked,
+            onClick = onRegisterClicked,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 32.dp)
+                .padding(top = 32.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryPinkDark,
+                containerColor = PrimaryVioletDark,
                 contentColor = Color.White
             )
         ) {
-            Text(text = "Login")
+            Text(text = "Create An Account")
         }
 
         Separator(
@@ -130,20 +126,20 @@ fun LoginScreen(
         )
 
         Button(
-            onClick = onOpenRegistrationClicked,
+            onClick = onLoginClicked,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
                 .padding(bottom = 24.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryPinkLight,
+                containerColor = PrimaryVioletLight,
                 contentColor = Color.White
             )
         ) {
-            Text(text = "Register Here")
+            Text(text = "Login")
         }
 
-
     }
+
 
 }

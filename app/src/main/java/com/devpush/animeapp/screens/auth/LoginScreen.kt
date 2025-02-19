@@ -1,9 +1,8 @@
-package com.devpush.animeapp.screens
+package com.devpush.animeapp.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,14 +13,12 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,20 +29,23 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.devpush.animeapp.ui.theme.PrimaryViolet
-import com.devpush.animeapp.ui.theme.PrimaryVioletDark
+import androidx.compose.ui.unit.sp
 import com.devpush.animeapp.R
-import com.devpush.animeapp.components.DashedLine
 import com.devpush.animeapp.components.RoundedCornerTextField
 import com.devpush.animeapp.components.Separator
-import com.devpush.animeapp.ui.theme.PrimaryVioletLight
+import com.devpush.animeapp.ui.theme.PrimaryPink
+import com.devpush.animeapp.ui.theme.PrimaryPinkBlended
+import com.devpush.animeapp.ui.theme.PrimaryPinkDark
+import com.devpush.animeapp.ui.theme.PrimaryPinkLight
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegistrationScreen(
+fun LoginScreen(
     modifier: Modifier = Modifier,
-    onRegisterClicked: () -> Unit,
+    onOpenRegistrationClicked: () -> Unit,
     onLoginClicked: () -> Unit
 ) {
 
@@ -65,38 +65,37 @@ fun RegistrationScreen(
             .verticalScroll(scrollState)
             .background(
                 Brush.verticalGradient(
-                    0f to PrimaryViolet,
-                    1f to PrimaryVioletDark
+                    0f to PrimaryPinkBlended,
+                    1f to PrimaryPink
                 )
             )
             .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(R.drawable.img_coder_w),
-            contentDescription = "Registration Image",
+            painterResource(R.drawable.img_coder_m),
+            contentDescription = "Login Image",
             modifier = Modifier
                 .size(300.dp)
                 .padding(top = 32.dp, bottom = 32.dp)
         )
 
         Text(
-            text = "Hi There!",
-            modifier = Modifier.padding(vertical = 8.dp),
-            color = Color.White,
-            style = MaterialTheme.typography.displaySmall
+            text = "Welcome back!",
+            modifier = Modifier.padding(all = 8.dp),
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp,
+            color = Color.White
         )
 
         Text(
-            text = "Let's Get Started",
-            modifier = Modifier.padding(all = 8.dp),
-            color = Color.White,
-            style = MaterialTheme.typography.bodyMedium
+            text = "Please Login", modifier = Modifier.padding(all = 8.dp),
+            fontWeight = FontWeight.Bold, color = Color.White, fontSize = 32.sp,
         )
 
         RoundedCornerTextField(
             leadingIconRes = R.drawable.ic_person,
-            placeholderText = "Your Email",
+            placeholderText = "You email",
             modifier = Modifier.padding(horizontal = 24.dp)
         )
 
@@ -104,24 +103,25 @@ fun RegistrationScreen(
 
         RoundedCornerTextField(
             leadingIconRes = R.drawable.ic_key,
-            placeholderText = "Password",
+            placeholderText = "Your Password",
             modifier = Modifier.padding(horizontal = 24.dp),
-            isPasswordTextField = true,
-            trailingIcon = Icons.Filled.Visibility
+            trailingIcon = Icons.Filled.VisibilityOff,
+            isPasswordTextField = true
         )
 
+        Spacer(modifier = Modifier.height(32.dp))
+
         Button(
-            onClick = onRegisterClicked,
+            onClick = onLoginClicked,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp)
-                .padding(top = 32.dp),
+                .padding(horizontal = 32.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryVioletDark,
+                containerColor = PrimaryPinkDark,
                 contentColor = Color.White
             )
         ) {
-            Text(text = "Create An Account")
+            Text(text = "Login")
         }
 
         Separator(
@@ -129,20 +129,20 @@ fun RegistrationScreen(
         )
 
         Button(
-            onClick = onLoginClicked,
+            onClick = onOpenRegistrationClicked,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
                 .padding(bottom = 24.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryVioletLight,
+                containerColor = PrimaryPinkLight,
                 contentColor = Color.White
             )
         ) {
-            Text(text = "Login")
+            Text(text = "Register Here")
         }
 
-    }
 
+    }
 
 }

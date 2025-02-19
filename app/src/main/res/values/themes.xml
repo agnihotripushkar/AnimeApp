@@ -4,8 +4,8 @@
     <style name="Theme.AnimeApp" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="Theme.Splash" parent="Theme.SplashScreen.IconBackground">
-    <item name="windowSplashScreenBackground">#ff262d3a</item>
-    <item name="windowSplashScreenAnimatedIcon">@drawable/ic_person</item>
+    <item name="windowSplashScreenBackground">#FFb0a7e2</item>
+    <item name="windowSplashScreenAnimatedIcon">@drawable/anime_icon</item>
     <item name="windowSplashScreenIconBackgroundColor">#FFFFFF</item>
     <item name="postSplashScreenTheme">@style/Theme.AnimeApp</item>
     </style>
