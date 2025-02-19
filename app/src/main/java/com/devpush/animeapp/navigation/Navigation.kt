@@ -1,12 +1,7 @@
 package com.devpush.animeapp.navigation
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,10 +10,13 @@ import com.devpush.animeapp.screens.LoginScreen
 import com.devpush.animeapp.screens.OnBoardingScreen
 import com.devpush.animeapp.screens.RegistrationScreen
 import com.devpush.animeapp.screens.WelcomeScreen
+import com.devpush.animeapp.utils.DataStoreUtils
 
 @Composable
 fun Navigation() {
     val navHost = rememberNavController()
+    val context = LocalContext.current
+    val isOnboardingShown = DataStoreUtils.readOnboardingStatus(context)
 
     NavHost(
         navController = navHost,
@@ -37,7 +35,11 @@ fun Navigation() {
                 navHost.navigate(NavGraph.Registration.route)
             },
                 onLoginClicked = {
-                    navHost.navigate(NavGraph.OnBoarding.route)
+                    if (isOnboardingShown) {
+                        navHost.navigate(NavGraph.Home.route)
+                    } else {
+                        navHost.navigate(NavGraph.OnBoarding.route)
+                    }
                 }
             )
         }
@@ -45,7 +47,7 @@ fun Navigation() {
         composable(NavGraph.Registration.route) {
             RegistrationScreen(
                 onRegisterClicked = {
-                    navHost.navigate(NavGraph.Home.route)
+                    navHost.navigate(NavGraph.OnBoarding.route)
                 },
                 onLoginClicked = {
                     navHost.navigate(NavGraph.Login.route)
@@ -58,9 +60,10 @@ fun Navigation() {
         }
 
         composable(NavGraph.OnBoarding.route) {
-            OnBoardingScreen()
+            OnBoardingScreen(onGetStartedClicked = {
+                navHost.navigate(NavGraph.Home.route)
+            })
         }
-
     }
 
 }

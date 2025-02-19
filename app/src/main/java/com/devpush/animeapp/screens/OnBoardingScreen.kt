@@ -1,9 +1,7 @@
 package com.devpush.animeapp.screens
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,10 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,39 +32,50 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.devpush.animeapp.components.onBoarding.OnBoardingItem
 import com.devpush.animeapp.R
 import com.devpush.animeapp.components.onBoarding.OnBoardingModel
-import com.devpush.animeapp.ui.theme.DarkTextColor
 import com.devpush.animeapp.ui.theme.PrimaryGreen
 import com.devpush.animeapp.ui.theme.PrimaryGreenDark
 import com.devpush.animeapp.ui.theme.PrimaryGreenLight
-import com.devpush.animeapp.ui.theme.PrimaryPinkLight
-import kotlinx.coroutines.flow.firstOrNull
+import com.devpush.animeapp.utils.DataStoreUtils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-// Define the DataStore name
-private val ONBOARDING_PREFERENCES = "onboarding_preferences"
 
-// Define the key for the boolean value
-private val IS_ONBOARDING_SHOWN = booleanPreferencesKey("is_onboarding_shown")
+fun goToLastPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
+    val skipPage = pagerState.pageCount - 1
+    coroutineScope.launch {
+        pagerState.animateScrollToPage(skipPage)
+    }
+}
 
-// Extension function to access DataStore (Best Practice)
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = ONBOARDING_PREFERENCES)
+fun goToNextPage(
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    onGetStartedClicked: () -> Unit
+) {
+    val currPage = pagerState.currentPage
+    if (currPage < pagerState.pageCount - 2) {
+        val skipPage = pagerState.currentPage + 1
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(skipPage)
+        }
+    } else {
+        goToHomepage(onGetStartedClicked)
+    }
+}
 
-suspend fun readOnboardingStatus(context: Context): Boolean {
-    val preferences =
-        context.dataStore.data.firstOrNull() // Use firstOrNull() to handle potential null
-    return preferences?.get(IS_ONBOARDING_SHOWN) == true // Provide default value
+fun goToHomepage(onGetStartedClicked: () -> Unit) {
+    onGetStartedClicked
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun OnBoardingScreen(modifier: Modifier = Modifier) {
+fun OnBoardingScreen(
+    onGetStartedClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     val onBoardList = listOf(
         OnBoardingModel(
@@ -90,17 +96,16 @@ fun OnBoardingScreen(modifier: Modifier = Modifier) {
     )
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { onBoardList.size })
-    val coroutineScope = rememberCoroutineScope()
+//    val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
-    // State to hold the onboarding shown status
-    var isOnboardingShown by remember { mutableStateOf(false) }
+    // read onboarding status from DataStore
+//    val isOnboardingCompleted = DataStoreUtils.readOnboardingStatus(context)
 
     // Use a LaunchedEffect to read the value from DataStore when the composable enters the composition
     LaunchedEffect(key1 = Unit) {
-        isOnboardingShown = readOnboardingStatus(context)
+        DataStoreUtils.updateOnboardingStatus(context, true)
     }
 
     Column(
@@ -160,12 +165,7 @@ fun OnBoardingScreen(modifier: Modifier = Modifier) {
                 .padding(horizontal = 16.dp)
         ) {
             Button(
-                onClick = {
-                    val skipPage = pagerState.pageCount - 1
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(skipPage)
-                    }
-                },
+                onClick = onGetStartedClicked,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryGreenLight,
                     contentColor = Color.White
@@ -181,7 +181,5 @@ fun OnBoardingScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
-
-
     }
 }
