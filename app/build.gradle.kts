@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.bundles.material)
     implementation(libs.bundles.paging)
     implementation(libs.androidx.datastore)
+    implementation(libs.koin.androidx.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
