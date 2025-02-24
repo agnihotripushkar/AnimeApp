@@ -1,4 +1,4 @@
-package com.devpush.animeapp.components.onBoarding
+package com.devpush.animeapp.presentation.components.onBoarding
 
 data class OnBoardingModel(
     val title: Int,

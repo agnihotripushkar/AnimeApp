@@ -1,4 +1,4 @@
-package com.devpush.animeapp.ui.theme
+package com.devpush.animeapp.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

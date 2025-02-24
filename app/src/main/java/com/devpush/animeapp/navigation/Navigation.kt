@@ -5,11 +5,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.devpush.animeapp.screens.home.HomeScreen
-import com.devpush.animeapp.screens.auth.LoginScreen
-import com.devpush.animeapp.screens.auth.OnBoardingScreen
-import com.devpush.animeapp.screens.auth.RegistrationScreen
-import com.devpush.animeapp.screens.auth.WelcomeScreen
+import com.devpush.animeapp.presentation.screens.home.HomeScreen
+import com.devpush.animeapp.presentation.screens.auth.LoginScreen
+import com.devpush.animeapp.presentation.screens.auth.OnBoardingScreen
+import com.devpush.animeapp.presentation.screens.auth.RegistrationScreen
+import com.devpush.animeapp.presentation.screens.auth.WelcomeScreen
 import com.devpush.animeapp.utils.DataStoreUtils
 
 @Composable

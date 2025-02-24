@@ -1,4 +1,4 @@
-package com.devpush.animeapp.components
+package com.devpush.animeapp.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,8 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.devpush.animeapp.R
-import com.devpush.animeapp.ui.theme.DarkTextColor
+import com.devpush.animeapp.presentation.ui.theme.DarkTextColor
 
 @Composable
 fun RoundedCornerTextField(

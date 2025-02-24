@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.bundles.paging)
     implementation(libs.androidx.datastore)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.bundles.ktor)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

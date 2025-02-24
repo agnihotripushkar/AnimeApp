@@ -1,4 +1,4 @@
-package com.devpush.animeapp.screens.auth
+package com.devpush.animeapp.presentation.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,10 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devpush.animeapp.R
-import com.devpush.animeapp.ui.theme.DarkTextColor
-import com.devpush.animeapp.ui.theme.Pink80
-import com.devpush.animeapp.ui.theme.Purple80
-import com.devpush.animeapp.ui.theme.PurpleGrey80
+import com.devpush.animeapp.presentation.ui.theme.DarkTextColor
+import com.devpush.animeapp.presentation.ui.theme.Pink80
+import com.devpush.animeapp.presentation.ui.theme.Purple80
+import com.devpush.animeapp.presentation.ui.theme.PurpleGrey80
 
 @Composable
 fun WelcomeScreen(

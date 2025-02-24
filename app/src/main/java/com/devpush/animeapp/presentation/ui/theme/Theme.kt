@@ -1,4 +1,4 @@
-package com.devpush.animeapp.ui.theme
+package com.devpush.animeapp.presentation.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

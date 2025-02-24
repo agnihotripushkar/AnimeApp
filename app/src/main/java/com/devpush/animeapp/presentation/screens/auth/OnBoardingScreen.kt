@@ -1,4 +1,4 @@
-package com.devpush.animeapp.screens.auth
+package com.devpush.animeapp.presentation.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,12 +31,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.devpush.animeapp.components.onBoarding.OnBoardingItem
+import com.devpush.animeapp.presentation.components.onBoarding.OnBoardingItem
 import com.devpush.animeapp.R
-import com.devpush.animeapp.components.onBoarding.OnBoardingModel
-import com.devpush.animeapp.ui.theme.PrimaryGreen
-import com.devpush.animeapp.ui.theme.PrimaryGreenDark
-import com.devpush.animeapp.ui.theme.PrimaryGreenLight
+import com.devpush.animeapp.presentation.components.onBoarding.OnBoardingModel
+import com.devpush.animeapp.presentation.ui.theme.PrimaryGreen
+import com.devpush.animeapp.presentation.ui.theme.PrimaryGreenDark
+import com.devpush.animeapp.presentation.ui.theme.PrimaryGreenLight
 import com.devpush.animeapp.utils.DataStoreUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

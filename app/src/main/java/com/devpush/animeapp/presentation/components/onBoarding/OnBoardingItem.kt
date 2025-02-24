@@ -1,4 +1,4 @@
-package com.devpush.animeapp.components.onBoarding
+package com.devpush.animeapp.presentation.components.onBoarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -15,19 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.devpush.animeapp.ui.theme.DarkTextColor
+import com.devpush.animeapp.presentation.ui.theme.DarkTextColor
 import android.content.res.Resources
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
-import com.devpush.animeapp.ui.theme.PrimaryGreen
-import com.devpush.animeapp.ui.theme.PrimaryGreenDark
-import com.devpush.animeapp.ui.theme.PrimaryPink
-import com.devpush.animeapp.ui.theme.PrimaryPinkBlended
 
 @Composable
 fun OnBoardingItem(

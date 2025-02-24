@@ -1,4 +1,4 @@
-package com.devpush.animeapp.components
+package com.devpush.animeapp.presentation.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding

@@ -20,6 +20,7 @@ material-icons-extended = "1.7.8" # Or latest
 paging_version = "3.3.6"
 dataStore = "1.0.0"
 koinAndroidxComposeVersion = "3.5.0"
+ktorVersion = "2.3.6"
 
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -37,6 +38,14 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "compose-navigation" }
+
+# Ktor
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorVersion" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorVersion" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorVersion" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorVersion" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorVersion" }
 
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref="material3"}
 androidx-material = { group = "com.google.android.material", name = "material", version.ref="material"}
@@ -56,4 +65,8 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 [bundles]
 material = ["material-icons-core","material-icons-extended","androidx-material","androidx-material3","androidx-material3-window","androidx-material3-nav"]
 paging = ["androidx-paging","androidx-paging-compose"]
+ktor = [
+    "ktor-client-core", "ktor-client-okhttp", "ktor-client-logging", "ktor-client-android",
+    "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"
+]
 

@@ -1,4 +1,4 @@
-package com.devpush.animeapp.components
+package com.devpush.animeapp.presentation.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable

@@ -1,4 +1,4 @@
-package com.devpush.animeapp.di.modules
+package com.devpush.animeapp.data.di.modules
 
 import org.koin.dsl.module
 

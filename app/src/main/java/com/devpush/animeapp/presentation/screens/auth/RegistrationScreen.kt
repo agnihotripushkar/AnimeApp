@@ -1,4 +1,4 @@
-package com.devpush.animeapp.screens.auth
+package com.devpush.animeapp.presentation.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,12 +31,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.devpush.animeapp.ui.theme.PrimaryViolet
-import com.devpush.animeapp.ui.theme.PrimaryVioletDark
+import com.devpush.animeapp.presentation.ui.theme.PrimaryViolet
+import com.devpush.animeapp.presentation.ui.theme.PrimaryVioletDark
 import com.devpush.animeapp.R
-import com.devpush.animeapp.components.RoundedCornerTextField
-import com.devpush.animeapp.components.Separator
-import com.devpush.animeapp.ui.theme.PrimaryVioletLight
+import com.devpush.animeapp.presentation.components.RoundedCornerTextField
+import com.devpush.animeapp.presentation.components.Separator
+import com.devpush.animeapp.presentation.ui.theme.PrimaryVioletLight
 import kotlinx.coroutines.launch
 
 @Composable

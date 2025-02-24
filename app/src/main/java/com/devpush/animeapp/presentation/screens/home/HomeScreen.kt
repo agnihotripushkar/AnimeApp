@@ -1,4 +1,4 @@
-package com.devpush.animeapp.screens.home
+package com.devpush.animeapp.presentation.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
