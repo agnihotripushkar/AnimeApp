@@ -1,10 +1,14 @@
 package com.devpush.animeapp.domian.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class AnimeData(
     val id: String,
     val attributes: Attributes,
 )
 
+@Serializable
 data class Attributes(
     val createdAt: String?,
     val updatedAt: String?,
@@ -31,10 +35,12 @@ data class Attributes(
     val showType: String?
 )
 
+@Serializable
 data class Titles(
     val en: String?
 )
 
+@Serializable
 data class PosterImage(
     val tiny: String,
     val small: String,
@@ -43,6 +49,7 @@ data class PosterImage(
     val original: String
 )
 
+@Serializable
 data class CoverImage(
     val tiny: String,
     val small: String,

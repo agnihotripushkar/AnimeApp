@@ -10,6 +10,7 @@ import com.devpush.animeapp.presentation.screens.auth.LoginScreen
 import com.devpush.animeapp.presentation.screens.auth.OnBoardingScreen
 import com.devpush.animeapp.presentation.screens.auth.RegistrationScreen
 import com.devpush.animeapp.presentation.screens.auth.WelcomeScreen
+import com.devpush.animeapp.presentation.screens.trending.TrendingAnimeScreen
 import com.devpush.animeapp.utils.DataStoreUtils
 
 @Composable
@@ -36,7 +37,7 @@ fun Navigation() {
             },
                 onLoginClicked = {
                     if (isOnboardingShown) {
-                        navHost.navigate(NavGraph.Home.route)
+                        navHost.navigate(NavGraph.TrendingAnime.route)
                     } else {
                         navHost.navigate(NavGraph.OnBoarding.route)
                     }
@@ -61,8 +62,16 @@ fun Navigation() {
 
         composable(NavGraph.OnBoarding.route) {
             OnBoardingScreen(onGetStartedClicked = {
-                navHost.navigate(NavGraph.Home.route)
+                navHost.navigate(NavGraph.TrendingAnime.route)
             })
+        }
+
+        composable(NavGraph.TrendingAnime.route) {
+            TrendingAnimeScreen(
+                onAnimeClick = { imageUrl, animeId ->
+                    navHost.navigate(NavGraph.Home.route)
+                }
+            )
         }
     }
 

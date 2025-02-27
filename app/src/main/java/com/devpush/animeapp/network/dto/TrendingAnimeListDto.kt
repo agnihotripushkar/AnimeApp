@@ -5,7 +5,9 @@ import com.devpush.animeapp.domian.model.Attributes
 import com.devpush.animeapp.domian.model.CoverImage
 import com.devpush.animeapp.domian.model.PosterImage
 import com.devpush.animeapp.domian.model.Titles
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class TrendingAnimeListDto(
     val data: List<AnimeDataDto>
 ) {
@@ -13,12 +15,14 @@ data class TrendingAnimeListDto(
         data.map { it.toModel() }
 }
 
+@Serializable
 data class AnimeResponseDto(
     val data: AnimeDataDto
 ) {
     fun toModel(): AnimeData = data.toModel()
 }
 
+@Serializable
 data class AnimeDataDto(
     val id: String,
     val type: String,
@@ -33,6 +37,7 @@ data class AnimeDataDto(
         )
 }
 
+@Serializable
 data class AttributesDto(
     val createdAt: String,
     val updatedAt: String,
@@ -91,8 +96,9 @@ data class AttributesDto(
         )
 }
 
+@Serializable
 data class TitlesDto(
-    val en: String?,
+    val en: String? = null,
     val en_jp: String?,
     val ja_jp: String?
 ) {
@@ -100,6 +106,7 @@ data class TitlesDto(
         Titles(en = en)
 }
 
+@Serializable
 data class PosterImageDto(
     val tiny: String,
     val small: String,
@@ -118,21 +125,25 @@ data class PosterImageDto(
         )
 }
 
+@Serializable
 data class MetaDto(
     val dimensions: DimensionsDto
 )
 
+@Serializable
 data class DimensionsDto(
     val tiny: SizeDto,
     val small: SizeDto,
     val large: SizeDto
 )
 
+@Serializable
 data class SizeDto(
     val width: Int? = null,
     val height: Int? = null
 )
 
+@Serializable
 data class CoverImageDto(
     val tiny: String,
     val small: String,
@@ -149,6 +160,7 @@ data class CoverImageDto(
         )
 }
 
+@Serializable
 data class RelationshipsDto(
     val genres: RelationDto,
     val categories: RelationDto,
@@ -164,14 +176,17 @@ data class RelationshipsDto(
     val animeStaff: RelationDto
 )
 
+@Serializable
 data class RelationDto(
     val links: RelationLinksDto
 )
 
+@Serializable
 data class LinksDto(
     val self: String
 )
 
+@Serializable
 data class RelationLinksDto(
     val self: String,
     val related: String
