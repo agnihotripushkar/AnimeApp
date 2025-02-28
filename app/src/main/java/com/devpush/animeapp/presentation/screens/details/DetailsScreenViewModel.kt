@@ -1,4 +1,4 @@
-package com.devpush.animeapp.presentation.screens.home
+package com.devpush.animeapp.presentation.screens.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeScreenViewModel( private val repository: KitsuRepository): ViewModel() {
+class DetailsScreenViewModel( private val repository: KitsuRepository): ViewModel() {
 
     private var _anime = MutableStateFlow<AnimeData?>(null)
     val anime = _anime.asStateFlow()

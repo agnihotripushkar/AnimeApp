@@ -2,7 +2,6 @@ package com.devpush.animeapp.network
 
 import com.devpush.animeapp.network.dto.AnimeResponseDto
 import com.devpush.animeapp.network.dto.TrendingAnimeListDto
-import okhttp3.Response
 
 interface KitsuApi {
     companion object {
@@ -12,6 +11,5 @@ interface KitsuApi {
     suspend fun getTrendingAnime(): TrendingAnimeListDto
 
     suspend fun getAnime(id: Int): AnimeResponseDto
-
 
 }

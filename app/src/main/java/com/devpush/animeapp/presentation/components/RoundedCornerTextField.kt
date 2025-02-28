@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -21,8 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,16 +41,19 @@ fun RoundedCornerTextField(
     placeholderText: String,
     modifier: Modifier = Modifier,
     trailingIcon: ImageVector? = null,
-    isPasswordTextField:Boolean = false
-){
+    isPasswordTextField: Boolean = false
+) {
     var value by remember {
         mutableStateOf("")
     }
 
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
     var passwordVisible by remember { mutableStateOf(false) }
     var trailIcon = if (passwordVisible) {
         Icons.Filled.Visibility
-    }else{
+    } else {
         Icons.Filled.VisibilityOff
     }
 
@@ -54,14 +61,13 @@ fun RoundedCornerTextField(
         VisualTransformation.None // Show the password
     } else if (isPasswordTextField) {
         PasswordVisualTransformation() // Hide the password
-    }
-    else{
+    } else {
         VisualTransformation.None
     }
 
     OutlinedTextField(
         value = value,
-        onValueChange = {value = it},
+        onValueChange = { value = it },
         modifier = modifier
             .fillMaxWidth()
             .height(62.dp),
@@ -95,13 +101,13 @@ fun RoundedCornerTextField(
         },
         leadingIcon = {
             Icon(
-                painter = painterResource(id =leadingIconRes),
+                painter = painterResource(id = leadingIconRes),
                 contentDescription = "Person Icon",
                 modifier = Modifier.size(24.dp)
             )
         },
         trailingIcon = {
-            if (trailingIcon != null){
+            if (trailingIcon != null) {
                 IconButton(
                     onClick = {
                         passwordVisible = !passwordVisible
@@ -115,11 +121,29 @@ fun RoundedCornerTextField(
                 }
             }
         },
-        keyboardOptions = if (isPasswordTextField){
-            KeyboardOptions(keyboardType = KeyboardType.Password)
-        }else{
-            KeyboardOptions(keyboardType = KeyboardType.Email)
+        keyboardOptions = if (isPasswordTextField) {
+            KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = androidx.compose.ui.text.input.ImeAction.Done
+            )
+        } else {
+            KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = androidx.compose.ui.text.input.ImeAction.Next
+            )
+        },
+        keyboardActions = if (isPasswordTextField) {
+            KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            )
+        } else {
+            KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            )
         }
     )
-
 }

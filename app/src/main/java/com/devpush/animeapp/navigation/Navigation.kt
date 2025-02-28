@@ -1,17 +1,23 @@
 package com.devpush.animeapp.navigation
 
+import android.R
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.devpush.animeapp.presentation.screens.home.HomeScreen
+import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.devpush.animeapp.presentation.screens.auth.LoginScreen
 import com.devpush.animeapp.presentation.screens.auth.OnBoardingScreen
 import com.devpush.animeapp.presentation.screens.auth.RegistrationScreen
 import com.devpush.animeapp.presentation.screens.auth.WelcomeScreen
+import com.devpush.animeapp.presentation.screens.details.DetailsScreen
 import com.devpush.animeapp.presentation.screens.trending.TrendingAnimeScreen
 import com.devpush.animeapp.utils.DataStoreUtils
+import kotlinx.serialization.Serializable
 
 @Composable
 fun Navigation() {
@@ -56,10 +62,6 @@ fun Navigation() {
             )
         }
 
-        composable(NavGraph.Home.route) {
-            HomeScreen()
-        }
-
         composable(NavGraph.OnBoarding.route) {
             OnBoardingScreen(onGetStartedClicked = {
                 navHost.navigate(NavGraph.TrendingAnime.route)
@@ -69,10 +71,26 @@ fun Navigation() {
         composable(NavGraph.TrendingAnime.route) {
             TrendingAnimeScreen(
                 onAnimeClick = { imageUrl, animeId ->
-                    navHost.navigate(NavGraph.Home.route)
+                    val encodedUrl = Uri.encode(imageUrl) // Encode the URL
+                    navHost.navigate("detail_anime/${encodedUrl}/${animeId}") // Build the route string
                 }
             )
         }
-    }
 
+        composable(
+            route = NavGraph.DetailAnime.route,
+            arguments = listOf(
+            navArgument("coverurl") { type = NavType.StringType },
+            navArgument("id") { type = NavType.StringType }
+        )
+        ) { backStackEntry ->
+            val encodedUrl = backStackEntry.arguments?.getString("coverurl") ?: ""
+            val decodedUrl = Uri.decode(encodedUrl) // Decode the URL
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            DetailsScreen(
+                id = id.toInt(),
+                coverImage = decodedUrl,
+            )
+        }
+    }
 }
