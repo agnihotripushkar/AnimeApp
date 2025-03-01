@@ -37,10 +37,11 @@ import com.devpush.animeapp.presentation.components.onBoarding.OnBoardingModel
 import com.devpush.animeapp.presentation.ui.theme.PrimaryGreen
 import com.devpush.animeapp.presentation.ui.theme.PrimaryGreenDark
 import com.devpush.animeapp.presentation.ui.theme.PrimaryGreenLight
+import com.devpush.animeapp.utils.Constants
 import com.devpush.animeapp.utils.DataStoreUtils
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-
 
 fun goToLastPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
     val skipPage = pagerState.pageCount - 1
@@ -104,7 +105,7 @@ fun OnBoardingScreen(
 
     // Use a LaunchedEffect to read the value from DataStore when the composable enters the composition
     LaunchedEffect(key1 = Unit) {
-        DataStoreUtils.updateOnboardingStatus(context, true)
+        DataStoreUtils.updateBooleanValue(context, Constants.IS_ONBOARDING_SHOWN,true)
     }
 
     Column(

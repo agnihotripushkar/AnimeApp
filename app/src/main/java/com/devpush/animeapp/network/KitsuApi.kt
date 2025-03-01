@@ -12,4 +12,6 @@ interface KitsuApi {
 
     suspend fun getAnime(id: Int): AnimeResponseDto
 
+    suspend fun loginCall()
+
 }

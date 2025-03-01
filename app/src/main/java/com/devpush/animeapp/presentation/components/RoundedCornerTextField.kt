@@ -41,7 +41,8 @@ fun RoundedCornerTextField(
     placeholderText: String,
     modifier: Modifier = Modifier,
     trailingIcon: ImageVector? = null,
-    isPasswordTextField: Boolean = false
+    isPasswordTextField: Boolean = false,
+    onValueChange: (String) -> Unit
 ) {
     var value by remember {
         mutableStateOf("")
@@ -67,7 +68,10 @@ fun RoundedCornerTextField(
 
     OutlinedTextField(
         value = value,
-        onValueChange = { value = it },
+        onValueChange = {
+            value = it
+            onValueChange(it)
+        },
         modifier = modifier
             .fillMaxWidth()
             .height(62.dp),

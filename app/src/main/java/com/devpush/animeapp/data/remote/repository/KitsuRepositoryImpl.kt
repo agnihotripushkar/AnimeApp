@@ -1,4 +1,4 @@
-package com.devpush.animeapp.data.repository
+package com.devpush.animeapp.data.remote.repository
 
 import com.devpush.animeapp.domian.model.AnimeData
 import com.devpush.animeapp.domian.repository.KitsuRepository
@@ -13,6 +13,5 @@ class KitsuRepositoryImpl(private val api: KitsuApi): KitsuRepository {
     override suspend fun getAnime(id: Int): AnimeData? {
         return api.getAnime(id).toModel()
     }
-
 
 }

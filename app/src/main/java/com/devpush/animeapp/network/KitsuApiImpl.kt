@@ -21,5 +21,9 @@ class KitsuApiImpl(val client: HttpClient) : KitsuApi {
         return client.get(anime.format(id)).body<AnimeResponseDto>()
     }
 
+    override suspend fun loginCall() {
+        TODO()
+    }
+
 
 }

@@ -1,6 +1,5 @@
 package com.devpush.animeapp.navigation
 
-import android.R
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -9,21 +8,21 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.navigation.toRoute
 import com.devpush.animeapp.presentation.screens.auth.LoginScreen
 import com.devpush.animeapp.presentation.screens.auth.OnBoardingScreen
 import com.devpush.animeapp.presentation.screens.auth.RegistrationScreen
 import com.devpush.animeapp.presentation.screens.auth.WelcomeScreen
 import com.devpush.animeapp.presentation.screens.details.DetailsScreen
 import com.devpush.animeapp.presentation.screens.trending.TrendingAnimeScreen
+import com.devpush.animeapp.utils.Constants
 import com.devpush.animeapp.utils.DataStoreUtils
-import kotlinx.serialization.Serializable
 
 @Composable
 fun Navigation() {
     val navHost = rememberNavController()
     val context = LocalContext.current
-    val isOnboardingShown = DataStoreUtils.readOnboardingStatus(context)
+    val isOnboardingShown = DataStoreUtils.readBooleanValue(context, Constants.IS_ONBOARDING_SHOWN)
+    val isLogin = DataStoreUtils.readBooleanValue(context, Constants.IS_LOGIN)
 
     NavHost(
         navController = navHost,
@@ -32,7 +31,11 @@ fun Navigation() {
         composable(NavGraph.Welcome.route) {
             WelcomeScreen(
                 onOpenLoginClicked = {
-                    navHost.navigate(NavGraph.Login.route)
+                    if (isLogin) {
+                        navHost.navigate(NavGraph.TrendingAnime.route)
+                    } else {
+                        navHost.navigate(NavGraph.Login.route)
+                    }
                 }
             )
         }
@@ -80,9 +83,9 @@ fun Navigation() {
         composable(
             route = NavGraph.DetailAnime.route,
             arguments = listOf(
-            navArgument("coverurl") { type = NavType.StringType },
-            navArgument("id") { type = NavType.StringType }
-        )
+                navArgument("coverurl") { type = NavType.StringType },
+                navArgument("id") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
             val encodedUrl = backStackEntry.arguments?.getString("coverurl") ?: ""
             val decodedUrl = Uri.decode(encodedUrl) // Decode the URL
