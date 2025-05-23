@@ -57,7 +57,7 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.bundles.ktor)
     implementation(libs.coil.compose)
-
+    implementation(libs.androidx.material3.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
