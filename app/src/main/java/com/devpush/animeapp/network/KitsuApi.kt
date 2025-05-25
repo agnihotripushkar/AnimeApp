@@ -8,9 +8,9 @@ interface KitsuApi {
         const val baseUrl = "https://kitsu.io/api/edge/"
     }
 
-    suspend fun getTrendingAnime(): TrendingAnimeListDto
+    suspend fun getTrendingAnime(): NetworkResult<TrendingAnimeListDto>
 
-    suspend fun getAnime(id: Int): AnimeResponseDto
+    suspend fun getAnime(id: Int): NetworkResult<AnimeResponseDto>
 
     suspend fun loginCall()
 
