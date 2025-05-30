@@ -24,6 +24,8 @@ koinAndroidxComposeVersion = "3.5.0"
 ktorVersion = "2.3.6"
 coilCompose = "2.6.0"
 
+kotlinCoroutines = "1.8.0"
+
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -62,6 +64,9 @@ androidx-datastore = { group = "androidx.datastore", name = "datastore-preferenc
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxComposeVersion" }
 
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinCoroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
