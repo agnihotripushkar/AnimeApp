@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.domian.repository.AuthRepository
 import com.devpush.animeapp.utils.Constants
+import com.devpush.animeapp.utils.DataStoreUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,9 +40,9 @@ class AuthViewModel(
             //authRepository.loginCall()
             delay(3000)
             // If login is successful:
-            dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(Constants.IS_LOGIN)] = true
-            }
+//            dataStore.edit { preferences ->
+//                preferences[booleanPreferencesKey(Constants.IS_LOGIN)] = true
+//            }
             _isLoggedIn.value = true
             _isLoading.value = false
         }
@@ -51,9 +52,9 @@ class AuthViewModel(
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             delay(3000)
-            dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(Constants.IS_LOGIN)] = true
-            }
+//            dataStore.edit { preferences ->
+//                preferences[booleanPreferencesKey(Constants.IS_LOGIN)] = true
+//            }
             _isRegister.value = true
             _isLoading.value = false
         }

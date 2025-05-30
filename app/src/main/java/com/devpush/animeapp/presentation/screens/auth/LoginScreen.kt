@@ -49,6 +49,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.devpush.animeapp.utils.Constants
+import com.devpush.animeapp.utils.DataStoreUtils
 
 @Composable
 fun LoginScreen(
@@ -65,7 +68,7 @@ fun LoginScreen(
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-
+    val context = LocalContext.current
     LaunchedEffect(keyboardHeight) {
         coroutineScope.launch {
             scrollState.scrollBy(keyboardHeight.toFloat())
@@ -74,6 +77,7 @@ fun LoginScreen(
 
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
+            DataStoreUtils.updateBooleanValue(context, Constants.IS_LOGIN,true)
             onLoginClicked()
         }
     }

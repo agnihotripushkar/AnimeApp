@@ -48,6 +48,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.devpush.animeapp.utils.Constants
+import com.devpush.animeapp.utils.DataStoreUtils
 
 @Composable
 fun RegistrationScreen(
@@ -62,7 +65,7 @@ fun RegistrationScreen(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
-
+    val context = LocalContext.current
     val isRegister by viewModel.isRegister.collectAsState()
     val isLoadings by viewModel.isLoading.collectAsState()
 
@@ -74,6 +77,7 @@ fun RegistrationScreen(
 
     LaunchedEffect(isRegister) {
         if (isRegister) {
+            DataStoreUtils.updateBooleanValue(context, Constants.IS_LOGIN,true)
             onRegisterClicked()
         }
     }

@@ -3,7 +3,6 @@ package com.devpush.animeapp.navigation
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
@@ -16,30 +15,21 @@ import com.devpush.animeapp.presentation.screens.auth.RegistrationScreen
 import com.devpush.animeapp.presentation.screens.details.DetailsScreen
 import com.devpush.animeapp.presentation.screens.trending.TrendingAnimeScreen
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun Navigation(
     authViewModel: AuthViewModel
 ) {
     val navHost = rememberNavController()
-    val context = LocalContext.current // Not strictly needed here unless you're writing to DataStore directly
 
     val isLogin by authViewModel.isLogin.collectAsState()
     val isOnboardingShown by authViewModel.isOnboardingShown.collectAsState()
-    val isInitialized by authViewModel.isInitialized.collectAsState()
-
-    // Show nothing until preferences are loaded
-    if (!isInitialized) return
 
     val startDestination = when {
         isLogin == true && isOnboardingShown == false -> NavGraph.OnBoarding.route
         isLogin == true -> NavGraph.TrendingAnime.route
         else -> NavGraph.Login.route
     }
-
 
     NavHost(
         navController = navHost,
