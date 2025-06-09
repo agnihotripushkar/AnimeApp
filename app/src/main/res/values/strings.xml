@@ -7,4 +7,6 @@
     <string name="onBoarding_text1">Freshly delivered groceries at your fingertips.</string>
     <string name="onBoarding_text2">Add your favourite groceries to your cart.</string>
     <string name="onBoarding_text3">no notifications, no distractions.</string>
+    <string name="trending_anime">Trending Anime</string>
+    <string name="retry">Retry</string>
 </resources>
