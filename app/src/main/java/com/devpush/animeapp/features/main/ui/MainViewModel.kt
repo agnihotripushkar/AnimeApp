@@ -1,53 +1,70 @@
 package com.devpush.animeapp.features.main.ui
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devpush.animeapp.utils.Constants
-import com.devpush.animeapp.utils.DataStoreUtils
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.devpush.animeapp.domian.repository.UserPreferencesRepository
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val _isLogin = MutableStateFlow<Boolean?>(null)
-    val isLogin: StateFlow<Boolean?> = _isLogin
-
-    private val _isOnboardingShown = MutableStateFlow<Boolean?>(null)
-    val isOnboardingShown: StateFlow<Boolean?> = _isOnboardingShown
-
-    private val _isInitialized = MutableStateFlow(false)
-    val isInitialized: StateFlow<Boolean> = _isInitialized
+class MainViewModel(private val userPreferencesRepository: UserPreferencesRepository) : ViewModel() {
 
     init {
-        viewModelScope.launch {
-            val context = getApplication<Application>().applicationContext
-            DataStoreUtils.observeBooleanPreference(context, Constants.IS_LOGIN)
-                .collect {
-                    _isLogin.value = it
-                }
-        }
+        Timber.tag("MainViewModel").d("Initializing...")
+    }
 
-        viewModelScope.launch {
-            val context = getApplication<Application>().applicationContext
-            DataStoreUtils.observeBooleanPreference(context, Constants.IS_ONBOARDING_SHOWN)
-                .collect {
-                    _isOnboardingShown.value = it
-                }
+    val isLogin: StateFlow<Boolean?> = userPreferencesRepository.isLoginFlow
+        .map { loginStatus ->
+            Timber.tag("MainViewModel").d("isLoginFlow emitted: $loginStatus")
+            loginStatus
         }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-        // Set initialized once both values are non-null
+    val isOnboardingShown: StateFlow<Boolean?> = userPreferencesRepository.isOnboardingShownFlow
+        .map { onboardingStatus ->
+            Timber.tag("MainViewModel").d("isOnboardingShownFlow emitted: $onboardingStatus")
+            onboardingStatus
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    //TODO combine is not working. splash Screen is getting stuck.
+//    val isInitialized: StateFlow<Boolean> = isLogin
+//        .combine(isOnboardingShown) { login, onboarding -> // Explicit combine call
+//            Timber.tag("MainViewModel").d("Combine: login=$login, onboarding=$onboarding")
+//            val initialized = login != null && onboarding != null
+//            Timber.tag("MainViewModel").d("isInitialized will be: $initialized")
+//            initialized
+//        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+
+    fun saveIsOnboardingShown(value: Boolean) {
         viewModelScope.launch {
-            combine(
-                isLogin,
-                isOnboardingShown
-            ) { login, onboarding ->
-                login != null && onboarding != null
-            }.collect { ready ->
-                _isInitialized.value = ready
+            userPreferencesRepository.updateOnboardingShownStatus(value)
+        }
+    }
+
+    fun performLogout() {
+        viewModelScope.launch {
+            userPreferencesRepository.updateLoginStatus(false)
+        }
+    }
+
+    fun userLoggedIn(isNewUser: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateLoginStatus(true)
+            if (isNewUser) {
+                userPreferencesRepository.updateOnboardingShownStatus(false)
             }
         }
     }
+
+    fun onboardingCompleted() {
+        viewModelScope.launch {
+            userPreferencesRepository.updateOnboardingShownStatus(true)
+        }
+    }
+
 }

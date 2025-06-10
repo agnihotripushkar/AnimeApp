@@ -9,9 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.devpush.animeapp.features.main.ui.MainViewModel
-import com.devpush.animeapp.features.auth.ui.LoginScreen
+import com.devpush.animeapp.features.auth.ui.login.LoginScreen
 import com.devpush.animeapp.features.onBoarding.ui.OnBoardingScreen
-import com.devpush.animeapp.features.auth.ui.RegistrationScreen
+import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
 import com.devpush.animeapp.features.details.ui.DetailsScreen
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 import androidx.compose.runtime.getValue
@@ -40,14 +40,16 @@ fun Navigation(
                 onOpenRegistrationClicked = {
                     navHost.navigate(NavGraph.Registration.route)
                 },
-                onLoginClicked = {
+                onLoginSuccessNavigation = {
                     if (isOnboardingShown == true) {
                         navHost.navigate(NavGraph.TrendingAnime.route) {
                             popUpTo(0) { inclusive = true }
+                            launchSingleTop = true
                         }
                     } else {
                         navHost.navigate(NavGraph.OnBoarding.route) {
                             popUpTo(NavGraph.Login.route) { inclusive = true }
+                            launchSingleTop = true
                         }
                     }
                 }
@@ -56,13 +58,17 @@ fun Navigation(
 
         composable(NavGraph.Registration.route) {
             RegistrationScreen(
-                onRegisterClicked = {
+                onRegisterSuccessNavigation = {
                     navHost.navigate(NavGraph.OnBoarding.route) {
                         popUpTo(NavGraph.Registration.route) { inclusive = true }
+                        launchSingleTop = true
                     }
                 },
                 onLoginClicked = {
-                    navHost.navigate(NavGraph.Login.route)
+                    navHost.navigate(NavGraph.Login.route){
+                        popUpTo(NavGraph.Registration.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -72,6 +78,7 @@ fun Navigation(
                 navHost.navigate(NavGraph.TrendingAnime.route) {
                     popUpTo(0) { inclusive = true }
                 }
+                mainViewModel.saveIsOnboardingShown(true)
             })
         }
 

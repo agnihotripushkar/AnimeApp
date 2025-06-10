@@ -27,12 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devpush.animeapp.R
 import com.devpush.animeapp.features.onBoarding.domain.OnBoardingModel
+import com.devpush.animeapp.ui.theme.Gray400
 import com.devpush.animeapp.ui.theme.PrimaryGreen
 import com.devpush.animeapp.ui.theme.PrimaryGreenDark
 import com.devpush.animeapp.ui.theme.PrimaryGreenLight
@@ -41,32 +44,32 @@ import com.devpush.animeapp.utils.DataStoreUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-fun goToLastPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
-    val skipPage = pagerState.pageCount - 1
-    coroutineScope.launch {
-        pagerState.animateScrollToPage(skipPage)
-    }
-}
+//fun goToLastPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
+//    val skipPage = pagerState.pageCount - 1
+//    coroutineScope.launch {
+//        pagerState.animateScrollToPage(skipPage)
+//    }
+//}
+//
+//fun goToNextPage(
+//    pagerState: PagerState,
+//    coroutineScope: CoroutineScope,
+//    onGetStartedClicked: () -> Unit
+//) {
+//    val currPage = pagerState.currentPage
+//    if (currPage < pagerState.pageCount - 2) {
+//        val skipPage = pagerState.currentPage + 1
+//        coroutineScope.launch {
+//            pagerState.animateScrollToPage(skipPage)
+//        }
+//    } else {
+//        goToHomepage(onGetStartedClicked)
+//    }
+//}
 
-fun goToNextPage(
-    pagerState: PagerState,
-    coroutineScope: CoroutineScope,
-    onGetStartedClicked: () -> Unit
-) {
-    val currPage = pagerState.currentPage
-    if (currPage < pagerState.pageCount - 2) {
-        val skipPage = pagerState.currentPage + 1
-        coroutineScope.launch {
-            pagerState.animateScrollToPage(skipPage)
-        }
-    } else {
-        goToHomepage(onGetStartedClicked)
-    }
-}
-
-fun goToHomepage(onGetStartedClicked: () -> Unit) {
-    onGetStartedClicked
-}
+//fun goToHomepage(onGetStartedClicked: () -> Unit) {
+//    onGetStartedClicked
+//}
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -94,17 +97,6 @@ fun OnBoardingScreen(
     )
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { onBoardList.size })
-//    val coroutineScope = rememberCoroutineScope()
-
-    val context = LocalContext.current
-
-    // read onboarding status from DataStore
-//    val isOnboardingCompleted = DataStoreUtils.readOnboardingStatus(context)
-
-    // Use a LaunchedEffect to read the value from DataStore when the composable enters the composition
-    LaunchedEffect(key1 = Unit) {
-        DataStoreUtils.updateBooleanValue(context, Constants.IS_ONBOARDING_SHOWN,true)
-    }
 
     Column(
         modifier = Modifier
@@ -142,11 +134,12 @@ fun OnBoardingScreen(
                         .height(if (isSelected) 8.dp else 8.dp)
                         .border(
                             width = 1.dp,
-                            color = Color(0xFF707784),
+                            color = Gray400,
                             shape = RoundedCornerShape(10.dp)
                         )
                         .background(
-                            color = if (isSelected) Color(0xFF3B6C64) else Color(0xFFFFFFFF),
+                            color = if (isSelected) colorResource(R.color.onboarding_indicator_selected)
+                            else colorResource(R.color.onboarding_indicator_unselected),
                             shape = CircleShape
                         )
                 )
@@ -170,7 +163,7 @@ fun OnBoardingScreen(
                 )
             ) {
                 Text(
-                    text = "Skip",
+                    text = stringResource(R.string.skip),
                     style = TextStyle(
                         color = Color.White,
                         fontSize = 14.sp,

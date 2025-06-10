@@ -1,17 +1,20 @@
 package com.devpush.animeapp.features.trending.ui
 
+import android.app.Application
 import android.content.ContentValues.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.core.network.NetworkResult
 import com.devpush.animeapp.features.trending.domain.repository.TrendingAnimeRepository
+import com.devpush.animeapp.utils.Constants
+import com.devpush.animeapp.utils.DataStoreUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository): ViewModel() {
+class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : ViewModel() {
 
     private var _uiState = MutableStateFlow<TrendingAnimeUiState>(TrendingAnimeUiState.Idle)
     val uiState = _uiState.asStateFlow()
@@ -19,6 +22,7 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository): V
     init {
         fetchTrendingAnime()
     }
+
     private fun fetchTrendingAnime() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = TrendingAnimeUiState.Loading
@@ -26,6 +30,7 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository): V
                 is NetworkResult.Loading -> {
                     _uiState.value = TrendingAnimeUiState.Loading
                 }
+
                 is NetworkResult.Success -> {
                     try {
                         val animeDataList = apiResult.data.toModel()
@@ -36,17 +41,19 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository): V
                         _uiState.value = TrendingAnimeUiState.Error("Error processing data", e)
                     }
                 }
+
                 is NetworkResult.Error -> {
                     Timber.tag(TAG)
                         .e(apiResult.exception, "getTrendingAnime failed: ${apiResult.message}")
-                    _uiState.value = TrendingAnimeUiState.Error(apiResult.message, apiResult.exception)
+                    _uiState.value =
+                        TrendingAnimeUiState.Error(apiResult.message, apiResult.exception)
                 }
 
             }
         }
     }
 
-    fun retryFetchTrendingAnime(){
+    fun retryFetchTrendingAnime() {
         fetchTrendingAnime()
     }
 }

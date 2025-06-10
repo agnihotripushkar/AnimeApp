@@ -9,4 +9,20 @@
     <string name="onBoarding_text3">no notifications, no distractions.</string>
     <string name="trending_anime">Trending Anime</string>
     <string name="retry">Retry</string>
+    <string name="skip">Skip</string>
+    <string name="login">Login</string>
+    <string name="register_here">Register Here</string>
+    <string name="your_password">Your Password</string>
+    <string name="you_email">You email</string>
+    <string name="please_login">Please Login</string>
+    <string name="welcome_back">Welcome back!</string>
+    <string name="get_started_with_your_account">Get started with your account!</string>
+    <string name="hi_there">Hi There!</string>
+    <string name="lets_get_started">Let\'s Get Started</string>
+    <string name="your_email_hint">Your Email</string>
+    <string name="create_password_hint">Create Password</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="create_an_account">Create an Account</string>
+    <string name="login_instead">Already have an account? Login</string>
+    // Add any other specific error messages or button texts if needed
 </resources>

@@ -24,3 +24,4 @@ val PrimaryGreen = Color(0xFF00c29f)
 val PrimaryGreenDark = Color(0xFF008b6c)
 
 val DarkTextColor = Color(0xFF132b4c)
+val Gray400 = Color(0xFF707784)
