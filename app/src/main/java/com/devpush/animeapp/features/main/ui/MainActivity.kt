@@ -8,7 +8,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.devpush.animeapp.R
 import com.devpush.animeapp.core.navigation.Navigation
-import com.devpush.animeapp.ui.theme.WeatherAppTheme
+import com.devpush.animeapp.ui.theme.AnimeAppTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
         }
         enableEdgeToEdge()
         setContent {
-            WeatherAppTheme {
+            AnimeAppTheme {
                 Navigation(mainViewModel)
             }
         }

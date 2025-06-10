@@ -59,8 +59,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import com.devpush.animeapp.features.auth.ui.AuthViewModel
 import com.devpush.animeapp.features.auth.ui.utils.Separator
+import com.devpush.animeapp.ui.theme.AnimeAppTheme
 
 @Composable
 fun LoginScreen(
@@ -134,7 +136,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = { viewModel.onEmailChanged(it) },
-                label = { Text(stringResource(R.string.you_email)) }, // Ensure R.string.you_email exists
+                label = { Text(stringResource(R.string.you_email)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -172,7 +174,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = { viewModel.onPasswordChanged(it) },
-                label = { Text(stringResource(R.string.your_password)) }, // Ensure R.string.your_password exists
+                label = { Text(stringResource(R.string.your_password)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -191,10 +193,15 @@ fun LoginScreen(
                     )
                 },
                 trailingIcon = {
-                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val image =
+                        if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                     val description = if (passwordVisible) "Hide password" else "Show password"
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = image, contentDescription = description, tint = Color.White.copy(alpha = 0.7f))
+                        Icon(
+                            imageVector = image,
+                            contentDescription = description,
+                            tint = Color.White.copy(alpha = 0.7f)
+                        )
                     }
                 },
 
@@ -232,7 +239,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                enabled = !uiState.isLoading, // Disable button when loading
+                enabled = !uiState.isLoading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryPinkDark,
                     contentColor = Color.White
@@ -258,8 +265,7 @@ fun LoginScreen(
                 onClick = onOpenRegistrationClicked,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(bottom = 24.dp),
+                    .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryPinkLight,
                     contentColor = Color.White
@@ -268,5 +274,16 @@ fun LoginScreen(
                 Text(text = stringResource(R.string.register_here), fontSize = 16.sp)
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginScreenPreview() {
+    AnimeAppTheme {
+        LoginScreen(
+            onOpenRegistrationClicked = {},
+            onLoginSuccessNavigation = {}
+        )
     }
 }

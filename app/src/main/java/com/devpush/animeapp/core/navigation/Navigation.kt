@@ -15,6 +15,7 @@ import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
 import com.devpush.animeapp.features.details.ui.DetailsScreen
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 import androidx.compose.runtime.getValue
+import com.devpush.animeapp.features.settings.ui.SettingsScreen
 
 @Composable
 fun Navigation(
@@ -87,6 +88,9 @@ fun Navigation(
                 onAnimeClick = { imageUrl, animeId ->
                     val encodedUrl = Uri.encode(imageUrl)
                     navHost.navigate("detail_anime/${encodedUrl}/${animeId}")
+                },
+                onSettingsClick = {
+                    navHost.navigate(NavGraph.Settings.route)
                 }
             )
         }
@@ -105,6 +109,10 @@ fun Navigation(
                 id = id.toInt(),
                 coverImage = decodedUrl,
             )
+        }
+
+        composable(NavGraph.Settings.route) {
+            SettingsScreen(navController = navHost,)
         }
     }
 }

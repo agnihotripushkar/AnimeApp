@@ -12,22 +12,10 @@ import timber.log.Timber
 
 class MainViewModel(private val userPreferencesRepository: UserPreferencesRepository) : ViewModel() {
 
-    init {
-        Timber.tag("MainViewModel").d("Initializing...")
-    }
-
     val isLogin: StateFlow<Boolean?> = userPreferencesRepository.isLoginFlow
-        .map { loginStatus ->
-            Timber.tag("MainViewModel").d("isLoginFlow emitted: $loginStatus")
-            loginStatus
-        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     val isOnboardingShown: StateFlow<Boolean?> = userPreferencesRepository.isOnboardingShownFlow
-        .map { onboardingStatus ->
-            Timber.tag("MainViewModel").d("isOnboardingShownFlow emitted: $onboardingStatus")
-            onboardingStatus
-        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     //TODO combine is not working. splash Screen is getting stuck.
@@ -46,11 +34,7 @@ class MainViewModel(private val userPreferencesRepository: UserPreferencesReposi
         }
     }
 
-    fun performLogout() {
-        viewModelScope.launch {
-            userPreferencesRepository.updateLoginStatus(false)
-        }
-    }
+
 
     fun userLoggedIn(isNewUser: Boolean) {
         viewModelScope.launch {

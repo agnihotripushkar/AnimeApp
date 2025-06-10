@@ -1,12 +1,13 @@
 <resources>
     <string name="app_name">AnimeApp</string>
+
     <string name="onBoarding_title1">Shop Smart. Eat Fresh.</string>
     <string name="onBoarding_title2">Groceries at Your Fingertips.</string>
     <string name="onBoarding_title3">Fresh Delivered, Hassle Free.</string>
-
     <string name="onBoarding_text1">Freshly delivered groceries at your fingertips.</string>
     <string name="onBoarding_text2">Add your favourite groceries to your cart.</string>
     <string name="onBoarding_text3">no notifications, no distractions.</string>
+
     <string name="trending_anime">Trending Anime</string>
     <string name="retry">Retry</string>
     <string name="skip">Skip</string>
@@ -24,5 +25,23 @@
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="create_an_account">Create an Account</string>
     <string name="login_instead">Already have an account? Login</string>
-    // Add any other specific error messages or button texts if needed
+
+    <string name="settings">Settings</string>
+    <string name="app_info">App Info</string>
+    <string name="back_button_desc">Back</string>
+    <string name="account_settings_section_title">Account Settings</string>
+    <string name="profile_info_title">Profile Info</string>
+    <string name="profile_info_subtitle">View/Update username, email, profile pic</string>
+    <string name="change_password_title">Change Password</string>
+    <string name="biometric_login_title">Biometric Login</string>
+    <string name="logout_title">Logout</string>
+    <string name="app_theme_section_title">App Theme</string>
+    <string name="theme_selection_title">Light / Dark / System Default</string>
+    <string name="app_language_title">App Language</string>
+    <string name="app_info_section_title">App Info</string>
+    <string name="app_version_title">App Version</string>
+    <string name="terms_conditions_title">Terms &amp; Conditions</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="an_error_occurred">An error occurred</string>
+    <string name="no_trending_anime_found">No trending anime found.</string>
 </resources>

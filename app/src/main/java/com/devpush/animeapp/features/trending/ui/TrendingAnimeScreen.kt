@@ -47,6 +47,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TrendingAnimeScreen(
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: TrendingAnimeViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -92,7 +93,7 @@ fun TrendingAnimeScreen(
                                 .padding(innerPadding),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("No trending anime found.")
+                            Text(stringResource(R.string.no_trending_anime_found))
                         }
                     } else {
                         Box( // Box to contain LazyColumn and FloatingToolbar
@@ -130,10 +131,7 @@ fun TrendingAnimeScreen(
                                     FloatingToolbarDefaults.VibrantFloatingActionButton(
                                         onClick = { /* */ },
                                     ) {
-                                        Icon(
-                                            Icons.AutoMirrored.Filled.Logout,
-                                            contentDescription = ""
-                                        )
+                                        Icon(Icons.Filled.Archive, contentDescription = "")
                                     }
                                 },
                                 modifier =
@@ -143,16 +141,14 @@ fun TrendingAnimeScreen(
                                 colors = vibrantColors,
                                 content = {
                                     IconButton(onClick = { /* */ }) {
-                                        Icon(Icons.Filled.Archive, contentDescription = "")
-                                    }
-                                    IconButton(onClick = { /* */ }) {
                                         Icon(Icons.Filled.Favorite, contentDescription = "")
                                     }
                                     IconButton(onClick = { /* */ }) {
                                         Icon(Icons.Filled.Bookmark, contentDescription = "")
                                     }
-                                    IconButton(onClick = { }) {
-                                        Icon(Icons.Filled.Settings, contentDescription = "")
+                                    IconButton(onClick = { onSettingsClick() }) {
+                                        Icon(Icons.Filled.Settings,
+                                            contentDescription = stringResource(R.string.settings))
                                     }
                                 }
                             )
@@ -169,7 +165,7 @@ fun TrendingAnimeScreen(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = targetState.message ?: "An error occurred",
+                                text = targetState.message ?: stringResource(R.string.an_error_occurred),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Spacer(modifier = Modifier.height(16.dp))

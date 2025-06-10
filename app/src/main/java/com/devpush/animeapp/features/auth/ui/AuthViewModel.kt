@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
-    private val userPreferencesRepository: UserPreferencesRepository, // Changed DataStore to UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -127,7 +127,7 @@ class AuthViewModel(
             try {
                 // Simulate API call
                 // val loginResponse = authRepository.loginCall(currentEmail, currentPassword)
-                delay(2000)
+                authRepository.loginCall()
 
                 // if (loginResponse.isSuccessful) {
                 userPreferencesRepository.updateLoginStatus(true)

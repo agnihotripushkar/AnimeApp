@@ -39,7 +39,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RegistrationScreen(
     modifier: Modifier = Modifier,
-    onRegisterSuccessNavigation: () -> Unit, // Changed from onRegisterClicked
+    onRegisterSuccessNavigation: () -> Unit,
     onLoginClicked: () -> Unit,
     viewModel: AuthViewModel = koinViewModel()
 ) {
@@ -81,7 +81,7 @@ fun RegistrationScreen(
                     )
                 )
                 .imePadding()
-                .padding(horizontal = 24.dp), // Added horizontal padding
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -93,17 +93,17 @@ fun RegistrationScreen(
             )
 
             Text(
-                text = stringResource(R.string.hi_there), // Use string resource
+                text = stringResource(R.string.hi_there),
                 modifier = Modifier.padding(vertical = 8.dp),
                 color = Color.White,
                 style = MaterialTheme.typography.displaySmall
             )
 
             Text(
-                text = stringResource(R.string.get_started_with_your_account), // Use string resource
-                modifier = Modifier.padding(bottom = 24.dp), // Adjusted padding
+                text = stringResource(R.string.get_started_with_your_account),
+                modifier = Modifier.padding(bottom = 24.dp),
                 color = Color.White,
-                style = MaterialTheme.typography.bodyLarge // Adjusted style
+                style = MaterialTheme.typography.bodyLarge
             )
 
             // --- Email TextField ---
@@ -124,7 +124,7 @@ fun RegistrationScreen(
                 leadingIcon = {
                     Icon(
                         painterResource(id = R.drawable.ic_person),
-                        contentDescription = "Email Icon"
+                        contentDescription = stringResource(R.string.your_email_hint)
                     )
                 },
                 colors = TextFieldDefaults.colors(
@@ -148,7 +148,7 @@ fun RegistrationScreen(
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = { viewModel.onRegistrationPasswordChanged(it) },
-                label = { Text(stringResource(R.string.your_password)) }, // Use string resource
+                label = { Text(stringResource(R.string.your_password)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -193,7 +193,7 @@ fun RegistrationScreen(
             OutlinedTextField(
                 value = uiState.confirmPassword,
                 onValueChange = { viewModel.onConfirmPasswordChanged(it) },
-                label = { Text(stringResource(R.string.confirm_password_hint)) }, // Use string resource
+                label = { Text(stringResource(R.string.confirm_password_hint)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -207,8 +207,8 @@ fun RegistrationScreen(
                 },
                 leadingIcon = {
                     Icon(
-                        painterResource(id = R.drawable.ic_key), // Can use the same key icon
-                        contentDescription = "Confirm Password Icon"
+                        painterResource(id = R.drawable.ic_key),
+                        contentDescription = stringResource(R.string.confirm_password_hint)
                     )
                 },
                 trailingIcon = {
@@ -246,7 +246,7 @@ fun RegistrationScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { viewModel.registerUser() }, // Call the ViewModel function
+                onClick = { viewModel.registerUser() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp), // Added height
@@ -265,21 +265,21 @@ fun RegistrationScreen(
             }
 
             Separator(
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp) // Increased vertical padding
+                modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
             )
 
             Button(
                 onClick = onLoginClicked,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp) // Added height
-                    .padding(bottom = 32.dp), // Increased bottom padding
+                    .height(50.dp)
+                    .padding(bottom = 32.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryVioletLight,
                     contentColor = Color.White
                 )
             ) {
-                Text(text = stringResource(R.string.login_instead)) // Use string resource
+                Text(text = stringResource(R.string.login_instead))
             }
         }
     }
