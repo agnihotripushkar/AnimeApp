@@ -56,4 +56,16 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : 
     fun retryFetchTrendingAnime() {
         fetchTrendingAnime()
     }
+
+    fun starAnime(animeId: String) {
+        Timber.tag(TAG).d("Starring anime: %s", animeId)
+        // In a real scenario, you would call a use case or repository here
+        // to update the starred status of the anime.
+    }
+
+    fun archiveAnime(animeId: String) {
+        Timber.tag(TAG).d("Archiving anime: %s", animeId)
+        // In a real scenario, you would call a use case or repository here
+        // to update the archived status of the anime.
+    }
 }

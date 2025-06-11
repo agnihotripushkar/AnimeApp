@@ -27,6 +27,7 @@ import com.devpush.animeapp.core.navigation.NavGraph
 import com.devpush.animeapp.features.auth.ui.login.LoginScreen
 import com.devpush.animeapp.features.settings.ui.utils.SettingsItem
 import com.devpush.animeapp.features.settings.ui.utils.SettingsSwitchItem
+import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -117,8 +118,7 @@ fun SettingsScreen(
 @Preview(showBackground = true)
 @Composable
 fun SettingsScreenPreview() {
-    // You might need to wrap this with your app's theme for the preview to render correctly
-    // WeatherAppTheme { // Assuming your theme is WeatherAppTheme
-    SettingsScreen(rememberNavController())
-    // }
+    AnimeAppTheme {
+        SettingsScreen(rememberNavController())
+    }
 }

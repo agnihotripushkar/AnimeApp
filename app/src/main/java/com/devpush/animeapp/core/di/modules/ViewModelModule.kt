@@ -1,5 +1,6 @@
 package com.devpush.animeapp.core.di.modules
 
+import com.devpush.animeapp.features.archived.ui.ArchivedAnimeViewModel
 import com.devpush.animeapp.features.auth.ui.AuthViewModel
 import com.devpush.animeapp.features.details.ui.DetailsScreenViewModel
 import com.devpush.animeapp.features.main.ui.MainViewModel

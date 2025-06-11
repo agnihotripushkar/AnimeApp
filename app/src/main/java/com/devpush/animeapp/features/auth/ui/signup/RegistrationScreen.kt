@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.devpush.animeapp.R
 import com.devpush.animeapp.features.auth.ui.AuthViewModel
-import com.devpush.animeapp.features.auth.ui.utils.Separator // Assuming you have this
+import com.devpush.animeapp.features.auth.ui.utils.Separator
 import com.devpush.animeapp.ui.theme.PrimaryViolet
 import com.devpush.animeapp.ui.theme.PrimaryVioletDark
 import com.devpush.animeapp.ui.theme.PrimaryVioletLight
@@ -43,7 +43,7 @@ fun RegistrationScreen(
     onLoginClicked: () -> Unit,
     viewModel: AuthViewModel = koinViewModel()
 ) {
-    val uiState by viewModel.registrationUiState.collectAsState() // Use registrationUiState
+    val uiState by viewModel.registrationUiState.collectAsState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
@@ -53,8 +53,8 @@ fun RegistrationScreen(
 
     LaunchedEffect(keyboardHeight) {
         coroutineScope.launch {
-            if (keyboardHeight > 0) { // Only scroll if keyboard is actually visible
-                scrollState.scrollBy(keyboardHeight.toFloat() * 1.5f) // Adjust multiplier as needed
+            if (keyboardHeight > 0) {
+                scrollState.scrollBy(keyboardHeight.toFloat() * 1.5f)
             }
         }
     }
@@ -88,7 +88,7 @@ fun RegistrationScreen(
                 painter = painterResource(R.drawable.img_coder_w),
                 contentDescription = "Registration Image",
                 modifier = Modifier
-                    .size(280.dp) // Adjusted size
+                    .size(280.dp)
                     .padding(top = 32.dp, bottom = 16.dp)
             )
 
@@ -249,7 +249,7 @@ fun RegistrationScreen(
                 onClick = { viewModel.registerUser() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp), // Added height
+                    .height(50.dp),
                 enabled = !uiState.isLoading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryVioletDark,
@@ -272,8 +272,7 @@ fun RegistrationScreen(
                 onClick = onLoginClicked,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(bottom = 32.dp),
+                    .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryVioletLight,
                     contentColor = Color.White

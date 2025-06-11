@@ -15,6 +15,9 @@ import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
 import com.devpush.animeapp.features.details.ui.DetailsScreen
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 import androidx.compose.runtime.getValue
+import com.devpush.animeapp.features.archived.ui.ArchivedAnimeScreen
+import com.devpush.animeapp.features.bookmarked.ui.BookmarkedAnimeScreen
+import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeScreen
 import com.devpush.animeapp.features.settings.ui.SettingsScreen
 
 @Composable
@@ -91,6 +94,15 @@ fun Navigation(
                 },
                 onSettingsClick = {
                     navHost.navigate(NavGraph.Settings.route)
+                },
+                onArchiveClick = {
+                    navHost.navigate(NavGraph.ArchivedAnime.route)
+                },
+                onFavoriteClick = {
+                    navHost.navigate(NavGraph.FavoritedAnime.route)
+                },
+                onBookmarkClick = {
+                    navHost.navigate(NavGraph.BookmarkedAnime.route)
                 }
             )
         }
@@ -113,6 +125,16 @@ fun Navigation(
 
         composable(NavGraph.Settings.route) {
             SettingsScreen(navController = navHost,)
+        }
+
+        composable(route = NavGraph.ArchivedAnime.route) {
+            ArchivedAnimeScreen(navController = navHost)
+        }
+        composable(route = NavGraph.FavoritedAnime.route) {
+            FavoritedAnimeScreen(navController = navHost)
+        }
+        composable(route = NavGraph.BookmarkedAnime.route) {
+            BookmarkedAnimeScreen(navController = navHost)
         }
     }
 }

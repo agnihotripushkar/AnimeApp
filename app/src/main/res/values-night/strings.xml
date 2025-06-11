@@ -18,4 +18,12 @@
     <string name="app_info">App Info</string>
     <string name="an_error_occurred">An error occurred</string>
     <string name="no_trending_anime_found">No trending anime found.</string>
+    <string name="favorite">Favorite</string>
+    <string name="bookmark">BookMark</string>
+    <string name="archived_anime">Archived Anime</string>
+    <string name="no_archived_animes_yet">No archived animes yet.</string>
+    <string name="favorited_anime">Favorite Animes</string>
+    <string name="no_favorited_animes_yet">No favorited animes yet.</string>
+    <string name="bookmarked_anime">BookMarked Anime</string>
+    <string name="no_bookmarked_animes_yet">No BookMarked Animes Found</string>
 </resources>

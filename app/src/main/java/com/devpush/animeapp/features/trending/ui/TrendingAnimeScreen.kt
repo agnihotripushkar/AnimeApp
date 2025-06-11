@@ -48,6 +48,9 @@ import org.koin.androidx.compose.koinViewModel
 fun TrendingAnimeScreen(
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
     onSettingsClick: () -> Unit,
+    onArchiveClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    onBookmarkClick: () -> Unit,
     viewModel: TrendingAnimeViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -121,7 +124,9 @@ fun TrendingAnimeScreen(
                                                 animeDataList[index].attributes.posterImage.original,
                                                 animeDataList[index].id
                                             )
-                                        }
+                                        },
+                                        onStar = { viewModel.starAnime(animeDataList[index].id) },
+                                        onArchive = { viewModel.archiveAnime(animeDataList[index].id) }
                                     )
                                 }
                             }
@@ -129,7 +134,7 @@ fun TrendingAnimeScreen(
                                 expanded = expanded,
                                 floatingActionButton = {
                                     FloatingToolbarDefaults.VibrantFloatingActionButton(
-                                        onClick = { /* */ },
+                                        onClick = { onArchiveClick() },
                                     ) {
                                         Icon(Icons.Filled.Archive, contentDescription = "")
                                     }
@@ -140,15 +145,17 @@ fun TrendingAnimeScreen(
                                         .padding(all = 16.dp),
                                 colors = vibrantColors,
                                 content = {
-                                    IconButton(onClick = { /* */ }) {
-                                        Icon(Icons.Filled.Favorite, contentDescription = "")
+                                    IconButton(onClick = { onFavoriteClick() }) {
+                                        Icon(Icons.Filled.Favorite, contentDescription = stringResource(R.string.favorite))
                                     }
-                                    IconButton(onClick = { /* */ }) {
-                                        Icon(Icons.Filled.Bookmark, contentDescription = "")
+                                    IconButton(onClick = { onBookmarkClick() }) {
+                                        Icon(Icons.Filled.Bookmark, contentDescription = stringResource(R.string.bookmark))
                                     }
                                     IconButton(onClick = { onSettingsClick() }) {
-                                        Icon(Icons.Filled.Settings,
-                                            contentDescription = stringResource(R.string.settings))
+                                        Icon(
+                                            Icons.Filled.Settings,
+                                            contentDescription = stringResource(R.string.settings)
+                                        )
                                     }
                                 }
                             )
@@ -165,7 +172,8 @@ fun TrendingAnimeScreen(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = targetState.message ?: stringResource(R.string.an_error_occurred),
+                                text = targetState.message
+                                    ?: stringResource(R.string.an_error_occurred),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Spacer(modifier = Modifier.height(16.dp))
