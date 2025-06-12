@@ -4,14 +4,12 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Favorite
@@ -56,7 +54,8 @@ fun TrendingAnimeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var expanded by rememberSaveable { mutableStateOf(true) }
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
-    val standardColors = FloatingToolbarDefaults.standardFloatingToolbarColors() // Not used
+    // Not used
+    val standardColors = FloatingToolbarDefaults.standardFloatingToolbarColors()
 
     Scaffold(
         topBar = {
@@ -102,17 +101,10 @@ fun TrendingAnimeScreen(
                         Box( // Box to contain LazyColumn and FloatingToolbar
                             Modifier
                                 .fillMaxSize()
-                                .padding(innerPadding) // Apply padding from Scaffold
+                                .padding(innerPadding)
                         ) {
                             LazyColumn(
-                                contentPadding = PaddingValues(
-                                    top = 10.dp,
-                                    start = 20.dp,
-                                    end = 20.dp,
-                                    // Adjust bottom padding if toolbar is present or not
-                                    bottom = innerPadding.calculateBottomPadding() + 10.dp + if (expanded) 72.dp else 10.dp
-                                ),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalArrangement = Arrangement.spacedBy(0.dp)
                             ) {
                                 items(
                                     animeDataList.size
@@ -146,10 +138,16 @@ fun TrendingAnimeScreen(
                                 colors = vibrantColors,
                                 content = {
                                     IconButton(onClick = { onFavoriteClick() }) {
-                                        Icon(Icons.Filled.Favorite, contentDescription = stringResource(R.string.favorite))
+                                        Icon(
+                                            Icons.Filled.Favorite,
+                                            contentDescription = stringResource(R.string.favorite)
+                                        )
                                     }
                                     IconButton(onClick = { onBookmarkClick() }) {
-                                        Icon(Icons.Filled.Bookmark, contentDescription = stringResource(R.string.bookmark))
+                                        Icon(
+                                            Icons.Filled.Bookmark,
+                                            contentDescription = stringResource(R.string.bookmark)
+                                        )
                                     }
                                     IconButton(onClick = { onSettingsClick() }) {
                                         Icon(

@@ -26,9 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.devpush.animeapp.domian.model.AnimeData
+import com.devpush.animeapp.ui.theme.AnimeAppTheme
 
 @Composable
 fun AnimeCard(
@@ -63,7 +65,7 @@ fun AnimeCard(
         enableDismissFromEndToStart = true, // Enable swipe left (Archive)
         backgroundContent = {
             val color = when (dismissState.dismissDirection) {
-                SwipeToDismissBoxValue.StartToEnd -> Color.Yellow.copy(alpha = 0.5f) // Star
+                SwipeToDismissBoxValue.StartToEnd -> Color.Red.copy(alpha = 0.5f) // Star
                 SwipeToDismissBoxValue.EndToStart -> Color.Blue.copy(alpha = 0.5f)  // Archive
                 else -> Color.Transparent
             }
@@ -91,11 +93,14 @@ fun AnimeCard(
             }
         }
     ) {
-        Card(onClick = onClick) {
+        Card(
+            onClick = onClick,
+            shape = RoundedCornerShape(0.dp),
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.padding(6.dp)
+                modifier = Modifier.padding(10.dp)
             ) {
                 AsyncImage(
                     model = anime.attributes.posterImage.original,
