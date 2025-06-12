@@ -1,13 +1,10 @@
 package com.devpush.animeapp.features.trending.ui
 
-import android.app.Application
 import android.content.ContentValues.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.core.network.NetworkResult
 import com.devpush.animeapp.features.trending.domain.repository.TrendingAnimeRepository
-import com.devpush.animeapp.utils.Constants
-import com.devpush.animeapp.utils.DataStoreUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

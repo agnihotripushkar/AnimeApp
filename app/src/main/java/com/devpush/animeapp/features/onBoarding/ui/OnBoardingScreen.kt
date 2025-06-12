@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,7 +20,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -39,37 +37,6 @@ import com.devpush.animeapp.ui.theme.Gray400
 import com.devpush.animeapp.ui.theme.PrimaryGreen
 import com.devpush.animeapp.ui.theme.PrimaryGreenDark
 import com.devpush.animeapp.ui.theme.PrimaryGreenLight
-import com.devpush.animeapp.utils.Constants
-import com.devpush.animeapp.utils.DataStoreUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-
-//fun goToLastPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
-//    val skipPage = pagerState.pageCount - 1
-//    coroutineScope.launch {
-//        pagerState.animateScrollToPage(skipPage)
-//    }
-//}
-//
-//fun goToNextPage(
-//    pagerState: PagerState,
-//    coroutineScope: CoroutineScope,
-//    onGetStartedClicked: () -> Unit
-//) {
-//    val currPage = pagerState.currentPage
-//    if (currPage < pagerState.pageCount - 2) {
-//        val skipPage = pagerState.currentPage + 1
-//        coroutineScope.launch {
-//            pagerState.animateScrollToPage(skipPage)
-//        }
-//    } else {
-//        goToHomepage(onGetStartedClicked)
-//    }
-//}
-
-//fun goToHomepage(onGetStartedClicked: () -> Unit) {
-//    onGetStartedClicked
-//}
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

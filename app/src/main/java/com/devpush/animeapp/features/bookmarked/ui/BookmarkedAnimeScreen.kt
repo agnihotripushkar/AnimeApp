@@ -24,13 +24,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.R
+import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
 fun BookmarkedAnimeScreen(
     navController: NavController,
@@ -65,17 +70,15 @@ fun BookmarkedAnimeScreen(
                 ContainedLoadingIndicator()
             } else if (uiState.error != null) {
                 Text("Error: ${uiState.error}")
-            }
-            else if (uiState.animes.isEmpty()) {
+            } else if (uiState.animes.isEmpty()) {
                 Text(stringResource(R.string.no_bookmarked_animes_yet))
-            }
-            else {
+            } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(uiState.animes) {animeTitle ->
+                    items(uiState.animes) { animeTitle ->
                         Text(
                             text = animeTitle,
                             style = MaterialTheme.typography.bodyLarge,
@@ -85,5 +88,19 @@ fun BookmarkedAnimeScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Bookmarked Screen Preview")
+@Composable
+fun BookmarkedAnimeScreenPreview() {
+    val navController = rememberNavController()
+    val previewViewModel = BookmarkedAnimeViewModel()
+
+    AnimeAppTheme {
+        BookmarkedAnimeScreen(
+            navController = navController,
+            viewModel = previewViewModel
+        )
     }
 }
