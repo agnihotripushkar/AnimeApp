@@ -8,7 +8,6 @@ import com.devpush.animeapp.core.di.modules.presentationModule
 import org.koin.dsl.module
 
 val appModule = module {
-    // Add application-wide dependencies here
     includes(
         dataStoreModule, databaseModule,
         networkKoinModule, RepositoryModule,

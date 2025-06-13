@@ -113,7 +113,7 @@ fun TrendingAnimeScreen(
                                         anime = animeDataList[index],
                                         onClick = {
                                             onAnimeClick(
-                                                animeDataList[index].attributes.posterImage.original,
+                                                animeDataList[index].attributes.posterImage.originalUrl,
                                                 animeDataList[index].id
                                             )
                                         },

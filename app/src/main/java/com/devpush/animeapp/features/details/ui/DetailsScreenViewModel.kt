@@ -13,21 +13,19 @@ import timber.log.Timber
 
 class DetailsScreenViewModel(private val repository: AnimeDetailsRepository) : ViewModel() {
 
-    // Default to Loading or an Idle state
     private val _uiState = MutableStateFlow<DetailsScreenUiState>(DetailsScreenUiState.Loading)
     val uiState: StateFlow<DetailsScreenUiState> = _uiState.asStateFlow()
 
     fun fetchAnime(id: Int) {
 
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.value = DetailsScreenUiState.Loading // Set to loading before making the call
-            when (val apiResult = repository.getAnime(id)) { // Make the call and process immediately
+            _uiState.value = DetailsScreenUiState.Loading
+            when (val apiResult = repository.getAnime(id)) {
                 is NetworkResult.Loading -> {
                     _uiState.value = DetailsScreenUiState.Loading
                 }
 
                 is NetworkResult.Success -> {
-                    // Successfully fetched DTO, now map it to domain model
                     val animeData = apiResult.data.toModel()
                     _uiState.value = DetailsScreenUiState.Success(animeData)
                 }

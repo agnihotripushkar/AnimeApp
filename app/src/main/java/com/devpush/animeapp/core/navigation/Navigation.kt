@@ -15,6 +15,7 @@ import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
 import com.devpush.animeapp.features.details.ui.DetailsScreen
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import com.devpush.animeapp.features.archived.ui.ArchivedAnimeScreen
 import com.devpush.animeapp.features.bookmarked.ui.BookmarkedAnimeScreen
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeScreen
@@ -26,14 +27,16 @@ fun Navigation(
 ) {
     val navHost = rememberNavController()
 
-    val isLogin by mainViewModel.isLogin.collectAsState()
-    val isOnboardingShown by mainViewModel.isOnboardingShown.collectAsState()
+    val isLogin = mainViewModel.isLogin.collectAsState().value
+    val isOnboardingShown = mainViewModel.isOnboardingShown.collectAsState().value
 
-    val startDestination = when {
-        isLogin == true && isOnboardingShown == false -> NavGraph.OnBoarding.route
-        isLogin == true -> NavGraph.TrendingAnime.route
-        else -> NavGraph.Login.route
+    val startDestination = remember(isLogin) {
+        when {
+            isLogin == true -> NavGraph.TrendingAnime.route
+            else -> NavGraph.Login.route
+        }
     }
+
 
     NavHost(
         navController = navHost,

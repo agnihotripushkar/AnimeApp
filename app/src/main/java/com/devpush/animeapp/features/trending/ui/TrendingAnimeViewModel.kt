@@ -17,41 +17,65 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : 
     val uiState = _uiState.asStateFlow()
 
     init {
-        fetchTrendingAnime()
+        fetchTrendingAnimeFromServer(initialLoad = true)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getTrendingAnimeFromDb().collect { animeList ->
+                if (animeList.isNotEmpty()) {
+                    _uiState.value = TrendingAnimeUiState.Success(animeList)
+                } else {
+                    if (_uiState.value !is TrendingAnimeUiState.Error && _uiState.value !is TrendingAnimeUiState.Loading) {
+                        // DB became empty (e.g. after a refresh that returned nothing),
+                        // and we are not in an error state or currently loading from server.
+                        _uiState.value =
+                            TrendingAnimeUiState.Success(emptyList()) // Or a specific "No data" state
+                    }
+                }
+            }
+        }
+
     }
 
-    private fun fetchTrendingAnime() {
+    private fun fetchTrendingAnimeFromServer(initialLoad: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = TrendingAnimeUiState.Loading
             when (val apiResult = repository.getTrendingAnime()) {
                 is NetworkResult.Loading -> {
-                    _uiState.value = TrendingAnimeUiState.Loading
                 }
 
                 is NetworkResult.Success -> {
-                    try {
-                        val animeDataList = apiResult.data.toModel()
-                        _uiState.value = TrendingAnimeUiState.Success(animeDataList)
-
-                    } catch (e: Exception) {
-                        Timber.tag(TAG).e(e, "Error mapping DTO to domain model")
-                        _uiState.value = TrendingAnimeUiState.Error("Error processing data", e)
+                    val animeDataList = apiResult.data.toModel()
+                    if (animeDataList.isEmpty() &&
+                        (_uiState.value as? TrendingAnimeUiState.Success)?.animeList?.isEmpty() == true) {
+                        _uiState.value = TrendingAnimeUiState.Success(emptyList())
+                    }
+                    else{
+                        repository.saveTrendingAnime(animeDataList)
                     }
                 }
 
                 is NetworkResult.Error -> {
                     Timber.tag(TAG)
-                        .e(apiResult.exception, "getTrendingAnime failed: ${apiResult.message}")
-                    _uiState.value =
-                        TrendingAnimeUiState.Error(apiResult.message, apiResult.exception)
-                }
+                        .e(
+                            apiResult.exception,
+                            "fetchTrendingAnimeFromServer failed: ${apiResult.message}"
+                        )
+                    if ((_uiState.value as? TrendingAnimeUiState.Success)?.animeList?.isEmpty() != false) {
+                        _uiState.value =
+                            TrendingAnimeUiState.Error(apiResult.message, apiResult.exception)
+                    } else {
+                        Timber.tag(TAG).w(
+                            apiResult.exception,
+                            "fetchTrendingAnimeFromServer failed but showing stale data: ${apiResult.message}"
+                        )
 
+                    }
+                }
             }
         }
     }
 
     fun retryFetchTrendingAnime() {
-        fetchTrendingAnime()
+        fetchTrendingAnimeFromServer(initialLoad = false)
     }
 
     fun starAnime(animeId: String) {

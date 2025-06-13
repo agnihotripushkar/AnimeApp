@@ -25,12 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.devpush.animeapp.domian.model.AnimeData
+import com.devpush.animeapp.R
+import com.devpush.animeapp.data.local.entities.AnimeDataEntity
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -45,20 +47,12 @@ fun DetailsScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    // State for the LazyColumn in DetailsScreen to control FAB visibility
     val detailsListState = rememberLazyListState()
-//    val fabVisible by remember {
-//        derivedStateOf {
-//            // Show FAB if list is at the top OR if the menu is already expanded
-//            detailsListState.firstVisibleItemIndex == 0
-//        }
-//    }
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     when (val state = uiState) {
         is DetailsScreenUiState.Success -> {
-            val anime: AnimeData? = state.animeData
+            val anime: AnimeDataEntity? = state.animeData
             if (anime != null) {
                 Scaffold(
                     floatingActionButton = {
@@ -66,7 +60,7 @@ fun DetailsScreen(
                             listOf(
                                 Icons.Filled.Bookmark to "BookMark",
                                 Icons.Filled.Favorite to "Favorite",
-                                Icons.Filled.Archive to "Archive", // Use the correct AutoMirrored import
+                                Icons.Filled.Archive to "Archive",
                             )
 
                         FloatingActionButtonMenu(
@@ -76,7 +70,7 @@ fun DetailsScreen(
                                 ToggleFloatingActionButton(
                                     modifier = Modifier.animateFloatingActionButton( // Apply animation here
                                         visible = true,
-                                        alignment = Alignment.BottomEnd // Ensure this alignment is what you want for the button itself
+                                        alignment = Alignment.BottomEnd
                                     ),
                                     checked = fabMenuExpanded,
                                     // for large size
@@ -97,8 +91,8 @@ fun DetailsScreen(
                                     }
                                     Icon(
                                         painter = rememberVectorPainter(imageVector),
-                                        contentDescription = if (fabMenuExpanded) "Close menu" else "Open menu", // Add Content Description
-                                        modifier = Modifier.animateIcon({ checkedProgress }) // Pass the animated progress
+                                        contentDescription = if (fabMenuExpanded) "Close menu" else "Open menu",
+                                        modifier = Modifier.animateIcon({ checkedProgress })
                                     )
                                 }
                             }
@@ -114,25 +108,25 @@ fun DetailsScreen(
                                             item.first,
                                             contentDescription = null
                                         )
-                                    }, // Add specific content descriptions if possible
+                                    },
                                     text = { Text(text = item.second) },
                                 )
                             }
                         }
                     },
-                    floatingActionButtonPosition = FabPosition.End // Standard position for FAB
+                    floatingActionButtonPosition = FabPosition.End
                 ) { innerPadding ->
                     LazyColumn(
-                        state = detailsListState, // Use the state here
+                        state = detailsListState,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding), // Apply innerPadding from Scaffold
+                            .padding(innerPadding),
                         horizontalAlignment = Alignment.Start
                     ) {
                         item {
                             AsyncImage(
                                 model = coverImage,
-                                contentDescription = "Anime Cover Image", // Add Content Description
+                                contentDescription = "Anime Cover Image",
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(300.dp)
@@ -153,7 +147,7 @@ fun DetailsScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = anime?.attributes?.canonicalTitle ?: "Unknown Title",
+                                    text = anime.attributes.canonicalTitle ?: stringResource(R.string.unknown_title),
                                     style = MaterialTheme.typography.displaySmall,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center
@@ -163,7 +157,7 @@ fun DetailsScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = anime?.attributes?.startDate?.split("-")?.first()
+                                        text = anime.attributes.startDate?.split("-")?.first()
                                             ?: "N/A",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Medium
@@ -178,7 +172,7 @@ fun DetailsScreen(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Rounded.Star,
-                                            contentDescription = "Rating Star", // Add Content Description
+                                            contentDescription = "Rating Star",
                                             modifier = Modifier.padding(end = 4.dp)
                                         )
                                         Text(
@@ -195,13 +189,13 @@ fun DetailsScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = "Synopsis",
+                                        text = stringResource(R.string.synopsis),
                                         style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.Bold
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp)) // Add some space
+                                    Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = anime?.attributes?.synopsis
+                                        text = anime.attributes.synopsis
                                             ?: "No synopsis available."
                                     )
                                 }
@@ -212,14 +206,14 @@ fun DetailsScreen(
                 }
             } else {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Anime not found")
+                    Text(text = stringResource(R.string.anime_not_found))
                 }
             }
         }
 
         is DetailsScreenUiState.Error -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = state.message ?: "An error occurred")
+                Text(text = state.message ?: stringResource(R.string.an_error_occurred))
             }
 
         }

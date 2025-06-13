@@ -1,37 +1,35 @@
-package com.devpush.animeapp.core.network.dto
+package com.devpush.animeapp.features.trending.data.remote.responsebody
 
-import com.devpush.animeapp.domian.model.AnimeData
-import com.devpush.animeapp.domian.model.Attributes
-import com.devpush.animeapp.domian.model.CoverImage
-import com.devpush.animeapp.domian.model.PosterImage
-import com.devpush.animeapp.domian.model.Titles
+import com.devpush.animeapp.data.local.entities.AnimeAttributesDb
+import com.devpush.animeapp.data.local.entities.AnimeDataEntity
+import com.devpush.animeapp.data.local.entities.PosterImageDb
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TrendingAnimeListDto(
-    val data: List<AnimeDataDto>
+data class TrendingAnimeListResponse(
+    val data: List<AnimeDataResponse>
 ) {
-    fun toModel(): List<AnimeData> =
+    fun toModel(): List<AnimeDataEntity> =
         data.map { it.toModel() }
 }
 
 @Serializable
 data class AnimeResponseDto(
-    val data: AnimeDataDto
+    val data: AnimeDataResponse
 ) {
-    fun toModel(): AnimeData = data.toModel()
+    fun toModel(): AnimeDataEntity = data.toModel()
 }
 
 @Serializable
-data class AnimeDataDto(
+data class AnimeDataResponse(
     val id: String,
     val type: String,
     val links: LinksDto,
     val attributes: AttributesDto,
     val relationships: RelationshipsDto
 ) {
-    fun toModel(): AnimeData =
-        AnimeData(
+    fun toModel(): AnimeDataEntity =
+        AnimeDataEntity(
             id = id,
             attributes = attributes.toModel()
         )
@@ -44,7 +42,6 @@ data class AttributesDto(
     val slug: String?,
     val synopsis: String?,
     val coverImageTopOffset: Int,
-    val titles: TitlesDto,
     val canonicalTitle: String?,
     val abbreviatedTitles: List<String>,
     val averageRating: String?,
@@ -61,49 +58,20 @@ data class AttributesDto(
     val status: String,
     val tba: String?,
     val posterImage: PosterImageDto,
-    val coverImage: CoverImageDto,
     val episodeCount: Int?,
     val episodeLength: Int?,
     val youtubeVideoId: String?,
     val showType: String?,
     val nsfw: Boolean
 ) {
-    fun toModel(): Attributes =
-        Attributes(
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-            slug = slug,
+    fun toModel(): AnimeAttributesDb =
+        AnimeAttributesDb(
             synopsis = synopsis,
-            titles = titles.toModel(),
             canonicalTitle = canonicalTitle,
-            abbreviatedTitles = abbreviatedTitles,
-            ageRating = ageRatingGuide,
-            coverImage = coverImage.toModel(),
-            subtype = subtype,
-            posterImage = posterImage.toModel(),
-            episodeCount = episodeCount,
-            episodeLength = episodeLength,
-            showType = showType,
-            ageRatingGuide = ageRatingGuide,
-            favoritesCount = favoritesCount,
-            popularityRank = popularityRank,
-            status = status,
-            endDate = endDate,
-            startDate = startDate,
-            userCount = userCount,
             averageRating = averageRating,
-            ratingRank = ratingRank
+            posterImage = posterImage.toModel(),
+            startDate = startDate
         )
-}
-
-@Serializable
-data class TitlesDto(
-    val en: String? = null,
-    val en_jp: String?,
-    val ja_jp: String?
-) {
-    fun toModel(): Titles =
-        Titles(en = en)
 }
 
 @Serializable
@@ -115,13 +83,9 @@ data class PosterImageDto(
     val original: String,
     val meta: MetaDto?
 ) {
-    fun toModel(): PosterImage =
-        PosterImage(
-            tiny = tiny,
-            small = small,
-            medium = medium,
-            large = large,
-            original = original
+    fun toModel(): PosterImageDb =
+        PosterImageDb(
+            originalUrl = original
         )
 }
 
@@ -143,22 +107,6 @@ data class SizeDto(
     val height: Int? = null
 )
 
-@Serializable
-data class CoverImageDto(
-    val tiny: String,
-    val small: String,
-    val large: String,
-    val original: String,
-    val meta: MetaDto?
-) {
-    fun toModel(): CoverImage =
-        CoverImage(
-            tiny = tiny,
-            small = small,
-            large = large,
-            original = original
-        )
-}
 
 @Serializable
 data class RelationshipsDto(

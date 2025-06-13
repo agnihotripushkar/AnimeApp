@@ -1,10 +1,10 @@
 package com.devpush.animeapp.features.details.ui
 
-import com.devpush.animeapp.domian.model.AnimeData
+import com.devpush.animeapp.data.local.entities.AnimeDataEntity
 
 sealed interface DetailsScreenUiState {
     data object Loading : DetailsScreenUiState
-    data class Success(val animeData: AnimeData) : DetailsScreenUiState
+    data class Success(val animeData: AnimeDataEntity) : DetailsScreenUiState
     data class Error(val message: String?, val exception: Throwable? = null) : DetailsScreenUiState
-    data object Idle : DetailsScreenUiState // Optional: for an initial, pre-loading state
+    data object Idle : DetailsScreenUiState
 }

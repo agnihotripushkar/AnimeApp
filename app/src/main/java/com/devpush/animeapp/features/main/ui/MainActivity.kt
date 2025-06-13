@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.devpush.animeapp.R
 import com.devpush.animeapp.core.navigation.Navigation
 import com.devpush.animeapp.ui.theme.AnimeAppTheme
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
 
@@ -20,14 +23,22 @@ class MainActivity : ComponentActivity() {
 
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                // Keep splash screen until authViewModel.isInitialized is true
-                mainViewModel.isOnboardingShown.value?.not() == true
+                val isDataReady = mainViewModel.isInitialized.value
+                !isDataReady
             }
         }
+
         enableEdgeToEdge()
+
         setContent {
             AnimeAppTheme {
-                Navigation(mainViewModel)
+                val isInitialized by mainViewModel.isInitialized.collectAsState()
+                if (isInitialized) {
+                    Navigation(mainViewModel = mainViewModel)
+                } else {
+                    Timber.tag("MainActivity")
+                        .d("setContent: Showing nothing as still initializing (splash should be visible).")
+                }
             }
         }
     }

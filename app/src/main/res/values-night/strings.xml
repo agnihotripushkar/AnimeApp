@@ -26,4 +26,7 @@
     <string name="no_favorited_animes_yet">No favorited animes yet.</string>
     <string name="bookmarked_anime">BookMarked Anime</string>
     <string name="no_bookmarked_animes_yet">No BookMarked Animes Found</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="anime_not_found">Anime not found</string>
+    <string name="unknown_title">Unknown Title</string>
 </resources>

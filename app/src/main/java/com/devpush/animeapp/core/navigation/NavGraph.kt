@@ -1,4 +1,4 @@
-package com.devpush.animeapp.core.navigation // Or your actual package
+package com.devpush.animeapp.core.navigation
 
 import android.net.Uri
 import com.devpush.animeapp.utils.Constants.ARCHIVED_ANIME_SCREEN
