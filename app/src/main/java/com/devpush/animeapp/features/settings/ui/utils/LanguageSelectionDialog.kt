@@ -32,7 +32,7 @@ fun LanguageSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.app_language_title)) }, // Reusing existing title
+        title = { Text(stringResource(R.string.app_language_title)) },
         text = {
             Column {
                 languages.forEach { (languageName, languageCode) ->

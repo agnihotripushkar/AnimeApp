@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.devpush.animeapp"
-        minSdk = 26
+        minSdk = 31
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -49,12 +49,17 @@ android {
         compose = true
         buildConfig = true
     }
+
+    androidResources {
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.compose.navigation)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))

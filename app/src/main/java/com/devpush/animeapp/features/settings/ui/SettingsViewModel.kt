@@ -15,14 +15,14 @@ class SettingsViewModel(private val userPreferencesRepository: UserPreferencesRe
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = "system" // Default value, will be updated by the flow
+            initialValue = "system"
         )
 
     val appLanguage: StateFlow<String> = userPreferencesRepository.appLanguageFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = "en" // Default value, will be updated by the flow
+            initialValue = "en"
         )
 
     fun setAppTheme(theme: String) {
