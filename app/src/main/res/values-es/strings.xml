@@ -1,0 +1,69 @@
+<resources>
+    <string name="app_name">AnimeApp</string>
+
+    <string name="onBoarding_title1">Compra Inteligente. Come Fresco.</string>
+    <string name="onBoarding_title2">Comestibles a Tu Alcance.</string>
+    <string name="onBoarding_title3">Fresco y Entregado, Sin Complicaciones.</string>
+    <string name="onBoarding_text1">Comestibles frescos entregados a tu alcance.</string>
+    <string name="onBoarding_text2">Añade tus comestibles favoritos a tu carrito.</string>
+    <string name="onBoarding_text3">sin notificaciones, sin distracciones.</string>
+
+    <string name="animes">Animes</string>
+    <string name="retry">Reintentar</string>
+    <string name="skip">Omitir</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="register_here">Regístrate Aquí</string>
+    <string name="your_password">Tu Contraseña</string>
+    <string name="you_email">Tu correo electrónico</string>
+    <string name="please_login">Por favor, inicia sesión</string>
+    <string name="welcome_back">¡Bienvenido de nuevo!</string>
+    <string name="get_started_with_your_account">¡Empieza con tu cuenta!</string>
+    <string name="hi_there">¡Hola!</string>
+    <string name="lets_get_started">Comencemos</string>
+    <string name="your_email_hint">Tu correo electrónico</string>
+    <string name="create_password_hint">Crear Contraseña</string>
+    <string name="confirm_password_hint">Confirmar Contraseña</string>
+    <string name="create_an_account">Crear una Cuenta</string>
+    <string name="login_instead">¿Ya tienes una cuenta? Inicia sesión</string>
+
+    <string name="settings">Ajustes</string>
+    <string name="app_info">Información de la App</string>
+    <string name="back_button_desc">Atrás</string>
+    <string name="account_settings_section_title">Ajustes de Cuenta</string>
+    <string name="profile_info_title">Información de Perfil</string>
+    <string name="profile_info_subtitle">Ver/Actualizar nombre de usuario, correo electrónico, foto de perfil</string>
+    <string name="change_password_title">Cambiar Contraseña</string>
+    <string name="biometric_login_title">Inicio de Sesión Biométrico</string>
+    <string name="logout_title">Cerrar Sesión</string>
+    <string name="app_theme_section_title">Tema de la App</string>
+    <string name="theme_selection_title">Claro / Oscuro / Predeterminado del Sistema</string>
+    <string name="app_language_title">Idioma de la App</string>
+    <string name="app_info_section_title">Información de la App</string>
+    <string name="app_version_title">Versión de la App</string>
+    <string name="terms_conditions_title">Términos &amp; Condiciones</string>
+    <string name="privacy_policy_title">Política de Privacidad</string>
+    <string name="an_error_occurred">Ocurrió un error</string>
+    <string name="no_trending_anime_found">No se encontraron animes de tendencia.</string>
+    <string name="favorite">Favorito</string>
+    <string name="bookmark">Marcador</string>
+    <string name="archived_anime">Anime Archivado</string>
+    <string name="no_archived_animes_yet">Aún no hay animes archivados.</string>
+    <string name="favorited_anime">Animes Favoritos</string>
+    <string name="no_favorited_animes_yet">Aún no hay animes favoritos.</string>
+    <string name="bookmarked_anime">Anime Marcado</string>
+    <string name="no_bookmarked_animes_yet">No se encontraron animes marcados</string>
+    <string name="synopsis">Sinopsis</string>
+    <string name="anime_not_found">Anime no encontrado</string>
+    <string name="unknown_title">Título Desconocido</string>
+    <string name="archive">Archivado</string>
+    <string name="all_anime">Todos</string>
+    <string name="trending">Tendencias</string>
+    <string name="no_all_anime_found">No se encontraron animes en la categoría "Todos".</string>
+
+    <string name="theme_option_light">Claro</string>
+    <string name="theme_option_dark">Oscuro</string>
+    <string name="theme_option_system">Predeterminado del Sistema</string>
+
+    <string name="language_option_english">Inglés</string>
+    <string name="language_option_spanish">Español</string>
+</resources>

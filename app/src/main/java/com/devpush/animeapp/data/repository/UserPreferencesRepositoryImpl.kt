@@ -39,6 +39,28 @@ class UserPreferencesRepositoryImpl(
             preferences[PreferenceKeys.IS_ONBOARDING_SHOWN] ?: false
         }
 
+    override val appThemeFlow: Flow<String> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            preferences[PreferenceKeys.APP_THEME] ?: "system"
+        }
+
+    override val appLanguageFlow: Flow<String> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            preferences[PreferenceKeys.APP_LANGUAGE] ?: "en"
+        }
+
     override suspend fun updateLoginStatus(isLoggedIn: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferenceKeys.IS_LOGIN] = isLoggedIn
@@ -51,11 +73,25 @@ class UserPreferencesRepositoryImpl(
         }
     }
 
+    override suspend fun updateAppTheme(theme: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferenceKeys.APP_THEME] = theme
+        }
+    }
+
+    override suspend fun updateAppLanguage(language: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferenceKeys.APP_LANGUAGE] = language
+        }
+    }
+
     override suspend fun fetchInitialPreferences(): UserPreferences {
         val preferences = dataStore.data.first()
         return UserPreferences(
             isLogin = preferences[PreferenceKeys.IS_LOGIN] ?: false,
-            isOnboardingShown = preferences[PreferenceKeys.IS_ONBOARDING_SHOWN] ?: false
+            isOnboardingShown = preferences[PreferenceKeys.IS_ONBOARDING_SHOWN] ?: false,
+            selectedTheme = preferences[PreferenceKeys.APP_THEME] ?: "system",
+            selectedLanguage = preferences[PreferenceKeys.APP_LANGUAGE] ?: "en"
         )
     }
 

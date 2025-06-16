@@ -59,4 +59,11 @@
     <string name="all_anime">All</string>
     <string name="trending">Trending</string>
     <string name="no_all_anime_found">No anime found in the "All" category.</string>
+
+    <string name="theme_option_light">Light</string>
+    <string name="theme_option_dark">Dark</string>
+    <string name="theme_option_system">System Default</string>
+
+    <string name="language_option_english">English</string>
+    <string name="language_option_spanish">Español</string>
 </resources>

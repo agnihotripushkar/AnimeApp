@@ -21,6 +21,12 @@ class MainViewModel(private val userPreferencesRepository: UserPreferencesReposi
     private val _isLogin = MutableStateFlow<Boolean?>(null)
     val isLogin: StateFlow<Boolean?> = _isLogin.asStateFlow()
 
+    val appTheme: StateFlow<String> = userPreferencesRepository.appThemeFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+
+    val currentLanguage: StateFlow<String> = userPreferencesRepository.appLanguageFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "en")
+
 
     val isInitialized: StateFlow<Boolean> = _isLogin.map { loginStatus ->
         val ready = loginStatus != null
