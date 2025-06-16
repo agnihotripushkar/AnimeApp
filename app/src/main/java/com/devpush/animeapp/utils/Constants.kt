@@ -15,14 +15,12 @@ object Constants {
     const val DETAIL_ANIME_SCREEN = "detail_anime_screen"
     const val ARCHIVED_ANIME_SCREEN = "archived_anime_screen"
     const val FAVORITED_ANIME_SCREEN = "favorited_anime_screen"
-    const val BOOKMARKED_ANIME_SCREEN = "bookmarked_anime_screen"
 
     // Define the key for the boolean value
     const val IS_ONBOARDING_SHOWN = "is_onboarding_shown"
     const val IS_LOGIN = "is_login"
     const val ANIME_PREFERENCES = "anime_preferences"
 
-    const val BASE_URL = "https://kitsu.io/api/edge/"
     const val TIMEOUT = 15000L
 
 }

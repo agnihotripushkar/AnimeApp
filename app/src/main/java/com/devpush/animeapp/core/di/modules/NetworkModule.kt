@@ -41,7 +41,7 @@ private fun provideKtorClient(): HttpClient {
         }
 
         install(DefaultRequest) {
-            url(Constants.BASE_URL)
+            url(BuildConfig.BASE_URL)
             header(HttpHeaders.ContentType, ContentType.Application.Json)
             header(HttpHeaders.Accept, "application/vnd.api+json")
         }

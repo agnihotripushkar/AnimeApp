@@ -8,7 +8,7 @@
     <string name="onBoarding_text2">Add your favourite groceries to your cart.</string>
     <string name="onBoarding_text3">no notifications, no distractions.</string>
 
-    <string name="trending_anime">Trending Anime</string>
+    <string name="animes">Animes</string>
     <string name="retry">Retry</string>
     <string name="skip">Skip</string>
     <string name="login">Login</string>
@@ -55,4 +55,8 @@
     <string name="synopsis">Synopsis</string>
     <string name="anime_not_found">Anime not found</string>
     <string name="unknown_title">Unknown Title</string>
+    <string name="archive">Archieved</string>
+    <string name="all_anime">All</string>
+    <string name="trending">Trending</string>
+    <string name="no_all_anime_found">No anime found in the "All" category.</string>
 </resources>

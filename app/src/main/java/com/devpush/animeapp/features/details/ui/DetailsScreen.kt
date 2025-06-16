@@ -58,7 +58,6 @@ fun DetailsScreen(
                     floatingActionButton = {
                         val fabMenuItems =
                             listOf(
-                                Icons.Filled.Bookmark to "BookMark",
                                 Icons.Filled.Favorite to "Favorite",
                                 Icons.Filled.Archive to "Archive",
                             )

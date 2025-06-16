@@ -63,8 +63,8 @@ fun AnimeCard(
         enableDismissFromEndToStart = true, // Enable swipe left (Archive)
         backgroundContent = {
             val color = when (dismissState.dismissDirection) {
-                SwipeToDismissBoxValue.StartToEnd -> Color.Red.copy(alpha = 0.5f) // Star
-                SwipeToDismissBoxValue.EndToStart -> Color.Blue.copy(alpha = 0.5f)  // Archive
+                SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.inversePrimary // Star
+                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error  // Archive
                 else -> Color.Transparent
             }
             val icon = when (dismissState.dismissDirection) {

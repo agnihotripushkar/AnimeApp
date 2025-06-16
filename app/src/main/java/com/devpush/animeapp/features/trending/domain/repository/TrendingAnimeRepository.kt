@@ -7,10 +7,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface TrendingAnimeRepository {
 
+    suspend fun getAllAnime(): NetworkResult<TrendingAnimeListResponse>
+
     suspend fun getTrendingAnime(): NetworkResult<TrendingAnimeListResponse>
 
-    fun getTrendingAnimeFromDb(): Flow<List<AnimeDataEntity>>
+    fun getAnimeFromDb(): Flow<List<AnimeDataEntity>>
 
-    suspend fun saveTrendingAnime(animeList: List<AnimeDataEntity>)
+    suspend fun saveAnime(animeList: List<AnimeDataEntity>)
 
 }

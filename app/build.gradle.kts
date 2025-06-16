@@ -18,6 +18,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+         buildTypes {
+             debug {
+                 buildConfigField("String", "BASE_URL", "\"https://kitsu.io/api/edge/\"")
+             }
+             release {
+                 buildConfigField("String", "BASE_URL", "\"https://kitsu.io/api/edge/\"")
+             }
+         }
     }
 
     buildTypes {
@@ -68,6 +77,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.databinding.adapters)
+    implementation(libs.androidx.compose.material3)
     ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)

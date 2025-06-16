@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.details.data.repository
 
+import com.devpush.animeapp.core.network.ApiEndpoints
 import com.devpush.animeapp.core.network.NetworkResult
 import com.devpush.animeapp.features.trending.data.remote.responsebody.AnimeResponseDto
 import com.devpush.animeapp.features.details.domain.repository.AnimeDetailsRepository
@@ -11,11 +12,11 @@ import timber.log.Timber
 import java.io.IOException
 import java.net.UnknownHostException
 
-class AnimeDetailsRepositoryImpl(val client: HttpClient) : AnimeDetailsRepository {
+class AnimeDetailsRepositoryImpl(val ktorClient: HttpClient) : AnimeDetailsRepository {
 
     override suspend fun getAnime(id: Int): NetworkResult<AnimeResponseDto> {
         return try {
-            val response = client.get(Constants.ANIME.format(id)).body<AnimeResponseDto>()
+            val response = ktorClient.get(ApiEndpoints.ANIME_ENDPOINT.format(id)).body<AnimeResponseDto>()
             NetworkResult.Success(response)
         } catch (e: UnknownHostException) {
             Timber.tag(Constants.TAG)

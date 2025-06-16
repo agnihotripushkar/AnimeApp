@@ -16,29 +16,38 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : 
     private var _uiState = MutableStateFlow<TrendingAnimeUiState>(TrendingAnimeUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
+    private val _selectedCategory = MutableStateFlow(AnimeCategory.ALL)
+    val selectedCategory = _selectedCategory.asStateFlow()
+
     init {
-        fetchTrendingAnimeFromServer(initialLoad = true)
+        fetchTrendingAnimeFromServer(animeCategory = AnimeCategory.TRENDING)
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getTrendingAnimeFromDb().collect { animeList ->
+            repository.getAnimeFromDb().collect { animeList ->
                 if (animeList.isNotEmpty()) {
                     _uiState.value = TrendingAnimeUiState.Success(animeList)
                 } else {
                     if (_uiState.value !is TrendingAnimeUiState.Error && _uiState.value !is TrendingAnimeUiState.Loading) {
-                        // DB became empty (e.g. after a refresh that returned nothing),
-                        // and we are not in an error state or currently loading from server.
                         _uiState.value =
-                            TrendingAnimeUiState.Success(emptyList()) // Or a specific "No data" state
+                            TrendingAnimeUiState.Success(emptyList())
                     }
                 }
             }
         }
-
     }
 
-    private fun fetchTrendingAnimeFromServer(initialLoad: Boolean = false) {
+    fun onCategorySelected(category: AnimeCategory) {
+        _selectedCategory.value = category
+        fetchTrendingAnimeFromServer(animeCategory = category)
+    }
+
+    private fun fetchTrendingAnimeFromServer(animeCategory: AnimeCategory) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = TrendingAnimeUiState.Loading
-            when (val apiResult = repository.getTrendingAnime()) {
+            val apiResult = when (animeCategory) {
+                AnimeCategory.TRENDING -> repository.getTrendingAnime()
+                AnimeCategory.ALL -> repository.getAllAnime()
+            }
+            when (apiResult) {
                 is NetworkResult.Loading -> {
                 }
 
@@ -49,7 +58,7 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : 
                         _uiState.value = TrendingAnimeUiState.Success(emptyList())
                     }
                     else{
-                        repository.saveTrendingAnime(animeDataList)
+                        repository.saveAnime(animeDataList)
                     }
                 }
 
@@ -75,7 +84,7 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : 
     }
 
     fun retryFetchTrendingAnime() {
-        fetchTrendingAnimeFromServer(initialLoad = false)
+        fetchTrendingAnimeFromServer(animeCategory = _selectedCategory.value)
     }
 
     fun starAnime(animeId: String) {

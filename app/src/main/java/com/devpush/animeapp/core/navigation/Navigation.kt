@@ -17,7 +17,6 @@ import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.devpush.animeapp.features.archived.ui.ArchivedAnimeScreen
-import com.devpush.animeapp.features.bookmarked.ui.BookmarkedAnimeScreen
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeScreen
 import com.devpush.animeapp.features.settings.ui.SettingsScreen
 
@@ -103,9 +102,6 @@ fun Navigation(
                 },
                 onFavoriteClick = {
                     navHost.navigate(NavGraph.FavoritedAnime.route)
-                },
-                onBookmarkClick = {
-                    navHost.navigate(NavGraph.BookmarkedAnime.route)
                 }
             )
         }
@@ -135,9 +131,6 @@ fun Navigation(
         }
         composable(route = NavGraph.FavoritedAnime.route) {
             FavoritedAnimeScreen(navController = navHost)
-        }
-        composable(route = NavGraph.BookmarkedAnime.route) {
-            BookmarkedAnimeScreen(navController = navHost)
         }
     }
 }

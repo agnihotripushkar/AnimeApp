@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="trending_anime">Trending Anime</string>
+    <string name="animes">Animes</string>
     <string name="retry">Retry</string>
     <string name="skip">Skip</string>
     <string name="login">Login</string>
@@ -29,4 +29,5 @@
     <string name="synopsis">Synopsis</string>
     <string name="anime_not_found">Anime not found</string>
     <string name="unknown_title">Unknown Title</string>
+    <string name="archive">Archieved</string>
 </resources>

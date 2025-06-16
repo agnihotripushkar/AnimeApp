@@ -2,7 +2,6 @@ package com.devpush.animeapp.core.di.modules
 
 import com.devpush.animeapp.features.archived.ui.ArchivedAnimeViewModel
 import com.devpush.animeapp.features.auth.ui.AuthViewModel
-import com.devpush.animeapp.features.bookmarked.ui.BookmarkedAnimeViewModel
 import com.devpush.animeapp.features.details.ui.DetailsScreenViewModel
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeViewModel
 import com.devpush.animeapp.features.main.ui.MainViewModel
@@ -18,6 +17,5 @@ val presentationModule = module {
     viewModel { MainViewModel(get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { ArchivedAnimeViewModel() }
-    viewModel { BookmarkedAnimeViewModel() }
     viewModel { FavoritedAnimeViewModel() }
 }
