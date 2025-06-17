@@ -8,4 +8,5 @@ object PreferenceKeys {
     val IS_ONBOARDING_SHOWN = booleanPreferencesKey("is_onboarding_shown")
     val APP_THEME = stringPreferencesKey("app_theme")
     val APP_LANGUAGE = stringPreferencesKey("app_language")
+    val IS_BIOMETRIC_AUTH_ENABLED = booleanPreferencesKey("is_biometric_auth_enabled")
 }

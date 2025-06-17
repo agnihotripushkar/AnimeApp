@@ -51,6 +51,7 @@ fun SettingsScreen(
     val currentTheme by settingsViewModel.appTheme.collectAsState()
     var showLanguageDialog by remember { mutableStateOf(false) }
     val currentLanguage by settingsViewModel.appLanguage.collectAsState()
+    val isBiometricAuthEnabled by settingsViewModel.isBiometricAuthEnabled.collectAsState()
 
     val scrollState = rememberScrollState()
 
@@ -93,8 +94,9 @@ fun SettingsScreen(
             )
             SettingsItem(title = stringResource(R.string.change_password_title), showArrow = true)
             SettingsSwitchItem(
-                title = stringResource(R.string.biometric_login_title),
-                initialChecked = false
+                title = stringResource(R.string.settings_biometric_auth_toggle_title),
+                checked = isBiometricAuthEnabled,
+                onCheckedChange = { settingsViewModel.setBiometricAuthEnabled(it) }
             )
             SettingsItem(
                 title = stringResource(R.string.logout_title),

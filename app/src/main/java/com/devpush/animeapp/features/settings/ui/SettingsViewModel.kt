@@ -25,6 +25,13 @@ class SettingsViewModel(private val userPreferencesRepository: UserPreferencesRe
             initialValue = "en"
         )
 
+    val isBiometricAuthEnabled: StateFlow<Boolean> = userPreferencesRepository.isBiometricAuthEnabledFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false
+        )
+
     fun setAppTheme(theme: String) {
         viewModelScope.launch(Dispatchers.IO) {
             userPreferencesRepository.updateAppTheme(theme)
@@ -34,6 +41,12 @@ class SettingsViewModel(private val userPreferencesRepository: UserPreferencesRe
     fun setAppLanguage(language: String) {
         viewModelScope.launch(Dispatchers.IO) {
             userPreferencesRepository.updateAppLanguage(language)
+        }
+    }
+
+    fun setBiometricAuthEnabled(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userPreferencesRepository.updateBiometricAuthEnabled(enabled)
         }
     }
 

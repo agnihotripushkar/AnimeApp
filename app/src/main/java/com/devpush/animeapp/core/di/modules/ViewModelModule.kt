@@ -13,7 +13,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 val presentationModule = module {
     viewModel { DetailsScreenViewModel(get()) }
     viewModel { TrendingAnimeViewModel(get()) }
-    viewModel { AuthViewModel(get(), get()) }
+    viewModel { AuthViewModel(application = get(), userPreferencesRepository = get(), authRepository = get()) }
     viewModel { MainViewModel(get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { ArchivedAnimeViewModel() }

@@ -61,6 +61,17 @@ class UserPreferencesRepositoryImpl(
             preferences[PreferenceKeys.APP_LANGUAGE] ?: "en"
         }
 
+    override val isBiometricAuthEnabledFlow: Flow<Boolean> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            preferences[PreferenceKeys.IS_BIOMETRIC_AUTH_ENABLED] ?: false
+        }
+
     override suspend fun updateLoginStatus(isLoggedIn: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferenceKeys.IS_LOGIN] = isLoggedIn
@@ -85,13 +96,20 @@ class UserPreferencesRepositoryImpl(
         }
     }
 
+    override suspend fun updateBiometricAuthEnabled(isEnabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferenceKeys.IS_BIOMETRIC_AUTH_ENABLED] = isEnabled
+        }
+    }
+
     override suspend fun fetchInitialPreferences(): UserPreferences {
         val preferences = dataStore.data.first()
         return UserPreferences(
             isLogin = preferences[PreferenceKeys.IS_LOGIN] ?: false,
             isOnboardingShown = preferences[PreferenceKeys.IS_ONBOARDING_SHOWN] ?: false,
             selectedTheme = preferences[PreferenceKeys.APP_THEME] ?: "system",
-            selectedLanguage = preferences[PreferenceKeys.APP_LANGUAGE] ?: "en"
+            selectedLanguage = preferences[PreferenceKeys.APP_LANGUAGE] ?: "en",
+            isBiometricAuthEnabled = preferences[PreferenceKeys.IS_BIOMETRIC_AUTH_ENABLED] ?: false
         )
     }
 

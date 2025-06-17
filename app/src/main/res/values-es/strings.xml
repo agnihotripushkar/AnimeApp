@@ -66,4 +66,10 @@
 
     <string name="language_option_english">Inglés</string>
     <string name="language_option_spanish">Español</string>
+
+    <!-- Biometric Strings -->
+    <string name="biometric_auth_title">Biometric Authentication</string>
+    <string name="biometric_auth_subtitle">Log in using your biometric credential</string>
+    <string name="settings_biometric_auth_toggle_title">Enable Biometric Authentication</string>
+    <string name="cancel">Cancel</string>
 </resources>

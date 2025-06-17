@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,6 +57,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import com.devpush.animeapp.utils.findActivity
+// import android.util.Log // Removed
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -77,6 +80,24 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
     var passwordVisible by remember { mutableStateOf(false) }
+    // val context = LocalContext.current as FragmentActivity // For Biometric Prompt // Old way
+    val context = LocalContext.current
+    val activity = remember(context) { context.findActivity() }
+
+
+    LaunchedEffect(key1 = Unit, key2 = activity) { // Runs once when the screen is composed
+        activity?.let { fragActivity ->
+            viewModel.onLoginScreenLaunched(fragActivity)
+        }
+    }
+
+    LaunchedEffect(key1 = viewModel.triggerBiometricPromptEvent, key2 = activity) {
+        viewModel.triggerBiometricPromptEvent.collect {
+            activity?.let { fragActivity ->
+                viewModel.startBiometricAuthentication(fragActivity)
+            }
+        }
+    }
 
     LaunchedEffect(keyboardHeight) {
         coroutineScope.launch {

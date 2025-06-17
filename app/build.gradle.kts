@@ -86,6 +86,8 @@ dependencies {
     implementation(libs.ui)
     ksp(libs.androidx.room.compiler)
 
+    implementation(libs.androidx.biometric)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

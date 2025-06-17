@@ -117,6 +117,7 @@ fun AnimeCard(
                                 shape = RoundedCornerShape(20.dp)
                             )
                             .padding(horizontal = 6.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Default.Star,
