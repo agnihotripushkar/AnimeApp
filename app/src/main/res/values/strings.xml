@@ -72,4 +72,13 @@
     <string name="biometric_auth_subtitle">Log in using your biometric credential</string>
     <string name="settings_biometric_auth_toggle_title">Enable Biometric Authentication</string>
     <string name="cancel">Cancel</string>
+    <string name="biometric_prompt_title">Biometric Authentication</string>
+    <string name="biometric_prompt_subtitle">Log in using your biometric credential or device PIN/Pattern/Password</string>
+    <string name="biometric_loading_text">Preparing biometric authentication...</string>
+    <string name="biometric_retry_button">Retry Biometric Scan</string>
+    <string name="biometric_success_text">Authentication Successful!</string>
+    <string name="biometric_error_text">Authentication Error. Please try again or use another method.</string>
+    <string name="biometric_not_available_text">Biometric authentication is not available or not set up on this device.</string>
+    <string name="biometric_cancelled_text">Authentication cancelled.</string>
+    <string name="biometric_continue_anyway_button">Continue</string>
 </resources>

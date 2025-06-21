@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.settings.ui
 
+import androidx.biometric.BiometricManager
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +37,8 @@ import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthStatus
 import com.devpush.animeapp.features.settings.ui.SettingsViewModel
 import com.devpush.animeapp.features.settings.ui.utils.LanguageSelectionDialog
 import com.devpush.animeapp.features.settings.ui.utils.ThemeSelectionDialog
@@ -47,6 +51,14 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
 
+    val context = LocalContext.current
+    val biometricManager = BiometricManager.from(context)
+    val canAuthenticate =
+        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> true
+            else -> false
+        }
+
     var showThemeDialog by remember { mutableStateOf(false) }
     val currentTheme by settingsViewModel.appTheme.collectAsState()
     var showLanguageDialog by remember { mutableStateOf(false) }
@@ -54,6 +66,14 @@ fun SettingsScreen(
     val isBiometricAuthEnabled by settingsViewModel.isBiometricAuthEnabled.collectAsState()
 
     val scrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        if (canAuthenticate) {
+            settingsViewModel.updateAuthStatus(BiometricAuthStatus.IDLE) // Reset status
+        } else {
+            settingsViewModel.updateAuthStatus(BiometricAuthStatus.NOT_AVAILABLE)
+        }
+    }
 
     Scaffold(
         topBar = {

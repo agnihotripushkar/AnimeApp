@@ -7,8 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.domian.repository.UserPreferencesRepository
 import com.devpush.animeapp.features.auth.domain.repository.AuthRepository
-import com.devpush.animeapp.utils.BiometricAuthHelper
-import com.devpush.animeapp.utils.BiometricAuthListener
+import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthStatus
 import com.devpush.animeapp.features.auth.ui.login.LoginUiState
 import com.devpush.animeapp.features.auth.ui.signup.RegistrationUiState
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,10 @@ class AuthViewModel(
     application: Application,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val authRepository: AuthRepository
-) : AndroidViewModel(application), BiometricAuthListener {
+) : AndroidViewModel(application) {
+
+    private val _authStatus = MutableStateFlow(BiometricAuthStatus.IDLE)
+    val authStatus: StateFlow<BiometricAuthStatus> = _authStatus.asStateFlow()
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -37,58 +39,8 @@ class AuthViewModel(
     val registrationUiState: StateFlow<RegistrationUiState> = _registrationUiState.asStateFlow()
     private var registrationJob: Job? = null
 
-    private val _triggerBiometricPromptEvent = MutableSharedFlow<Unit>(replay = 0)
-    val triggerBiometricPromptEvent = _triggerBiometricPromptEvent.asSharedFlow()
-
-    private lateinit var biometricAuthHelper: BiometricAuthHelper
-
-    init {
-        // Initialize BiometricAuthHelper here if activity is not immediately available
-        // Or ensure onLoginScreenLaunched is called to initialize it
-    }
-
-    fun onLoginScreenLaunched(activity: FragmentActivity) {
-        // It's important that BiometricAuthHelper is initialized with the activity context for the prompt
-        // but uses application context for BiometricManager if needed for checks outside activity lifecycle.
-        // For simplicity, and since promptBiometricAuth takes activity, using application context for helper instance is fine.
-        biometricAuthHelper = BiometricAuthHelper(getApplication<Application>().applicationContext, this)
-        viewModelScope.launch {
-            val isBiometricEnabled = userPreferencesRepository.isBiometricAuthEnabledFlow.first()
-            val canAuthResult = biometricAuthHelper.canAuthenticate()
-
-            if (isBiometricEnabled && canAuthResult) {
-                _triggerBiometricPromptEvent.emit(Unit)
-            }
-        }
-    }
-
-    fun startBiometricAuthentication(activity: FragmentActivity) {
-        if (!::biometricAuthHelper.isInitialized) {
-            // Initialize if not already, though onLoginScreenLaunched should handle this.
-            biometricAuthHelper = BiometricAuthHelper(getApplication<Application>().applicationContext, this)
-        }
-
-        if (biometricAuthHelper.canAuthenticate()) {
-            biometricAuthHelper.promptBiometricAuth(activity)
-        } else {
-            _uiState.update { it.copy(isLoading = false, generalLoginError = "Biometric authentication not available.") }
-        }
-    }
-
-    override fun onBiometricAuthSuccess() {
-        // Similar to successful password login
-        viewModelScope.launch(Dispatchers.IO) {
-            userPreferencesRepository.updateLoginStatus(true)
-            _uiState.update { it.copy(isLoading = false, isLoginSuccess = true) }
-        }
-    }
-
-    override fun onBiometricAuthError(errorCode: Int, errString: CharSequence) {
-        _uiState.update { it.copy(isLoading = false, generalLoginError = "Biometric Auth Error: $errString") }
-    }
-
-    override fun onBiometricAuthFailed() {
-        _uiState.update { it.copy(isLoading = false, generalLoginError = "Biometric authentication failed.") }
+    fun updateAuthStatus(status: BiometricAuthStatus) {
+        _authStatus.value = status
     }
 
     fun onEmailChanged(email: String) {

@@ -9,6 +9,7 @@ object Constants {
     // Nav Graph keys
     const val LOGIN_SCREEN = "login_screen"
     const val REGISTRATION_SCREEN = "registration_screen"
+    const val BIOMETRIC_AUTH_SCREEN = "biometric_auth_screen"
     const val ONBOARDING_SCREEN = "onBoarding_screen"
     const val TRENDING_ANIME_SCREEN = "trending_anime_screen"
     const val SETTINGS_SCREEN = "settings_screen"

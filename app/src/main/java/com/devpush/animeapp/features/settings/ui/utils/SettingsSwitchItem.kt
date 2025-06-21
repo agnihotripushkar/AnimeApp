@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SettingsSwitchItem(
     title: String,
-    checked: Boolean, // Parameter name changed from initialChecked to checked
+    checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
     Card(

@@ -80,24 +80,6 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
     var passwordVisible by remember { mutableStateOf(false) }
-    // val context = LocalContext.current as FragmentActivity // For Biometric Prompt // Old way
-    val context = LocalContext.current
-    val activity = remember(context) { context.findActivity() }
-
-
-    LaunchedEffect(key1 = Unit, key2 = activity) { // Runs once when the screen is composed
-        activity?.let { fragActivity ->
-            viewModel.onLoginScreenLaunched(fragActivity)
-        }
-    }
-
-    LaunchedEffect(key1 = viewModel.triggerBiometricPromptEvent, key2 = activity) {
-        viewModel.triggerBiometricPromptEvent.collect {
-            activity?.let { fragActivity ->
-                viewModel.startBiometricAuthentication(fragActivity)
-            }
-        }
-    }
 
     LaunchedEffect(keyboardHeight) {
         coroutineScope.launch {

@@ -17,6 +17,7 @@ import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.devpush.animeapp.features.archived.ui.ArchivedAnimeScreen
+import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthScreen
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeScreen
 import com.devpush.animeapp.features.settings.ui.SettingsScreen
 
@@ -28,11 +29,13 @@ fun Navigation(
 
     val isLogin = mainViewModel.isLogin.collectAsState().value
     val isOnboardingShown = mainViewModel.isOnboardingShown.collectAsState().value
+    val isBiometricEnabled by mainViewModel.isBiometricAuthEnabled.collectAsState()
 
-    val startDestination = remember(isLogin) {
+    val startDestination = remember(isLogin,isBiometricEnabled) {
         when {
-            isLogin == true -> NavGraph.TrendingAnime.route
-            else -> NavGraph.Login.route
+            isLogin == true && isBiometricEnabled -> NavGraph.BiometricAuth.route // If logged in & biometric, go to biometric
+            isLogin == true && !isBiometricEnabled -> NavGraph.TrendingAnime.route // Logged in, no biometric, go to trending
+            else -> NavGraph.Login.route // Not logged in, go to login
         }
     }
 
@@ -86,6 +89,21 @@ fun Navigation(
                 }
                 mainViewModel.saveIsOnboardingShown(true)
             })
+        }
+
+        composable(NavGraph.BiometricAuth.route) {
+            BiometricAuthScreen(
+                onAuthSuccess = {
+                    navHost.navigate(NavGraph.TrendingAnime.route) {
+                        popUpTo(NavGraph.BiometricAuth.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onAuthCancelledOrFailed = { // E.g., user cancels, or too many failed attempts
+                    // Navigate to login, effectively logging them out or requiring re-auth
+                    navHost.navigate(NavGraph.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+            )
         }
 
         composable(NavGraph.TrendingAnime.route) {
