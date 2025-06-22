@@ -15,6 +15,12 @@ data class AnimeDataEntity(
     @Embedded
     val attributes: AnimeAttributesDb,
 
+    @ColumnInfo(name = "is_favorite", defaultValue = "false")
+    val isFavorite: Boolean = false,
+
+    @ColumnInfo(name = "is_archived", defaultValue = "false")
+    val isArchived: Boolean = false
+
     // If you want to store other fields from the original JSON that were not in AnimeData,
     // you can add them here. For example, if 'Titles' or 'CoverImage' were needed directly.
 )

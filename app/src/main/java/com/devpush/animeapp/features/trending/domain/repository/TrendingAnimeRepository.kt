@@ -15,4 +15,7 @@ interface TrendingAnimeRepository {
 
     suspend fun saveAnime(animeList: List<AnimeDataEntity>)
 
+    suspend fun updateFavoriteStatus(animeId: String, isFavorite: Boolean)
+
+    suspend fun updateArchivedStatus(animeId: String, isFavorite: Boolean)
 }

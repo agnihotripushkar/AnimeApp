@@ -87,15 +87,26 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : 
         fetchTrendingAnimeFromServer(animeCategory = _selectedCategory.value)
     }
 
-    fun starAnime(animeId: String) {
-        Timber.tag(TAG).d("Starring anime: %s", animeId)
-        // In a real scenario, you would call a use case or repository here
-        // to update the starred status of the anime.
+    fun starAnime(animeId: String, isCurrentlyFavorite: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.updateFavoriteStatus(animeId, !isCurrentlyFavorite)
+                Timber.tag(TAG).d("Toggled favorite status for anime: %s to %s", animeId, !isCurrentlyFavorite)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
+                // Optionally, notify the UI about the error
+            }
+        }
     }
 
-    fun archiveAnime(animeId: String) {
-        Timber.tag(TAG).d("Archiving anime: %s", animeId)
-        // In a real scenario, you would call a use case or repository here
-        // to update the archived status of the anime.
+    fun archiveAnime(animeId: String, isCurrentlyArchived: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.updateArchivedStatus(animeId, !isCurrentlyArchived)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
+                // Optionally, notify the UI about the error
+            }
+        }
     }
 }

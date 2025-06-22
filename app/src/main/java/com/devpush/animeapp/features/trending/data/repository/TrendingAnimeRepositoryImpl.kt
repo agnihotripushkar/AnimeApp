@@ -63,4 +63,12 @@ class TrendingAnimeRepositoryImpl(
         trendingAnimeDao.deleteAll()
         trendingAnimeDao.insertAll(animeList)
     }
+
+    override suspend fun updateFavoriteStatus(animeId: String, isFavorite: Boolean) {
+        trendingAnimeDao.updateFavoriteStatus(animeId, isFavorite)
+    }
+
+    override suspend fun updateArchivedStatus(animeId: String, isArchived: Boolean) {
+        return trendingAnimeDao.updateArchivedStatus(animeId, isArchived)
+    }
 }

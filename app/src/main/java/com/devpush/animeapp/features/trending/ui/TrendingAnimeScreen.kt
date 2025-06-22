@@ -146,8 +146,10 @@ fun TrendingAnimeScreen(
                                                         animeDataList[index].id
                                                     )
                                                 },
-                                                onStar = { viewModel.starAnime(animeDataList[index].id) },
-                                                onArchive = { viewModel.archiveAnime(animeDataList[index].id) }
+                                                onStar = { viewModel.starAnime(animeDataList[index].id,
+                                                    animeDataList[index].isFavorite) },
+                                                onArchive = { viewModel.archiveAnime(animeDataList[index].id,
+                                                    animeDataList[index].isArchived) },
                                             )
                                         }
                                     }

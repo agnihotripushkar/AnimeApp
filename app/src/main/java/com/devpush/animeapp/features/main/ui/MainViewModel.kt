@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class MainViewModel(private val userPreferencesRepository: UserPreferencesRepository) : ViewModel() {
+class MainViewModel(private val userPreferencesRepository: UserPreferencesRepository) :
+    ViewModel() {
 
     val isOnboardingShown: StateFlow<Boolean?> = userPreferencesRepository.isOnboardingShownFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
@@ -28,20 +29,32 @@ class MainViewModel(private val userPreferencesRepository: UserPreferencesReposi
     val currentLanguage: StateFlow<String> = userPreferencesRepository.appLanguageFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "en")
 
-    val isBiometricAuthEnabled: StateFlow<Boolean> = userPreferencesRepository.isBiometricAuthEnabledFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = false // Default to false until loaded
-        )
+    val isBiometricAuthEnabled: StateFlow<Boolean> =
+        userPreferencesRepository.isBiometricAuthEnabledFlow
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = false // Default to false until loaded
+            )
 
-    val isInitialized: StateFlow<Boolean> = combine(_isLogin, isBiometricAuthEnabled) { loginStatus, biometricStatusLoaded ->
-        // We consider initialized if loginStatus is no longer null (meaning it has been loaded)
-        // and biometricStatusLoaded is anything (just to ensure the combine has an emission from it).
-        val ready = (loginStatus != null && biometricStatusLoaded)
-        Timber.tag("MainViewModel").d("Initialization check: loginStatus=$loginStatus, biometricStatusLoaded=$biometricStatusLoaded, ready=$ready")
-        ready
-    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000L), initialValue = false)
+    val isInitialized: StateFlow<Boolean> =
+        combine(_isLogin, isBiometricAuthEnabled) { loginStatus, biometricStatusLoaded ->
+            // We consider initialized if loginStatus is no longer null (meaning it has been loaded)
+            // and biometricStatusLoaded is anything (just to ensure the combine has an emission from it).
+            var ready = false
+            if (loginStatus == true && biometricStatusLoaded!=null) {
+                ready = true
+            }
+            if (loginStatus == false) {
+                ready = true
+            }
+            ready
+
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = false
+        )
 
     init {
         viewModelScope.launch {

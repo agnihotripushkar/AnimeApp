@@ -32,13 +32,17 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.R
 import com.devpush.animeapp.core.navigation.NavGraph
+import com.devpush.animeapp.data.local.entities.AnimeDataEntity
+import com.devpush.animeapp.features.trending.ui.utils.AnimeCard
 import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FavoritedAnimeScreen(
     navController: NavController,
+    onAnimeClick: (animeId: String) -> Unit = { Timber.d("Anime card clicked: $it") },
     viewModel: FavoritedAnimeViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -62,12 +66,11 @@ fun FavoritedAnimeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
+                .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (uiState.isLoading) {
-                ContainedLoadingIndicator()
+                ContainedLoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else if (uiState.error != null) {
                 Text("Error: ${uiState.error}")
             } else if (uiState.animes.isEmpty()) {
@@ -75,30 +78,26 @@ fun FavoritedAnimeScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp), // Adjusted padding
+                    verticalArrangement = Arrangement.spacedBy(0.dp) // AnimeCard might have internal padding
                 ) {
-                    items(uiState.animes) { animeTitle ->
-                        Text(
-                            text = animeTitle,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(8.dp)
+                    items(uiState.animes, key = { anime -> anime.id }) { anime: AnimeDataEntity ->
+                        AnimeCard(
+                            anime = anime,
+                            onClick = { onAnimeClick(anime.id) },
+                            onStar = {
+                                // On this screen, "starring" effectively means "unfavorite"
+                                // anime.isFavorite should be true here
+                                viewModel.toggleFavoriteStatus(anime.id, anime.isFavorite)
+                            },
+                            onArchive = {
+                                // Archive action not implemented for this screen
+                                Timber.d("Archive clicked for ${anime.id} on favorites screen")
+                            }
                         )
                     }
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun FavoritedAnimeScreenPreview() {
-    val viewModel = FavoritedAnimeViewModel()
-    AnimeAppTheme {
-        FavoritedAnimeScreen(
-            rememberNavController(),
-            viewModel
-        )
     }
 }

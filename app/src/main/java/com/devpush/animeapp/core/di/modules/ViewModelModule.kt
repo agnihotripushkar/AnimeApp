@@ -16,6 +16,6 @@ val presentationModule = module {
     viewModel { AuthViewModel(application = get(), userPreferencesRepository = get(), authRepository = get()) }
     viewModel { MainViewModel(get()) }
     viewModel { SettingsViewModel(get()) }
-    viewModel { ArchivedAnimeViewModel() }
-    viewModel { FavoritedAnimeViewModel() }
+    viewModel { ArchivedAnimeViewModel(get()) }
+    viewModel { FavoritedAnimeViewModel(get()) }
 }

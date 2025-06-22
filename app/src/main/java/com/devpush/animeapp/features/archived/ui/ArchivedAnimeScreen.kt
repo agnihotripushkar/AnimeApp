@@ -31,8 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.R
+import com.devpush.animeapp.data.local.entities.AnimeDataEntity
+import com.devpush.animeapp.features.trending.ui.utils.AnimeCard
 import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -41,6 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ArchivedAnimeScreen(
     navController: NavController,
+    onAnimeClick: (animeId: String) -> Unit = { Timber.d("Anime card clicked: $it") },
     viewModel: ArchivedAnimeViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -71,35 +75,30 @@ fun ArchivedAnimeScreen(
             } else if (uiState.error != null) {
                 Text("Error: ${uiState.error}")
             } else if (uiState.animes.isEmpty()) {
-                Text(stringResource(R.string.no_archived_animes_yet)) // Replace with stringResource later
+                Text(stringResource(R.string.no_archived_animes_yet))
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(uiState.animes) { animeTitle ->
-                        Text(
-                            text = animeTitle,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(8.dp)
+                    items(uiState.animes, key = { anime -> anime.id }) { anime: AnimeDataEntity ->
+                        AnimeCard(
+                            anime = anime,
+                            onClick = { onAnimeClick(anime.id) },
+                            onStar = {
+                                // Star action not implemented for this screen
+                                Timber.d("Star clicked for ${anime.id} on Archived screen")
+
+                            },
+                            onArchive = {
+                                viewModel.toggleArchivedStatus(anime.id, anime.isArchived)
+
+                            }
                         )
                     }
                 }
             }
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ArchivedAnimeScreenPreview() {
-    val viewModel = ArchivedAnimeViewModel()
-    AnimeAppTheme {
-        ArchivedAnimeScreen(
-            rememberNavController(),
-            viewModel
-        )
-    }
-
 }
