@@ -12,4 +12,8 @@ class ArchivedRepositoryImpl(
         return trendingAnimeDao.getArchivedAnimes()
     }
 
+    override suspend fun updateArchivedStatus(animeId: String, isArchived: Boolean) {
+        return trendingAnimeDao.updateArchivedStatus(animeId, isArchived)
+    }
+
 }

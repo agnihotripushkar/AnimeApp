@@ -30,9 +30,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -136,8 +138,32 @@ fun TrendingAnimeScreen(
                                     )
                                     {
                                         items(
-                                            animeDataList.size
+                                            animeDataList.size,
+                                            key = { animeDataList[it].id }
                                         ) { index ->
+                                            val dismissState = rememberSwipeToDismissBoxState(
+                                                confirmValueChange = { direction ->
+                                                    when (direction) {
+                                                        SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
+                                                            viewModel.archiveAnime(
+                                                                animeDataList[index].id,
+                                                                animeDataList[index].isArchived
+                                                            )
+                                                            false // Prevent immediate dismissal
+                                                        }
+
+                                                        SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
+                                                            viewModel.starAnime(
+                                                                animeDataList[index].id,
+                                                                animeDataList[index].isFavorite
+                                                            )
+                                                            false // Prevent immediate dismissal
+                                                        }
+
+                                                        SwipeToDismissBoxValue.Settled -> false
+                                                    }
+                                                }
+                                            )
                                             AnimeCard(
                                                 anime = animeDataList[index],
                                                 onClick = {
@@ -146,10 +172,19 @@ fun TrendingAnimeScreen(
                                                         animeDataList[index].id
                                                     )
                                                 },
-                                                onStar = { viewModel.starAnime(animeDataList[index].id,
-                                                    animeDataList[index].isFavorite) },
-                                                onArchive = { viewModel.archiveAnime(animeDataList[index].id,
-                                                    animeDataList[index].isArchived) },
+                                                onStar = {
+                                                    viewModel.starAnime(
+                                                        animeDataList[index].id,
+                                                        animeDataList[index].isFavorite
+                                                    )
+                                                },
+                                                onArchive = {
+                                                    viewModel.archiveAnime(
+                                                        animeDataList[index].id,
+                                                        animeDataList[index].isArchived
+                                                    )
+                                                },
+                                                dismissState = dismissState
                                             )
                                         }
                                     }
@@ -161,7 +196,8 @@ fun TrendingAnimeScreen(
                                     )
                                     {
                                         items(
-                                            animeDataList.size
+                                            animeDataList.size,
+                                            key = { animeDataList[it].id }
                                         ) { index ->
                                             AnimePoster(
                                                 anime = animeDataList[index],

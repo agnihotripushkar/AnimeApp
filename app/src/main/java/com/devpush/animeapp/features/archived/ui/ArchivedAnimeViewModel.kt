@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.archived.ui
 
+import android.content.ContentValues.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.features.archived.domain.repository.ArchivedRepository
@@ -33,6 +34,18 @@ class ArchivedAnimeViewModel(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = ArchivedAnimeUiState(isLoading = true)
             )
+
+    fun archiveAnime(animeId: String, isCurrentlyArchived: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                archivedRepository.updateArchivedStatus(animeId, !isCurrentlyArchived)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
+                // Optionally, notify the UI about the error
+            }
+        }
+    }
+
 
     fun toggleArchivedStatus(animeId: String, isCurrentlyArchived: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {

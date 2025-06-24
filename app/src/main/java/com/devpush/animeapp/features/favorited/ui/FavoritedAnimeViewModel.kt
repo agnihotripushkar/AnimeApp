@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.favorited.ui
 
+import android.content.ContentValues.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.features.favorited.domain.repository.FavoriteRepository
@@ -35,6 +36,18 @@ class FavoritedAnimeViewModel(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = FavoritedAnimeUiState(isLoading = true)
             )
+
+    fun starAnime(animeId: String, isCurrentlyFavorite: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.updateFavoriteStatus(animeId, !isCurrentlyFavorite)
+                Timber.tag(TAG).d("Toggled favorite status for anime: %s to %s", animeId, !isCurrentlyFavorite)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
+                // Optionally, notify the UI about the error
+            }
+        }
+    }
 
     fun toggleFavoriteStatus(animeId: String, isCurrentlyFavorite: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {

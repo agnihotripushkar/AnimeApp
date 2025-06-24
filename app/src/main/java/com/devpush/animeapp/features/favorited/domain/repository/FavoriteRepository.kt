@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface FavoriteRepository {
 
     fun getFavoriteAnimes(): Flow<List<AnimeDataEntity>>
+
+    suspend fun updateFavoriteStatus(animeId: String, isFavorite: Boolean)
 }

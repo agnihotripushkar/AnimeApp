@@ -12,4 +12,8 @@ class FavoriteRepositoryImpl(
     override fun getFavoriteAnimes(): Flow<List<AnimeDataEntity>> {
         return trendingAnimeDao.getFavoriteAnimes()
     }
+
+    override suspend fun updateFavoriteStatus(animeId: String, isFavorite: Boolean) {
+        return trendingAnimeDao.updateFavoriteStatus(animeId, isFavorite)
+    }
 }

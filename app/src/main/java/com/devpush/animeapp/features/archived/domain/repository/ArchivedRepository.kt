@@ -7,4 +7,6 @@ interface ArchivedRepository {
 
     fun getArchivedAnimes(): Flow<List<AnimeDataEntity>>
 
+    suspend fun updateArchivedStatus(animeId: String, isArchived: Boolean)
+
 }

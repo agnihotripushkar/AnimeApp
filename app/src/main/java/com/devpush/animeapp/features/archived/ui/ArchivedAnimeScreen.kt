@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.archived.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,8 +19,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,11 +56,16 @@ fun ArchivedAnimeScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.archived_anime)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button_desc)
+                            contentDescription = stringResource(R.string.back_button_desc),
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -66,6 +75,9 @@ fun ArchivedAnimeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                )
                 .padding(innerPadding)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -82,7 +94,26 @@ fun ArchivedAnimeScreen(
                     contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(uiState.animes, key = { anime -> anime.id }) { anime: AnimeDataEntity ->
+                    items(uiState.animes,
+                        key = { anime -> anime.id }
+                    ) { anime: AnimeDataEntity ->
+                        val dismissState = rememberSwipeToDismissBoxState(
+                            confirmValueChange = { direction ->
+                                when (direction) {
+                                    SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
+                                        viewModel.archiveAnime(
+                                            anime.id,
+                                            anime.isArchived
+                                        )
+                                        false // Prevent immediate dismissal
+                                    }
+
+                                    SwipeToDismissBoxValue.StartToEnd -> false
+
+                                    SwipeToDismissBoxValue.Settled -> false
+                                }
+                            }
+                        )
                         AnimeCard(
                             anime = anime,
                             onClick = { onAnimeClick(anime.id) },
@@ -94,7 +125,8 @@ fun ArchivedAnimeScreen(
                             onArchive = {
                                 viewModel.toggleArchivedStatus(anime.id, anime.isArchived)
 
-                            }
+                            },
+                            dismissState = dismissState
                         )
                     }
                 }

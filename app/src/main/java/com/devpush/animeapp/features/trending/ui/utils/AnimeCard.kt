@@ -16,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -36,25 +37,9 @@ fun AnimeCard(
     onClick: () -> Unit,
     onStar: () -> Unit,
     onArchive: () -> Unit,
+    dismissState: SwipeToDismissBoxState,
     modifier: Modifier = Modifier
 ) {
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { direction ->
-            when (direction) {
-                SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
-                    onArchive()
-                    false // Prevent immediate dismissal
-                }
-
-                SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
-                    onStar()
-                    false // Prevent immediate dismissal
-                }
-
-                SwipeToDismissBoxValue.Settled -> false
-            }
-        }
-    )
 
     SwipeToDismissBox(
         state = dismissState,

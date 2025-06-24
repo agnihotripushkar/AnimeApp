@@ -13,7 +13,7 @@ interface TrendingAnimeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(animeList: List<AnimeDataEntity>)
 
-    @Query("SELECT * FROM ${Constants.TRENDING_ANIME_TABLE}")
+    @Query("SELECT * FROM ${Constants.TRENDING_ANIME_TABLE} WHERE is_archived = 0 AND is_favorite = 0")
     fun getAll(): Flow<List<AnimeDataEntity>>
 
     @Query("DELETE FROM ${Constants.TRENDING_ANIME_TABLE}")

@@ -1,6 +1,7 @@
 package com.devpush.animeapp.features.favorited.ui
 
 import android.R.attr.navigationIcon
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,8 +19,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,11 +55,16 @@ fun FavoritedAnimeScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.favorited_anime)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button_desc)
+                            contentDescription = stringResource(R.string.back_button_desc),
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -66,6 +75,9 @@ fun FavoritedAnimeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                color = MaterialTheme.colorScheme.surfaceVariant
+            )
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -81,7 +93,26 @@ fun FavoritedAnimeScreen(
                     contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp), // Adjusted padding
                     verticalArrangement = Arrangement.spacedBy(0.dp) // AnimeCard might have internal padding
                 ) {
-                    items(uiState.animes, key = { anime -> anime.id }) { anime: AnimeDataEntity ->
+                    items(uiState.animes, key = { anime -> anime.id })
+                    { anime: AnimeDataEntity ->
+                        val dismissState = rememberSwipeToDismissBoxState(
+                            confirmValueChange = { direction ->
+                                when (direction) {
+                                    SwipeToDismissBoxValue.EndToStart -> false
+
+
+                                    SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
+                                        viewModel.starAnime(
+                                            anime.id,
+                                            anime.isFavorite
+                                        )
+                                        false // Prevent immediate dismissal
+                                    }
+
+                                    SwipeToDismissBoxValue.Settled -> false
+                                }
+                            }
+                        )
                         AnimeCard(
                             anime = anime,
                             onClick = { onAnimeClick(anime.id) },
@@ -93,7 +124,8 @@ fun FavoritedAnimeScreen(
                             onArchive = {
                                 // Archive action not implemented for this screen
                                 Timber.d("Archive clicked for ${anime.id} on favorites screen")
-                            }
+                            },
+                            dismissState = dismissState
                         )
                     }
                 }
