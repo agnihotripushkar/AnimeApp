@@ -3,20 +3,30 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
     namespace = "com.devpush.animeapp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.devpush.animeapp"
-        minSdk = 26
-        targetSdk = 35
+        minSdk = 31
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+         buildTypes {
+             debug {
+                 buildConfigField("String", "BASE_URL", "\"https://kitsu.io/api/edge/\"")
+             }
+             release {
+                 buildConfigField("String", "BASE_URL", "\"https://kitsu.io/api/edge/\"")
+             }
+         }
     }
 
     buildTypes {
@@ -39,12 +49,17 @@ android {
         compose = true
         buildConfig = true
     }
+
+    androidResources {
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.compose.navigation)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -57,7 +72,21 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.bundles.ktor)
     implementation(libs.coil.compose)
+    implementation(libs.androidx.material3.android)
 
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
+    implementation(libs.timber)
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.databinding.adapters)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.ui)
+    ksp(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.biometric)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
