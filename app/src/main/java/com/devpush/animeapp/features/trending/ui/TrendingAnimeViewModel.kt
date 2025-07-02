@@ -88,23 +88,51 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : 
     }
 
     fun starAnime(animeId: String, isCurrentlyFavorite: Boolean) {
+        // Optimistically update the UI
+        val currentState = _uiState.value
+        if (currentState is TrendingAnimeUiState.Success) {
+            val updatedList = currentState.animeList.map { anime ->
+                if (anime.id == animeId) {
+                    anime.copy(isFavorite = !isCurrentlyFavorite)
+                } else {
+                    anime
+                }
+            }
+            _uiState.value = TrendingAnimeUiState.Success(updatedList)
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.updateFavoriteStatus(animeId, !isCurrentlyFavorite)
                 Timber.tag(TAG).d("Toggled favorite status for anime: %s to %s", animeId, !isCurrentlyFavorite)
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
-                // Optionally, notify the UI about the error
+                // Optionally, revert UI update or notify the user
+                // For now, we'll rely on the database flow to correct any discrepancies eventually
             }
         }
     }
 
     fun archiveAnime(animeId: String, isCurrentlyArchived: Boolean) {
+        // Optimistically update the UI
+        val currentState = _uiState.value
+        if (currentState is TrendingAnimeUiState.Success) {
+            val updatedList = currentState.animeList.map { anime ->
+                if (anime.id == animeId) {
+                    anime.copy(isArchived = !isCurrentlyArchived)
+                } else {
+                    anime
+                }
+            }
+            _uiState.value = TrendingAnimeUiState.Success(updatedList)
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.updateArchivedStatus(animeId, !isCurrentlyArchived)
+                Timber.tag(TAG).d("Toggled archived status for anime: %s to %s", animeId, !isCurrentlyArchived)
             } catch (e: Exception) {
-                Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
+                Timber.tag(TAG).e(e, "Failed to toggle archived status for anime: %s", animeId)
                 // Optionally, notify the UI about the error
             }
         }

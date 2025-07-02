@@ -99,13 +99,9 @@ fun TrendingAnimeScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp)
             )
             // Use AnimatedContent to switch between Loading, Success, and Error states
-            AnimatedContent(
-                targetState = uiState, // Animate based on the entire uiState object
-                label = "TrendingAnimeContent",
-                modifier = Modifier.weight(1f)
-                // You can add transitionSpec here for custom animations if desired
-            ) { targetState ->
-                when (targetState) {
+            // Temporarily replaced AnimatedContent with a direct when statement for diagnosis
+            Box(modifier = Modifier.weight(1f)) { // Added a Box to maintain similar layout structure as AnimatedContent
+                when (val currentUiState = uiState) { // Used a val for smart casting
                     TrendingAnimeUiState.Loading, TrendingAnimeUiState.Idle -> {
                         Box(
                             modifier = Modifier
@@ -117,7 +113,7 @@ fun TrendingAnimeScreen(
                     }
 
                     is TrendingAnimeUiState.Success -> {
-                        val animeDataList = targetState.animeList
+                        val animeDataList = currentUiState.animeList
                         if (animeDataList.isEmpty()) {
                             Box(
                                 modifier = Modifier
@@ -265,7 +261,7 @@ fun TrendingAnimeScreen(
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = targetState.message
+                                    text = currentUiState.message // Use currentUiState for smart cast
                                         ?: stringResource(R.string.an_error_occurred),
                                     style = MaterialTheme.typography.titleMedium
                                 )
