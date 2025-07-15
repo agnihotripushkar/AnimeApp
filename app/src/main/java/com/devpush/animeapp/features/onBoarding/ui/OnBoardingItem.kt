@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.devpush.animeapp.ui.theme.DarkTextColor
 import android.content.res.Resources
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -52,8 +54,8 @@ fun OnBoardingItem(
             painter = painterResource(id = page.image),
             contentDescription = null,
             modifier = Modifier
-                .height(350.dp)
-                .width(350.dp)
+                .fillMaxWidth(0.8f)
+                .aspectRatio(1f)
                 .padding(vertical = 16.dp)
         )
 

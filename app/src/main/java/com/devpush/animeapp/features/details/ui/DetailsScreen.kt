@@ -128,7 +128,7 @@ fun DetailsScreen(
                                 contentDescription = "Anime Cover Image",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(300.dp)
+                                    .aspectRatio(16f / 9f)
                                     .clip(
                                         RoundedCornerShape(
                                             bottomStart = 20.dp,

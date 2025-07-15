@@ -186,8 +186,7 @@ fun TrendingAnimeScreen(
                                     }
                                 } else {
                                     LazyVerticalGrid(
-                                        columns = GridCells.Fixed(2),
-                                        // columns = GridCells.Adaptive(minSize = 180.dp), // Alternative: Adaptive columns
+                                        columns = GridCells.Adaptive(minSize = 180.dp), // Alternative: Adaptive columns
                                         contentPadding = PaddingValues(8.dp)
                                     )
                                     {

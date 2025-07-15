@@ -89,12 +89,12 @@ fun AnimeCard(
                     model = anime.attributes.posterImage.originalUrl,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(96.dp)
+                        .size(width = 120.dp, height = 120.dp)
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop
                 )
 
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Row(
                         modifier = Modifier
                             .background(
