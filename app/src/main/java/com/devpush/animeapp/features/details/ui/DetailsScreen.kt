@@ -34,8 +34,16 @@ import coil.compose.AsyncImage
 import com.devpush.animeapp.R
 import com.devpush.animeapp.data.local.entities.AnimeDataEntity
 import org.koin.androidx.compose.koinViewModel
+import android.app.Activity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.ContainedLoadingIndicator
+import rememberDevicePosture
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun DetailsScreen(
     id: Int,
@@ -45,6 +53,12 @@ fun DetailsScreen(
     LaunchedEffect(key1 = true) {
         viewModel.fetchAnime(id)
     }
+
+    val windowSize = rememberDevicePosture(
+        windowSizeClass = calculateWindowSizeClass(
+            LocalContext.current as Activity
+        )
+    )
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val detailsListState = rememberLazyListState()
@@ -115,93 +129,23 @@ fun DetailsScreen(
                     },
                     floatingActionButtonPosition = FabPosition.End
                 ) { innerPadding ->
-                    LazyColumn(
-                        state = detailsListState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        item {
-                            AsyncImage(
-                                model = coverImage,
-                                contentDescription = "Anime Cover Image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(16f / 9f)
-                                    .clip(
-                                        RoundedCornerShape(
-                                            bottomStart = 20.dp,
-                                            bottomEnd = 20.dp
-                                        )
-                                    ),
-                                contentScale = ContentScale.Crop
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        if (windowSize == DevicePosture.EXPANDED_WIDTH) {
+                            DetailsScreenExpanded(
+                                modifier = Modifier.padding(innerPadding),
+                                detailsListState = detailsListState,
+                                coverImage = coverImage,
+                                anime = anime
+                            )
+                        } else {
+                            DetailsScreenCompact(
+                                modifier = Modifier.padding(innerPadding),
+                                detailsListState = detailsListState,
+                                coverImage = coverImage,
+                                anime = anime
                             )
                         }
-                        item {
-                            Column(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = anime.attributes.canonicalTitle ?: stringResource(R.string.unknown_title),
-                                    style = MaterialTheme.typography.displaySmall,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center
-                                )
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = anime.attributes.startDate?.split("-")?.first()
-                                            ?: "N/A",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = " - ",
-                                        modifier = Modifier.padding(horizontal = 4.dp)
-                                    )
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(1.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Star,
-                                            contentDescription = "Rating Star",
-                                            modifier = Modifier.padding(end = 4.dp)
-                                        )
-                                        Text(
-                                            text = anime?.attributes?.averageRating ?: "N/A",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                Column(
-                                    horizontalAlignment = Alignment.Start,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.synopsis),
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        text = anime.attributes.synopsis
-                                            ?: "No synopsis available."
-                                    )
-                                }
-                            }
-                        }
                     }
-
                 }
             } else {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -222,6 +166,197 @@ fun DetailsScreen(
                 ContainedLoadingIndicator()
             }
 
+        }
+    }
+}
+
+@Composable
+fun DetailsScreenCompact(
+    modifier: Modifier,
+    detailsListState: LazyListState,
+    coverImage: String?,
+    anime: AnimeDataEntity
+) {
+    LazyColumn(
+        state = detailsListState,
+        modifier = modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.Start
+    ) {
+        item {
+            AsyncImage(
+                model = coverImage,
+                contentDescription = "Anime Cover Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomStart = 20.dp,
+                            bottomEnd = 20.dp
+                        )
+                    ),
+                contentScale = ContentScale.Crop
+            )
+        }
+        item {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = anime.attributes.canonicalTitle ?: stringResource(R.string.unknown_title),
+                    style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = anime.attributes.startDate?.split("-")?.first()
+                            ?: "N/A",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = " - ",
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(1.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Star,
+                            contentDescription = "Rating Star",
+                            modifier = Modifier.padding(end = 4.dp)
+                        )
+                        Text(
+                            text = anime?.attributes?.averageRating ?: "N/A",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.synopsis),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = anime.attributes.synopsis
+                            ?: "No synopsis available."
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailsScreenExpanded(
+    modifier: Modifier,
+    detailsListState: LazyListState,
+    coverImage: String?,
+    anime: AnimeDataEntity
+) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        AsyncImage(
+            model = coverImage,
+            contentDescription = "Anime Cover Image",
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .aspectRatio(9f / 16f)
+                .clip(
+                    RoundedCornerShape(
+                        topEnd = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                ),
+            contentScale = ContentScale.Crop
+        )
+        LazyColumn(
+            state = detailsListState,
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.Start
+        ) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = anime.attributes.canonicalTitle ?: stringResource(R.string.unknown_title),
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = anime.attributes.startDate?.split("-")?.first()
+                                ?: "N/A",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = " - ",
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(1.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Star,
+                                contentDescription = "Rating Star",
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                            Text(
+                                text = anime?.attributes?.averageRating ?: "N/A",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.synopsis),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = anime.attributes.synopsis
+                                ?: "No synopsis available."
+                        )
+                    }
+                }
+            }
         }
     }
 }

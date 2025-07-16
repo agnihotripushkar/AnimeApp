@@ -42,14 +42,25 @@ import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthStatus
 import com.devpush.animeapp.features.settings.ui.SettingsViewModel
 import com.devpush.animeapp.features.settings.ui.utils.LanguageSelectionDialog
 import com.devpush.animeapp.features.settings.ui.utils.ThemeSelectionDialog
+import android.app.Activity
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import rememberDevicePosture
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun SettingsScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
+    val windowSize = rememberDevicePosture(
+        windowSizeClass = calculateWindowSizeClass(
+            LocalContext.current as Activity
+        )
+    )
 
     val context = LocalContext.current
     val biometricManager = BiometricManager.from(context)
@@ -95,92 +106,233 @@ fun SettingsScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .verticalScroll(scrollState)
-                .padding(all = 16.dp)
-        ) {
-            // Account Settings Section
-            Text(
-                text = stringResource(R.string.account_settings_section_title),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            SettingsItem(
-                title = stringResource(R.string.profile_info_title),
-                subtitle = stringResource(R.string.profile_info_subtitle),
-                showArrow = true
-            )
-            SettingsItem(title = stringResource(R.string.change_password_title), showArrow = true)
-            SettingsSwitchItem(
-                title = stringResource(R.string.settings_biometric_auth_toggle_title),
-                checked = isBiometricAuthEnabled,
-                onCheckedChange = { settingsViewModel.setBiometricAuthEnabled(it) }
-            )
-            SettingsItem(
-                title = stringResource(R.string.logout_title),
-                showArrow = true,
-                onClick = {
-                    settingsViewModel.performLogout()
-                    navController.navigate(NavGraph.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
+        Box(modifier = Modifier.padding(paddingValues)) {
+            if (windowSize == DevicePosture.EXPANDED_WIDTH) {
+                SettingsExpanded(
+                    scrollState = scrollState,
+                    settingsViewModel = settingsViewModel,
+                    isBiometricAuthEnabled = isBiometricAuthEnabled,
+                    navController = navController,
+                    currentTheme = currentTheme,
+                    showThemeDialog = showThemeDialog,
+                    currentLanguage = currentLanguage,
+                    showLanguageDialog = showLanguageDialog
+                )
+            } else {
+                SettingsCompact(
+                    scrollState = scrollState,
+                    settingsViewModel = settingsViewModel,
+                    isBiometricAuthEnabled = isBiometricAuthEnabled,
+                    navController = navController,
+                    currentTheme = currentTheme,
+                    showThemeDialog = showThemeDialog,
+                    currentLanguage = currentLanguage,
+                    showLanguageDialog = showLanguageDialog
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SettingsCompact(
+    scrollState: ScrollState,
+    settingsViewModel: SettingsViewModel,
+    isBiometricAuthEnabled: Boolean,
+    navController: NavController,
+    currentTheme: String,
+    showThemeDialog: Boolean,
+    currentLanguage: String,
+    showLanguageDialog: Boolean
+) {
+    var mShowThemeDialog = showThemeDialog
+    var mShowLanguageDialog = showLanguageDialog
+
+    Column(
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .padding(all = 16.dp)
+    ) {
+        // Account Settings Section
+        Text(
+            text = stringResource(R.string.account_settings_section_title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        SettingsItem(
+            title = stringResource(R.string.profile_info_title),
+            subtitle = stringResource(R.string.profile_info_subtitle),
+            showArrow = true
+        )
+        SettingsItem(title = stringResource(R.string.change_password_title), showArrow = true)
+        SettingsSwitchItem(
+            title = stringResource(R.string.settings_biometric_auth_toggle_title),
+            checked = isBiometricAuthEnabled,
+            onCheckedChange = { settingsViewModel.setBiometricAuthEnabled(it) }
+        )
+        SettingsItem(
+            title = stringResource(R.string.logout_title),
+            showArrow = true,
+            onClick = {
+                settingsViewModel.performLogout()
+                navController.navigate(NavGraph.Login.route) {
+                    popUpTo(0) { inclusive = true }
                 }
-            )
+            }
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // App Theme Section
-            Text(
-                text = stringResource(R.string.app_theme_section_title),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            SettingsItem(
-                title = stringResource(R.string.theme_selection_title),
-                subtitle = currentTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
-                showArrow = true,
-                onClick = { showThemeDialog = true }
-            )
-            SettingsItem(
-                title = stringResource(R.string.app_language_title),
-                subtitle = currentLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
-                showArrow = true,
-                onClick = { showLanguageDialog = true }
-            )
+        // App Theme Section
+        Text(
+            text = stringResource(R.string.app_theme_section_title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        SettingsItem(
+            title = stringResource(R.string.theme_selection_title),
+            subtitle = currentTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
+            showArrow = true,
+            onClick = { mShowThemeDialog = true }
+        )
+        SettingsItem(
+            title = stringResource(R.string.app_language_title),
+            subtitle = currentLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
+            showArrow = true,
+            onClick = { mShowLanguageDialog = true }
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // App Info Section
-            Text(
-                text = stringResource(R.string.app_info),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            SettingsItem(title = stringResource(R.string.app_version_title), subtitle = "1.0.0")
-            SettingsItem(title = stringResource(R.string.terms_conditions_title), showArrow = true)
-            SettingsItem(title = stringResource(R.string.privacy_policy_title), showArrow = true)
-        }
+        // App Info Section
+        Text(
+            text = stringResource(R.string.app_info),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        SettingsItem(title = stringResource(R.string.app_version_title), subtitle = "1.0.0")
+        SettingsItem(title = stringResource(R.string.terms_conditions_title), showArrow = true)
+        SettingsItem(title = stringResource(R.string.privacy_policy_title), showArrow = true)
+    }
 
-        if (showThemeDialog) {
-            ThemeSelectionDialog(
-                currentTheme = currentTheme,
-                onThemeSelected = { theme ->
-                    settingsViewModel.setAppTheme(theme)
-                },
-                onDismiss = { showThemeDialog = false }
-            )
-        }
-        if (showLanguageDialog) {
-            LanguageSelectionDialog(
-                currentLanguage = currentLanguage,
-                onLanguageSelected = { lang ->
-                    settingsViewModel.setAppLanguage(lang)
-                },
-                onDismiss = { showLanguageDialog = false }
-            )
-        }
+    if (mShowThemeDialog) {
+        ThemeSelectionDialog(
+            currentTheme = currentTheme,
+            onThemeSelected = { theme ->
+                settingsViewModel.setAppTheme(theme)
+            },
+            onDismiss = { mShowThemeDialog = false }
+        )
+    }
+    if (mShowLanguageDialog) {
+        LanguageSelectionDialog(
+            currentLanguage = currentLanguage,
+            onLanguageSelected = { lang ->
+                settingsViewModel.setAppLanguage(lang)
+            },
+            onDismiss = { mShowLanguageDialog = false }
+        )
+    }
+}
+
+@Composable
+fun SettingsExpanded(
+    scrollState: ScrollState,
+    settingsViewModel: SettingsViewModel,
+    isBiometricAuthEnabled: Boolean,
+    navController: NavController,
+    currentTheme: String,
+    showThemeDialog: Boolean,
+    currentLanguage: String,
+    showLanguageDialog: Boolean
+) {
+    var mShowThemeDialog = showThemeDialog
+    var mShowLanguageDialog = showLanguageDialog
+
+    Column(
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .padding(all = 16.dp)
+    ) {
+        // Account Settings Section
+        Text(
+            text = stringResource(R.string.account_settings_section_title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        SettingsItem(
+            title = stringResource(R.string.profile_info_title),
+            subtitle = stringResource(R.string.profile_info_subtitle),
+            showArrow = true
+        )
+        SettingsItem(title = stringResource(R.string.change_password_title), showArrow = true)
+        SettingsSwitchItem(
+            title = stringResource(R.string.settings_biometric_auth_toggle_title),
+            checked = isBiometricAuthEnabled,
+            onCheckedChange = { settingsViewModel.setBiometricAuthEnabled(it) }
+        )
+        SettingsItem(
+            title = stringResource(R.string.logout_title),
+            showArrow = true,
+            onClick = {
+                settingsViewModel.performLogout()
+                navController.navigate(NavGraph.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // App Theme Section
+        Text(
+            text = stringResource(R.string.app_theme_section_title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        SettingsItem(
+            title = stringResource(R.string.theme_selection_title),
+            subtitle = currentTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
+            showArrow = true,
+            onClick = { mShowThemeDialog = true }
+        )
+        SettingsItem(
+            title = stringResource(R.string.app_language_title),
+            subtitle = currentLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
+            showArrow = true,
+            onClick = { mShowLanguageDialog = true }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // App Info Section
+        Text(
+            text = stringResource(R.string.app_info),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        SettingsItem(title = stringResource(R.string.app_version_title), subtitle = "1.0.0")
+        SettingsItem(title = stringResource(R.string.terms_conditions_title), showArrow = true)
+        SettingsItem(title = stringResource(R.string.privacy_policy_title), showArrow = true)
+    }
+
+    if (mShowThemeDialog) {
+        ThemeSelectionDialog(
+            currentTheme = currentTheme,
+            onThemeSelected = { theme ->
+                settingsViewModel.setAppTheme(theme)
+            },
+            onDismiss = { mShowThemeDialog = false }
+        )
+    }
+    if (mShowLanguageDialog) {
+        LanguageSelectionDialog(
+            currentLanguage = currentLanguage,
+            onLanguageSelected = { lang ->
+                settingsViewModel.setAppLanguage(lang)
+            },
+            onDismiss = { mShowLanguageDialog = false }
+        )
     }
 }
 
