@@ -2,7 +2,6 @@ package com.devpush.animeapp.features.onBoarding.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,13 +36,27 @@ import com.devpush.animeapp.ui.theme.Gray400
 import com.devpush.animeapp.ui.theme.PrimaryGreen
 import com.devpush.animeapp.ui.theme.PrimaryGreenDark
 import com.devpush.animeapp.ui.theme.PrimaryGreenLight
+import android.app.Activity
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.MaterialTheme
+import com.devpush.animeapp.ui.theme.DarkTextColor
+import rememberDevicePosture
+import timber.log.Timber
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun OnBoardingScreen(
     onGetStartedClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val windowSize = rememberDevicePosture(
+        windowSizeClass = calculateWindowSizeClass(
+            LocalContext.current as Activity
+        )
+    )
 
     val onBoardList = listOf(
         OnBoardingModel(
@@ -65,8 +78,145 @@ fun OnBoardingScreen(
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { onBoardList.size })
 
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        when (windowSize) {
+            DevicePosture.PHONE_COMPACT -> {
+                OnBoardingCompact(
+                    modifier = modifier,
+                    onBoardList = onBoardList,
+                    pagerState = pagerState,
+                    onGetStartedClicked = onGetStartedClicked
+                )
+            }
+
+            DevicePosture.TABLET_COMPACT_PORTRAIT -> {
+                Timber.d("TABLET_COMPACT_PORTRAIT")
+                OnBoardingTabletCompact(
+                    modifier = modifier,
+                    onBoardList = onBoardList,
+                    pagerState = pagerState,
+                    onGetStartedClicked = onGetStartedClicked
+                )
+            }
+            DevicePosture.MEDIUM_WIDTH -> {
+                Timber.d("MEDIUM_WIDTH")
+                OnBoardingCompact(
+                    modifier = modifier,
+                    onBoardList = onBoardList,
+                    pagerState = pagerState,
+                    onGetStartedClicked = onGetStartedClicked
+                )
+            }
+            DevicePosture.EXPANDED_WIDTH -> {
+                OnBoardingExpanded(
+                    modifier = modifier,
+                    onBoardList = onBoardList,
+                    pagerState = pagerState,
+                    onGetStartedClicked = onGetStartedClicked
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OnBoardingTabletCompact(
+    modifier: Modifier,
+    onBoardList: List<OnBoardingModel>,
+    pagerState: PagerState,
+    onGetStartedClicked: () -> Unit,
+    style: TextStyle = MaterialTheme.typography.headlineSmall
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    0f to PrimaryGreen,
+                    1f to PrimaryGreenDark
+                )
+            )
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = modifier
+                .fillMaxWidth()
+                .weight(0.8f)
+                .padding(horizontal = 16.dp)
+        ) { page ->
+            OnBoardingItem(onBoardList[page], style = style)
+        }
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.1f)
+                .padding(horizontal = 16.dp)
+        ) {
+            repeat(onBoardList.size) { index ->
+                val isSelected = pagerState.currentPage == index
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .width(if (isSelected) 18.dp else 8.dp)
+                        .height(if (isSelected) 8.dp else 8.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Gray400,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .background(
+                            color = if (isSelected) colorResource(R.color.onboarding_indicator_selected)
+                            else colorResource(R.color.onboarding_indicator_unselected),
+                            shape = CircleShape
+                        )
+                )
+            }
+
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.1f)
+                .padding(horizontal = 16.dp)
+        ) {
+            Button(
+                onClick = onGetStartedClicked,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryGreenLight,
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.skip),
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                    )
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun OnBoardingCompact(
+    modifier: Modifier,
+    onBoardList: List<OnBoardingModel>,
+    pagerState: PagerState,
+    onGetStartedClicked: () -> Unit
+) {
+    Column(
+        modifier = modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
@@ -139,5 +289,97 @@ fun OnBoardingScreen(
                 )
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun OnBoardingExpanded(
+    modifier: Modifier,
+    onBoardList: List<OnBoardingModel>,
+    pagerState: PagerState,
+    onGetStartedClicked: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.horizontalGradient(
+                    0f to PrimaryGreenLight,
+                    1f to PrimaryGreenDark
+                )
+            )
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = modifier
+                .weight(0.8f)
+                .padding(horizontal = 16.dp)
+        ) { page ->
+            OnBoardingExpandedItem(onBoardList[page])
+        }
+
+        Row (
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.2f)
+                .padding(horizontal = 16.dp)
+        ){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.9f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(onBoardList.size) { index ->
+                    val isSelected = pagerState.currentPage == index
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .width(if (isSelected) 18.dp else 8.dp)
+                            .height(if (isSelected) 8.dp else 8.dp)
+                            .border(
+                                width = 1.dp,
+                                color = Gray400,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .background(
+                                color = if (isSelected) colorResource(R.color.onboarding_indicator_selected)
+                                else colorResource(R.color.onboarding_indicator_unselected),
+                                shape = CircleShape
+                            )
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.1f),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+
+            ) {
+                Button(
+                    onClick = onGetStartedClicked,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryGreenLight,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.skip),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = DarkTextColor
+                    )
+                }
+            }
+        }
+
+
+
     }
 }

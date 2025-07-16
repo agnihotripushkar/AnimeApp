@@ -37,10 +37,9 @@ import com.devpush.animeapp.features.auth.ui.utils.Separator
 import com.devpush.animeapp.ui.theme.PrimaryViolet
 import com.devpush.animeapp.ui.theme.PrimaryVioletDark
 import com.devpush.animeapp.ui.theme.PrimaryVioletLight
-import com.devpush.animeapp.utils.WindowSize
-import com.devpush.animeapp.utils.rememberWindowSizeClass
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import rememberDevicePosture
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -50,7 +49,7 @@ fun RegistrationScreen(
     onLoginClicked: () -> Unit,
     viewModel: AuthViewModel = koinViewModel()
 ) {
-    val windowSize = rememberWindowSizeClass(
+    val windowSize = rememberDevicePosture(
         windowSizeClass = calculateWindowSizeClass(
             LocalContext.current as Activity
         )
@@ -83,30 +82,61 @@ fun RegistrationScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        if (windowSize == WindowSize.EXPANDED) {
-            RegistrationScreenExpanded(
-                modifier = modifier,
-                onRegisterSuccessNavigation = onRegisterSuccessNavigation,
-                onLoginClicked = onLoginClicked,
-                viewModel = viewModel,
-                uiState = uiState,
-                passwordVisible = passwordVisible,
-                onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
-                confirmPasswordVisible = confirmPasswordVisible,
-                onConfirmPasswordVisibilityChanged = { confirmPasswordVisible = !confirmPasswordVisible }
-            )
-        } else {
-            RegistrationScreenCompact(
-                modifier = modifier,
-                onRegisterSuccessNavigation = onRegisterSuccessNavigation,
-                onLoginClicked = onLoginClicked,
-                viewModel = viewModel,
-                uiState = uiState,
-                passwordVisible = passwordVisible,
-                onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
-                confirmPasswordVisible = confirmPasswordVisible,
-                onConfirmPasswordVisibilityChanged = { confirmPasswordVisible = !confirmPasswordVisible }
-            )
+        when (windowSize) {
+            DevicePosture.PHONE_COMPACT -> {
+                RegistrationScreenCompact(
+                    modifier = modifier,
+                    onRegisterSuccessNavigation = onRegisterSuccessNavigation,
+                    onLoginClicked = onLoginClicked,
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
+                    confirmPasswordVisible = confirmPasswordVisible,
+                    onConfirmPasswordVisibilityChanged = { confirmPasswordVisible = !confirmPasswordVisible }
+                )
+            }
+
+            DevicePosture.TABLET_COMPACT_PORTRAIT -> {
+                // TODO Handle Tablet vertical Orientation
+                RegistrationScreenCompact(
+                    modifier = modifier,
+                    onRegisterSuccessNavigation = onRegisterSuccessNavigation,
+                    onLoginClicked = onLoginClicked,
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
+                    confirmPasswordVisible = confirmPasswordVisible,
+                    onConfirmPasswordVisibilityChanged = { confirmPasswordVisible = !confirmPasswordVisible }
+                )
+            }
+            DevicePosture.MEDIUM_WIDTH -> {
+                RegistrationScreenCompact(
+                    modifier = modifier,
+                    onRegisterSuccessNavigation = onRegisterSuccessNavigation,
+                    onLoginClicked = onLoginClicked,
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
+                    confirmPasswordVisible = confirmPasswordVisible,
+                    onConfirmPasswordVisibilityChanged = { confirmPasswordVisible = !confirmPasswordVisible }
+                )
+            }
+            DevicePosture.EXPANDED_WIDTH -> {
+                RegistrationScreenExpanded(
+                    modifier = modifier,
+                    onRegisterSuccessNavigation = onRegisterSuccessNavigation,
+                    onLoginClicked = onLoginClicked,
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
+                    confirmPasswordVisible = confirmPasswordVisible,
+                    onConfirmPasswordVisibilityChanged = { confirmPasswordVisible = !confirmPasswordVisible }
+                )
+            }
         }
     }
 }

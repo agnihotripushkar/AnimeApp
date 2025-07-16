@@ -70,8 +70,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import com.devpush.animeapp.utils.WindowSize
-import com.devpush.animeapp.utils.rememberWindowSizeClass
+import rememberDevicePosture
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -81,7 +80,7 @@ fun LoginScreen(
     onLoginSuccessNavigation: () -> Unit,
     viewModel: AuthViewModel = koinViewModel()
 ) {
-    val windowSize = rememberWindowSizeClass(
+    val windowSize = rememberDevicePosture(
         windowSizeClass = calculateWindowSizeClass(
             LocalContext.current as Activity
         )
@@ -110,26 +109,58 @@ fun LoginScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        if (windowSize == WindowSize.EXPANDED) {
-            LoginScreenExpanded(
-                modifier = modifier,
-                onOpenRegistrationClicked = onOpenRegistrationClicked,
-                onLoginSuccessNavigation = onLoginSuccessNavigation,
-                viewModel = viewModel,
-                uiState = uiState,
-                passwordVisible = passwordVisible,
-                onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
-            )
+        when (windowSize) {
+            DevicePosture.PHONE_COMPACT -> {
+                LoginScreenCompact(
+                    modifier = modifier,
+                    onOpenRegistrationClicked = onOpenRegistrationClicked,
+                    onLoginSuccessNavigation = onLoginSuccessNavigation,
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
+                )
+            }
+
+            DevicePosture.TABLET_COMPACT_PORTRAIT -> {
+                //TODO Handle Tablet vertical Orientation
+                LoginScreenCompact(
+                    modifier = modifier,
+                    onOpenRegistrationClicked = onOpenRegistrationClicked,
+                    onLoginSuccessNavigation = onLoginSuccessNavigation,
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
+                )
+            }
+            DevicePosture.MEDIUM_WIDTH ->{
+                LoginScreenCompact(
+                    modifier = modifier,
+                    onOpenRegistrationClicked = onOpenRegistrationClicked,
+                    onLoginSuccessNavigation = onLoginSuccessNavigation,
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
+                )
+            }
+            DevicePosture.EXPANDED_WIDTH -> {
+                LoginScreenExpanded(
+                    modifier = modifier,
+                    onOpenRegistrationClicked = onOpenRegistrationClicked,
+                    onLoginSuccessNavigation = onLoginSuccessNavigation,
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
+                )
+            }
+        }
+        if (windowSize == DevicePosture.EXPANDED_WIDTH) {
+
         } else {
-            LoginScreenCompact(
-                modifier = modifier,
-                onOpenRegistrationClicked = onOpenRegistrationClicked,
-                onLoginSuccessNavigation = onLoginSuccessNavigation,
-                viewModel = viewModel,
-                uiState = uiState,
-                passwordVisible = passwordVisible,
-                onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
-            )
+
         }
     }
 }

@@ -22,13 +22,15 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.devpush.animeapp.features.onBoarding.domain.OnBoardingModel
 
 @Composable
 fun OnBoardingItem(
     page: OnBoardingModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.bodyLarge
 ) {
     val context = LocalContext.current
     val resources: Resources = context.resources
@@ -39,36 +41,31 @@ fun OnBoardingItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = resources.getString(page.title),
             style = MaterialTheme.typography.headlineLarge,
             color = DarkTextColor,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(vertical = 32.dp, horizontal = 16.dp)
         )
-
-        Spacer(modifier = Modifier.height(32.dp))
 
         Image(
             painter = painterResource(id = page.image),
             contentDescription = null,
             modifier = Modifier
-                .fillMaxWidth(0.8f)
+                .fillMaxWidth(0.7f)
                 .aspectRatio(1f)
-                .padding(vertical = 16.dp)
-        )
+                .padding(vertical = 32.dp)
 
-        Spacer(modifier = Modifier.height(32.dp))
+        )
 
         Text(
             text = resources.getString(page.text),
-            modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp),
-            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(vertical = 32.dp, horizontal = 16.dp),
+            style = style,
             color = Color.White,
             textAlign = TextAlign.Center
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
