@@ -17,26 +17,24 @@ class DetailsScreenViewModel(private val repository: AnimeDetailsRepository) : V
     val uiState: StateFlow<DetailsScreenUiState> = _uiState.asStateFlow()
 
     fun fetchAnime(id: Int) {
-
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = DetailsScreenUiState.Loading
-            when (val apiResult = repository.getAnime(id)) {
-                is NetworkResult.Loading -> {
-                    _uiState.value = DetailsScreenUiState.Loading
-                }
+            val animeResult = repository.getAnime(id)
+            val genresResult = repository.getAnimeGenres(id)
 
-                is NetworkResult.Success -> {
-                    val animeData = apiResult.data.toModel()
-                    _uiState.value = DetailsScreenUiState.Success(animeData)
-                }
-
-                is NetworkResult.Error -> {
-                    Timber.e("getAnime for id $id failed: ${apiResult.message}")
-                    _uiState.value =
-                        DetailsScreenUiState.Error(apiResult.message, apiResult.exception)
-                }
+            if (animeResult is NetworkResult.Success && genresResult is NetworkResult.Success) {
+                val animeData = animeResult.data.toModel()
+                val genresData = genresResult.data.data
+                _uiState.value = DetailsScreenUiState.Success(animeData, genresData)
+            } else if (animeResult is NetworkResult.Error) {
+                Timber.e("getAnime for id $id failed: ${animeResult.message}")
+                _uiState.value =
+                    DetailsScreenUiState.Error(animeResult.message, animeResult.exception)
+            } else if (genresResult is NetworkResult.Error) {
+                Timber.e("getAnimeGenres for id $id failed: ${genresResult.message}")
+                _uiState.value =
+                    DetailsScreenUiState.Error(genresResult.message, genresResult.exception)
             }
         }
     }
-
 }

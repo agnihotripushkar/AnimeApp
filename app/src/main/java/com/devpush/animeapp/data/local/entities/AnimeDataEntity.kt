@@ -39,6 +39,24 @@ data class AnimeAttributesDb(
     @ColumnInfo(name = "start_date")
     val startDate: String?,
 
+    @ColumnInfo(name = "endDate")
+    val endDate: String?,
+
+    @ColumnInfo(name = "subType")
+    val subType: String?,
+
+    @ColumnInfo(name = "status")
+    val status: String?,
+
+    @ColumnInfo(name = "ageRating")
+    val ageRating: String?,
+
+    @ColumnInfo(name = "ageRatingGuide")
+    val ageRatingGuide: String?,
+
+    @ColumnInfo(name = "episodeCount")
+    val episodeCount: Int?,
+
     @Embedded(prefix = "poster_") // Prefix to avoid column name conflicts if PosterImageDb had more fields
     val posterImage: PosterImageDb
 )

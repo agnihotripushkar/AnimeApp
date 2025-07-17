@@ -5,6 +5,7 @@ import com.devpush.animeapp.core.network.NetworkResult
 import com.devpush.animeapp.features.trending.data.remote.responsebody.AnimeResponseDto
 import com.devpush.animeapp.features.details.domain.repository.AnimeDetailsRepository
 import com.devpush.animeapp.features.details.utils.Constants
+import com.devpush.animeapp.features.trending.data.remote.responsebody.GenreResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -27,6 +28,23 @@ class AnimeDetailsRepositoryImpl(val ktorClient: HttpClient) : AnimeDetailsRepos
             NetworkResult.Error(e, "Network error occurred.")
         } catch (e: Exception) {
             Timber.tag(Constants.TAG).e(e, "getAnime Exception for id $id: An unexpected error occurred")
+            NetworkResult.Error(e, "An unexpected error occurred.")
+        }
+    }
+
+    override suspend fun getAnimeGenres(id: Int): NetworkResult<GenreResponse> {
+        return try {
+            val response = ktorClient.get(ApiEndpoints.ANIME_GENRES_ENDPOINT.format(id)).body<GenreResponse>()
+            NetworkResult.Success(response)
+        } catch (e: UnknownHostException) {
+            Timber.tag(Constants.TAG)
+                .e(e, "getAnimeGenres UnknownHostException for id $id: No internet or host not found")
+            NetworkResult.Error(e, "Unable to resolve host. Check internet connection.")
+        } catch (e: IOException) {
+            Timber.tag(Constants.TAG).e(e, "getAnimeGenres IOException for id $id: Network error")
+            NetworkResult.Error(e, "Network error occurred.")
+        } catch (e: Exception) {
+            Timber.tag(Constants.TAG).e(e, "getAnimeGenres Exception for id $id: An unexpected error occurred")
             NetworkResult.Error(e, "An unexpected error occurred.")
         }
     }

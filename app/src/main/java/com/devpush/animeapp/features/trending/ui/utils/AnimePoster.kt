@@ -71,7 +71,13 @@ fun AnimPosterPreview() {
                     ),
                     synopsis = "",
                     averageRating = "",
-                    startDate = ""
+                    startDate = "2025-09-19",
+                    endDate = "2025-10-20",
+                    subType = "TV",
+                    status = "Finished",
+                    ageRating = "R",
+                    ageRatingGuide = "Recommended 18+",
+                    episodeCount = 25,
                 )
             ),
             onClick = {}
@@ -93,7 +99,13 @@ fun AnimPosterMissingDataPreview() {
                     ),
                     synopsis = "",
                     averageRating = "",
-                    startDate = ""
+                    startDate = "",
+                    endDate = "",
+                    subType = "",
+                    status = "",
+                    ageRating = "",
+                    ageRatingGuide = "",
+                    episodeCount = 0,
                 )
             ),
             onClick = {}

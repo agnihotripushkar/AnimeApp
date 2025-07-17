@@ -41,9 +41,12 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.ContainedLoadingIndicator
+import com.devpush.animeapp.features.trending.data.remote.responsebody.GenreData
 import rememberDevicePosture
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalMaterial3WindowSizeClassApi::class,
+    ExperimentalLayoutApi::class)
 @Composable
 fun DetailsScreen(
     id: Int,
@@ -135,14 +138,16 @@ fun DetailsScreen(
                                 modifier = Modifier.padding(innerPadding),
                                 detailsListState = detailsListState,
                                 coverImage = coverImage,
-                                anime = anime
+                                anime = anime,
+                                genres = state.genres
                             )
                         } else {
                             DetailsScreenCompact(
                                 modifier = Modifier.padding(innerPadding),
                                 detailsListState = detailsListState,
                                 coverImage = coverImage,
-                                anime = anime
+                                anime = anime,
+                                genres = state.genres
                             )
                         }
                     }
@@ -170,12 +175,14 @@ fun DetailsScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailsScreenCompact(
     modifier: Modifier,
     detailsListState: LazyListState,
     coverImage: String?,
-    anime: AnimeDataEntity
+    anime: AnimeDataEntity,
+    genres: List<GenreData>
 ) {
     LazyColumn(
         state = detailsListState,
@@ -259,17 +266,36 @@ fun DetailsScreenCompact(
                             ?: "No synopsis available."
                     )
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    genres.forEach { genre ->
+                        Button(
+                            onClick = { /*TODO*/ },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(text = genre.attributes.name)
+                        }
+                    }
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailsScreenExpanded(
     modifier: Modifier,
     detailsListState: LazyListState,
     coverImage: String?,
-    anime: AnimeDataEntity
+    anime: AnimeDataEntity,
+    genres: List<GenreData>
 ) {
     Row(
         modifier = modifier
@@ -283,8 +309,8 @@ fun DetailsScreenExpanded(
                 .aspectRatio(9f / 16f)
                 .clip(
                     RoundedCornerShape(
-                        topEnd = 20.dp,
-                        bottomEnd = 20.dp
+                        topEnd = 10.dp,
+                        bottomEnd = 10.dp
                     )
                 ),
             contentScale = ContentScale.Crop
@@ -310,26 +336,33 @@ fun DetailsScreenExpanded(
                     )
 
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    )
+                    {
                         Text(
-                            text = anime.attributes.startDate?.split("-")?.first()
-                                ?: "N/A",
+                            text = anime.attributes.startDate?.split("-")?.first() ?: "N/A",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = " - ",
-                            modifier = Modifier.padding(horizontal = 4.dp)
+                            modifier = Modifier.padding(horizontal = 2.dp)
+                        )
+                        Text(
+                            text = anime.attributes.endDate?.split("-")?.first()
+                                ?: "N/A",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
                         )
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(1.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Star,
                                 contentDescription = "Rating Star",
-                                modifier = Modifier.padding(end = 4.dp)
+                                modifier = Modifier.padding(start = 4.dp)
                             )
                             Text(
                                 text = anime?.attributes?.averageRating ?: "N/A",
@@ -337,7 +370,62 @@ fun DetailsScreenExpanded(
                                 fontWeight = FontWeight.Medium
                             )
                         }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+
+                        ) {
+                            Text(
+                                text = anime?.attributes?.ageRating ?: "N/A",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            Text(
+                                text = " - ",
+                                modifier = Modifier.padding(horizontal = 2.dp)
+                            )
+
+                            Text(
+                                text = anime?.attributes?.ageRatingGuide ?: "N/A",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
+                    Row (
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Text(
+                            text = "Episodes - ${anime.attributes.episodeCount}" ?: "N/A",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Text(
+                            text = "Type - ${anime.attributes.subType}" ?: "N/A",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        genres.forEach { genre ->
+                            Button(
+                                onClick = { /*TODO*/ },
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                            ) {
+                                Text(text = genre.attributes.name)
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Column(
@@ -355,6 +443,8 @@ fun DetailsScreenExpanded(
                                 ?: "No synopsis available."
                         )
                     }
+
+
                 }
             }
         }
