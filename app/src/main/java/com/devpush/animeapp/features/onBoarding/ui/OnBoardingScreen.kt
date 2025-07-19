@@ -43,7 +43,8 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.MaterialTheme
 import com.devpush.animeapp.ui.theme.DarkTextColor
-import rememberDevicePosture
+import com.devpush.animeapp.utils.DevicePosture
+import com.devpush.animeapp.utils.rememberDevicePosture
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3WindowSizeClassApi::class)

@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.rounded.Star
@@ -41,8 +40,9 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.ContainedLoadingIndicator
-import com.devpush.animeapp.features.trending.data.remote.responsebody.GenreData
-import rememberDevicePosture
+import com.devpush.animeapp.features.details.data.remote.responsebody.GenreData
+import com.devpush.animeapp.utils.DevicePosture
+import com.devpush.animeapp.utils.rememberDevicePosture
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class,
     ExperimentalMaterial3WindowSizeClassApi::class,

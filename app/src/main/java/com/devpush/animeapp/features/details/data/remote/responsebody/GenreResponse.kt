@@ -1,4 +1,4 @@
-package com.devpush.animeapp.features.trending.data.remote.responsebody
+package com.devpush.animeapp.features.details.data.remote.responsebody
 
 import kotlinx.serialization.Serializable
 

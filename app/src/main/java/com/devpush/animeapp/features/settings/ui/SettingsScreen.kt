@@ -30,7 +30,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.R
 import com.devpush.animeapp.core.navigation.NavGraph
-import com.devpush.animeapp.features.auth.ui.login.LoginScreen
 import com.devpush.animeapp.features.settings.ui.utils.SettingsItem
 import com.devpush.animeapp.features.settings.ui.utils.SettingsSwitchItem
 import com.devpush.animeapp.ui.theme.AnimeAppTheme
@@ -39,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthStatus
-import com.devpush.animeapp.features.settings.ui.SettingsViewModel
 import com.devpush.animeapp.features.settings.ui.utils.LanguageSelectionDialog
 import com.devpush.animeapp.features.settings.ui.utils.ThemeSelectionDialog
 import android.app.Activity
@@ -47,7 +45,8 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import rememberDevicePosture
+import com.devpush.animeapp.utils.DevicePosture
+import com.devpush.animeapp.utils.rememberDevicePosture
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)

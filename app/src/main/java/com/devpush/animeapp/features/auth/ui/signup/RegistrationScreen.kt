@@ -37,9 +37,10 @@ import com.devpush.animeapp.features.auth.ui.utils.Separator
 import com.devpush.animeapp.ui.theme.PrimaryViolet
 import com.devpush.animeapp.ui.theme.PrimaryVioletDark
 import com.devpush.animeapp.ui.theme.PrimaryVioletLight
+import com.devpush.animeapp.utils.DevicePosture
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import rememberDevicePosture
+import com.devpush.animeapp.utils.rememberDevicePosture
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
