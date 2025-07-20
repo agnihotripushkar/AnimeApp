@@ -1,6 +1,9 @@
 package com.devpush.animeapp.features.settings.ui
 
+import android.app.Activity
 import androidx.biometric.BiometricManager
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -17,12 +20,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,23 +38,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.R
 import com.devpush.animeapp.core.navigation.NavGraph
-import com.devpush.animeapp.features.settings.ui.utils.SettingsItem
-import com.devpush.animeapp.features.settings.ui.utils.SettingsSwitchItem
-import com.devpush.animeapp.ui.theme.AnimeAppTheme
-import org.koin.androidx.compose.koinViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthStatus
 import com.devpush.animeapp.features.settings.ui.utils.LanguageSelectionDialog
+import com.devpush.animeapp.features.settings.ui.utils.SettingsItem
+import com.devpush.animeapp.features.settings.ui.utils.SettingsSwitchItem
 import com.devpush.animeapp.features.settings.ui.utils.ThemeSelectionDialog
-import android.app.Activity
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import com.devpush.animeapp.utils.DevicePosture
 import com.devpush.animeapp.utils.rememberDevicePosture
+import org.koin.androidx.compose.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)

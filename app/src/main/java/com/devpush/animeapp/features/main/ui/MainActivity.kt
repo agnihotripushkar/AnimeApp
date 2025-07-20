@@ -1,12 +1,12 @@
 package com.devpush.animeapp.features.main.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity // Added
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.devpush.animeapp.R

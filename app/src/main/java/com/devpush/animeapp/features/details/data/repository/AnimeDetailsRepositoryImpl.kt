@@ -2,10 +2,10 @@ package com.devpush.animeapp.features.details.data.repository
 
 import com.devpush.animeapp.core.network.ApiEndpoints
 import com.devpush.animeapp.core.network.NetworkResult
-import com.devpush.animeapp.features.trending.data.remote.responsebody.AnimeResponseDto
+import com.devpush.animeapp.features.details.data.remote.responsebody.GenreResponse
 import com.devpush.animeapp.features.details.domain.repository.AnimeDetailsRepository
 import com.devpush.animeapp.features.details.utils.Constants
-import com.devpush.animeapp.features.details.data.remote.responsebody.GenreResponse
+import com.devpush.animeapp.features.trending.data.remote.responsebody.AnimeResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

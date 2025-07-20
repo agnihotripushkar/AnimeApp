@@ -7,8 +7,8 @@ import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeViewModel
 import com.devpush.animeapp.features.main.ui.MainViewModel
 import com.devpush.animeapp.features.settings.ui.SettingsViewModel
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeViewModel
-import org.koin.dsl.module
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
 
 val presentationModule = module {
     viewModel { DetailsScreenViewModel(get()) }

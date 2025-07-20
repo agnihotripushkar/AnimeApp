@@ -2,9 +2,9 @@ package com.devpush.animeapp.features.trending.data.repository
 
 import com.devpush.animeapp.core.network.ApiEndpoints
 import com.devpush.animeapp.core.network.NetworkResult
-import com.devpush.animeapp.features.trending.data.remote.responsebody.TrendingAnimeListResponse
 import com.devpush.animeapp.data.local.dao.TrendingAnimeDao
 import com.devpush.animeapp.data.local.entities.AnimeDataEntity
+import com.devpush.animeapp.features.trending.data.remote.responsebody.TrendingAnimeListResponse
 import com.devpush.animeapp.features.trending.domain.repository.TrendingAnimeRepository
 import com.devpush.animeapp.features.trending.utils.Constants
 import io.ktor.client.HttpClient
