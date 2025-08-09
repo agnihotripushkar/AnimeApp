@@ -11,7 +11,9 @@ val databaseModule = module {
             androidApplication(),
             AnimeDatabase::class.java,
             "anime_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration(true)
+            .build()
     }
 
     single {
