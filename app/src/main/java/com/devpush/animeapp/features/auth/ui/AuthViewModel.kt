@@ -1,8 +1,7 @@
 package com.devpush.animeapp.features.auth.ui
 
-import android.util.Patterns
 import android.app.Application
-import androidx.fragment.app.FragmentActivity
+import android.util.Patterns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.domian.repository.UserPreferencesRepository
@@ -13,12 +12,9 @@ import com.devpush.animeapp.features.auth.ui.signup.RegistrationUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 

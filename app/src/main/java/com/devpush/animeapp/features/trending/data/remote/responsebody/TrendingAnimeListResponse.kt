@@ -24,9 +24,7 @@ data class AnimeResponseDto(
 data class AnimeDataResponse(
     val id: String,
     val type: String,
-    val links: LinksDto,
     val attributes: AttributesDto,
-    val relationships: RelationshipsDto
 ) {
     fun toModel(): AnimeDataEntity =
         AnimeDataEntity(
@@ -61,7 +59,6 @@ data class AttributesDto(
     val episodeCount: Int?,
     val episodeLength: Int?,
     val youtubeVideoId: String?,
-    val showType: String?,
     val nsfw: Boolean
 ) {
     fun toModel(): AnimeAttributesDb =
@@ -70,7 +67,13 @@ data class AttributesDto(
             canonicalTitle = canonicalTitle,
             averageRating = averageRating,
             posterImage = posterImage.toModel(),
-            startDate = startDate
+            startDate = startDate,
+            endDate = endDate,
+            subType = subtype,
+            status = status,
+            ageRating = ageRating,
+            ageRatingGuide = ageRatingGuide,
+            episodeCount = episodeCount,
         )
 }
 
@@ -81,7 +84,6 @@ data class PosterImageDto(
     val medium: String,
     val large: String,
     val original: String,
-    val meta: MetaDto?
 ) {
     fun toModel(): PosterImageDb =
         PosterImageDb(
@@ -89,53 +91,3 @@ data class PosterImageDto(
         )
 }
 
-@Serializable
-data class MetaDto(
-    val dimensions: DimensionsDto
-)
-
-@Serializable
-data class DimensionsDto(
-    val tiny: SizeDto,
-    val small: SizeDto,
-    val large: SizeDto
-)
-
-@Serializable
-data class SizeDto(
-    val width: Int? = null,
-    val height: Int? = null
-)
-
-
-@Serializable
-data class RelationshipsDto(
-    val genres: RelationDto,
-    val categories: RelationDto,
-    val castings: RelationDto,
-    val installments: RelationDto,
-    val mappings: RelationDto,
-    val reviews: RelationDto,
-    val mediaRelationships: RelationDto,
-    val episodes: RelationDto,
-    val streamingLinks: RelationDto,
-    val animeProductions: RelationDto,
-    val animeCharacters: RelationDto,
-    val animeStaff: RelationDto
-)
-
-@Serializable
-data class RelationDto(
-    val links: RelationLinksDto
-)
-
-@Serializable
-data class LinksDto(
-    val self: String
-)
-
-@Serializable
-data class RelationLinksDto(
-    val self: String,
-    val related: String
-)

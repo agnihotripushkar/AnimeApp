@@ -1,6 +1,5 @@
 package com.devpush.animeapp.features.favorited.ui
 
-import android.R.attr.navigationIcon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -30,25 +28,34 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.R
-import com.devpush.animeapp.core.navigation.NavGraph
 import com.devpush.animeapp.data.local.entities.AnimeDataEntity
 import com.devpush.animeapp.features.trending.ui.utils.AnimeCard
-import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import android.app.Activity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.ui.platform.LocalContext
+import com.devpush.animeapp.utils.DevicePosture
+import com.devpush.animeapp.utils.rememberDevicePosture
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun FavoritedAnimeScreen(
     navController: NavController,
     onAnimeClick: (animeId: String) -> Unit = { Timber.d("Anime card clicked: $it") },
     viewModel: FavoritedAnimeViewModel = koinViewModel()
 ) {
+    val windowSize = rememberDevicePosture(
+        windowSizeClass = calculateWindowSizeClass(
+            LocalContext.current as Activity
+        )
+    )
+
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
@@ -71,63 +78,159 @@ fun FavoritedAnimeScreen(
             )
         }
     ) { innerPadding ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                color = MaterialTheme.colorScheme.surfaceVariant
-            )
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            if (uiState.isLoading) {
-                ContainedLoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else if (uiState.error != null) {
-                Text("Error: ${uiState.error}")
-            } else if (uiState.animes.isEmpty()) {
-                Text(stringResource(R.string.no_favorited_animes_yet))
+            if (windowSize == DevicePosture.EXPANDED_WIDTH) {
+                FavoritedAnimeExpanded(
+                    modifier = Modifier.padding(innerPadding),
+                    onAnimeClick = onAnimeClick,
+                    viewModel = viewModel,
+                    uiState = uiState
+                )
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp), // Adjusted padding
-                    verticalArrangement = Arrangement.spacedBy(0.dp) // AnimeCard might have internal padding
-                ) {
-                    items(uiState.animes, key = { anime -> anime.id })
-                    { anime: AnimeDataEntity ->
-                        val dismissState = rememberSwipeToDismissBoxState(
-                            confirmValueChange = { direction ->
-                                when (direction) {
-                                    SwipeToDismissBoxValue.EndToStart -> false
+                FavoritedAnimeCompact(
+                    modifier = Modifier.padding(innerPadding),
+                    onAnimeClick = onAnimeClick,
+                    viewModel = viewModel,
+                    uiState = uiState
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun FavoritedAnimeCompact(
+    modifier: Modifier,
+    onAnimeClick: (animeId: String) -> Unit,
+    viewModel: FavoritedAnimeViewModel,
+    uiState: FavoritedAnimeUiState
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (uiState.isLoading) {
+            ContainedLoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else if (uiState.error != null) {
+            Text("Error: ${uiState.error}")
+        } else if (uiState.animes.isEmpty()) {
+            Text(stringResource(R.string.no_favorited_animes_yet))
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp), // Adjusted padding
+                verticalArrangement = Arrangement.spacedBy(0.dp) // AnimeCard might have internal padding
+            ) {
+                items(uiState.animes, key = { anime -> anime.id })
+                { anime: AnimeDataEntity ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { direction ->
+                            when (direction) {
+                                SwipeToDismissBoxValue.EndToStart -> false
 
 
-                                    SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
-                                        viewModel.starAnime(
-                                            anime.id,
-                                            anime.isFavorite
-                                        )
-                                        false // Prevent immediate dismissal
-                                    }
-
-                                    SwipeToDismissBoxValue.Settled -> false
+                                SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
+                                    viewModel.starAnime(
+                                        anime.id,
+                                        anime.isFavorite
+                                    )
+                                    false // Prevent immediate dismissal
                                 }
+
+                                SwipeToDismissBoxValue.Settled -> false
                             }
-                        )
-                        AnimeCard(
-                            anime = anime,
-                            onClick = { onAnimeClick(anime.id) },
-                            onStar = {
-                                // On this screen, "starring" effectively means "unfavorite"
-                                // anime.isFavorite should be true here
-                                viewModel.toggleFavoriteStatus(anime.id, anime.isFavorite)
-                            },
-                            onArchive = {
-                                // Archive action not implemented for this screen
-                                Timber.d("Archive clicked for ${anime.id} on favorites screen")
-                            },
-                            dismissState = dismissState
-                        )
-                    }
+                        }
+                    )
+                    AnimeCard(
+                        anime = anime,
+                        onClick = { onAnimeClick(anime.id) },
+                        onStar = {
+                            // On this screen, "starring" effectively means "unfavorite"
+                            // anime.isFavorite should be true here
+                            viewModel.toggleFavoriteStatus(anime.id, anime.isFavorite)
+                        },
+                        onArchive = {
+                            // Archive action not implemented for this screen
+                            Timber.d("Archive clicked for ${anime.id} on favorites screen")
+                        },
+                        dismissState = dismissState
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun FavoritedAnimeExpanded(
+    modifier: Modifier,
+    onAnimeClick: (animeId: String) -> Unit,
+    viewModel: FavoritedAnimeViewModel,
+    uiState: FavoritedAnimeUiState
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (uiState.isLoading) {
+            ContainedLoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else if (uiState.error != null) {
+            Text("Error: ${uiState.error}")
+        } else if (uiState.animes.isEmpty()) {
+            Text(stringResource(R.string.no_favorited_animes_yet))
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp), // Adjusted padding
+                verticalArrangement = Arrangement.spacedBy(0.dp) // AnimeCard might have internal padding
+            ) {
+                items(uiState.animes, key = { anime -> anime.id })
+                { anime: AnimeDataEntity ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { direction ->
+                            when (direction) {
+                                SwipeToDismissBoxValue.EndToStart -> false
+
+
+                                SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
+                                    viewModel.starAnime(
+                                        anime.id,
+                                        anime.isFavorite
+                                    )
+                                    false // Prevent immediate dismissal
+                                }
+
+                                SwipeToDismissBoxValue.Settled -> false
+                            }
+                        }
+                    )
+                    AnimeCard(
+                        anime = anime,
+                        onClick = { onAnimeClick(anime.id) },
+                        onStar = {
+                            // On this screen, "starring" effectively means "unfavorite"
+                            // anime.isFavorite should be true here
+                            viewModel.toggleFavoriteStatus(anime.id, anime.isFavorite)
+                        },
+                        onArchive = {
+                            // Archive action not implemented for this screen
+                            Timber.d("Archive clicked for ${anime.id} on favorites screen")
+                        },
+                        dismissState = dismissState
+                    )
                 }
             }
         }

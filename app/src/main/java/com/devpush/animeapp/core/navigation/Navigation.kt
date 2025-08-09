@@ -3,23 +3,23 @@ package com.devpush.animeapp.core.navigation
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.navigation.NavType
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.devpush.animeapp.features.main.ui.MainViewModel
-import com.devpush.animeapp.features.auth.ui.login.LoginScreen
-import com.devpush.animeapp.features.onBoarding.ui.OnBoardingScreen
-import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
-import com.devpush.animeapp.features.details.ui.DetailsScreen
-import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.devpush.animeapp.features.archived.ui.ArchivedAnimeScreen
 import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthScreen
+import com.devpush.animeapp.features.auth.ui.login.LoginScreen
+import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
+import com.devpush.animeapp.features.details.ui.DetailsScreen
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeScreen
+import com.devpush.animeapp.features.main.ui.MainViewModel
+import com.devpush.animeapp.features.onBoarding.ui.OnBoardingScreen
 import com.devpush.animeapp.features.settings.ui.SettingsScreen
+import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 
 @Composable
 fun Navigation(

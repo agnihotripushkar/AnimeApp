@@ -1,7 +1,5 @@
 package com.devpush.animeapp.utils
 
-import androidx.datastore.preferences.core.booleanPreferencesKey
-
 object Constants {
     //DB Names
     const val TRENDING_ANIME_TABLE = "trending_anime"
