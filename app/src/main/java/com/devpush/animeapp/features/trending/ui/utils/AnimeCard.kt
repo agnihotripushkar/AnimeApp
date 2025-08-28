@@ -54,14 +54,16 @@ fun AnimeCard(
     onClick: () -> Unit,
     onStar: () -> Unit,
     onArchive: () -> Unit,
-    dismissState: SwipeToDismissBoxState // Assuming you pass this from where you use AnimeCard
+    dismissState: SwipeToDismissBoxState,
+    showStarAction: Boolean = true,
+    showArchiveAction: Boolean = true
 ) {
 
     SwipeToDismissBox(
         state = dismissState,
         modifier = modifier,
-        enableDismissFromStartToEnd = true, // Swipe Right for Star
-        enableDismissFromEndToStart = true, // Swipe Left for Archive
+        enableDismissFromStartToEnd = showStarAction, // Swipe Right for Star
+        enableDismissFromEndToStart = showArchiveAction, // Swipe Left for Archive
         backgroundContent = {
             val direction = dismissState.dismissDirection
             val currentProgress = dismissState.progress // Progress from 0.0 to 1.0
