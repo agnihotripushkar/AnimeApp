@@ -207,7 +207,7 @@ fun TrendingAnimeCompact(
                                                             animeDataList[index].id,
                                                             animeDataList[index].isArchived
                                                         )
-                                                        false // Prevent immediate dismissal
+                                                        true // Allow dismissal
                                                     }
 
                                                     SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
@@ -215,7 +215,7 @@ fun TrendingAnimeCompact(
                                                             animeDataList[index].id,
                                                             animeDataList[index].isFavorite
                                                         )
-                                                        false // Prevent immediate dismissal
+                                                        true // Allow dismissal
                                                     }
 
                                                     SwipeToDismissBoxValue.Settled -> false
@@ -415,7 +415,7 @@ fun TrendingAnimeExpanded(
                                                             animeDataList[index].id,
                                                             animeDataList[index].isArchived
                                                         )
-                                                        false // Prevent immediate dismissal
+                                                        true // Allow dismissal
                                                     }
 
                                                     SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
@@ -423,7 +423,7 @@ fun TrendingAnimeExpanded(
                                                             animeDataList[index].id,
                                                             animeDataList[index].isFavorite
                                                         )
-                                                        false // Prevent immediate dismissal
+                                                        true // Allow dismissal
                                                     }
 
                                                     SwipeToDismissBoxValue.Settled -> false

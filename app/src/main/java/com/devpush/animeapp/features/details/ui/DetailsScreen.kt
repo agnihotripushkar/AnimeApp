@@ -274,6 +274,23 @@ fun DetailsScreenCompact(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    genres.forEach { genre ->
+                        Button(
+                            onClick = { /*TODO*/ },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(text = genre.attributes.name)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Column(
                     horizontalAlignment = Alignment.Start,
                     modifier = Modifier.fillMaxWidth()
@@ -290,22 +307,7 @@ fun DetailsScreenCompact(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
 
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    genres.forEach { genre ->
-                        Button(
-                            onClick = { /*TODO*/ },
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Text(text = genre.attributes.name)
-                        }
-                    }
-                }
             }
         }
     }
