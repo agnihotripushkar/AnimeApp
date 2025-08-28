@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rating_icon_description">star</string>
+    <string name="title_unknown">Unknown</string>
+    <string name="no_synopsis_available">not available</string>
+    <string name="action_star">Star</string>
+</resources>
