@@ -81,4 +81,9 @@
     <string name="biometric_not_available_text">Biometric authentication is not available or not set up on this device.</string>
     <string name="biometric_cancelled_text">Authentication cancelled.</string>
     <string name="biometric_continue_anyway_button">Continue</string>
+    <string name="rating_icon_description">star</string>
+    <string name="title_unknown">Unknown</string>
+    <string name="no_synopsis_available">not available</string>
+    <string name="action_star">Star</string>
+    <string name="action_archive">Archieve</string>
 </resources>

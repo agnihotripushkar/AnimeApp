@@ -114,8 +114,10 @@ fun SettingsScreen(
                     navController = navController,
                     currentTheme = currentTheme,
                     showThemeDialog = showThemeDialog,
+                    onShowThemeDialogChange = { showThemeDialog = it },
                     currentLanguage = currentLanguage,
-                    showLanguageDialog = showLanguageDialog
+                    showLanguageDialog = showLanguageDialog,
+                    onShowLanguageDialogChange = { showLanguageDialog = it }
                 )
             } else {
                 SettingsCompact(
@@ -125,8 +127,10 @@ fun SettingsScreen(
                     navController = navController,
                     currentTheme = currentTheme,
                     showThemeDialog = showThemeDialog,
+                    onShowThemeDialogChange = { showThemeDialog = it },
                     currentLanguage = currentLanguage,
-                    showLanguageDialog = showLanguageDialog
+                    showLanguageDialog = showLanguageDialog,
+                    onShowLanguageDialogChange = { showLanguageDialog = it }
                 )
             }
         }
@@ -141,12 +145,11 @@ fun SettingsCompact(
     navController: NavController,
     currentTheme: String,
     showThemeDialog: Boolean,
+    onShowThemeDialogChange: (Boolean) -> Unit,
     currentLanguage: String,
-    showLanguageDialog: Boolean
+    showLanguageDialog: Boolean,
+    onShowLanguageDialogChange: (Boolean) -> Unit
 ) {
-    var mShowThemeDialog = showThemeDialog
-    var mShowLanguageDialog = showLanguageDialog
-
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
@@ -192,13 +195,13 @@ fun SettingsCompact(
             title = stringResource(R.string.theme_selection_title),
             subtitle = currentTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
             showArrow = true,
-            onClick = { mShowThemeDialog = true }
+            onClick = { onShowThemeDialogChange(true) }
         )
         SettingsItem(
             title = stringResource(R.string.app_language_title),
             subtitle = currentLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
             showArrow = true,
-            onClick = { mShowLanguageDialog = true }
+            onClick = { onShowLanguageDialogChange(true) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -214,22 +217,22 @@ fun SettingsCompact(
         SettingsItem(title = stringResource(R.string.privacy_policy_title), showArrow = true)
     }
 
-    if (mShowThemeDialog) {
+    if (showThemeDialog) {
         ThemeSelectionDialog(
             currentTheme = currentTheme,
             onThemeSelected = { theme ->
                 settingsViewModel.setAppTheme(theme)
             },
-            onDismiss = { mShowThemeDialog = false }
+            onDismiss = { onShowThemeDialogChange(false) }
         )
     }
-    if (mShowLanguageDialog) {
+    if (showLanguageDialog) {
         LanguageSelectionDialog(
             currentLanguage = currentLanguage,
             onLanguageSelected = { lang ->
                 settingsViewModel.setAppLanguage(lang)
             },
-            onDismiss = { mShowLanguageDialog = false }
+            onDismiss = { onShowLanguageDialogChange(false) }
         )
     }
 }
@@ -242,12 +245,11 @@ fun SettingsExpanded(
     navController: NavController,
     currentTheme: String,
     showThemeDialog: Boolean,
+    onShowThemeDialogChange: (Boolean) -> Unit,
     currentLanguage: String,
-    showLanguageDialog: Boolean
+    showLanguageDialog: Boolean,
+    onShowLanguageDialogChange: (Boolean) -> Unit
 ) {
-    var mShowThemeDialog = showThemeDialog
-    var mShowLanguageDialog = showLanguageDialog
-
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
@@ -293,13 +295,13 @@ fun SettingsExpanded(
             title = stringResource(R.string.theme_selection_title),
             subtitle = currentTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
             showArrow = true,
-            onClick = { mShowThemeDialog = true }
+            onClick = { onShowThemeDialogChange(true) }
         )
         SettingsItem(
             title = stringResource(R.string.app_language_title),
             subtitle = currentLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
             showArrow = true,
-            onClick = { mShowLanguageDialog = true }
+            onClick = { onShowLanguageDialogChange(true) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -315,22 +317,22 @@ fun SettingsExpanded(
         SettingsItem(title = stringResource(R.string.privacy_policy_title), showArrow = true)
     }
 
-    if (mShowThemeDialog) {
+    if (showThemeDialog) {
         ThemeSelectionDialog(
             currentTheme = currentTheme,
             onThemeSelected = { theme ->
                 settingsViewModel.setAppTheme(theme)
             },
-            onDismiss = { mShowThemeDialog = false }
+            onDismiss = { onShowThemeDialogChange(false) }
         )
     }
-    if (mShowLanguageDialog) {
+    if (showLanguageDialog) {
         LanguageSelectionDialog(
             currentLanguage = currentLanguage,
             onLanguageSelected = { lang ->
                 settingsViewModel.setAppLanguage(lang)
             },
-            onDismiss = { mShowLanguageDialog = false }
+            onDismiss = { onShowLanguageDialogChange(false) }
         )
     }
 }

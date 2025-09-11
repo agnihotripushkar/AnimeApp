@@ -165,7 +165,9 @@ fun ArchivedAnimeCompact(
                             viewModel.toggleArchivedStatus(anime.id, anime.isArchived)
 
                         },
-                        dismissState = dismissState
+                        dismissState = dismissState,
+                        showStarAction = false,
+                        showArchiveAction = true
                     )
                 }
             }
@@ -234,7 +236,9 @@ fun ArchivedAnimeExpanded(
                             viewModel.toggleArchivedStatus(anime.id, anime.isArchived)
 
                         },
-                        dismissState = dismissState
+                        dismissState = dismissState,
+                        showStarAction = false,
+                        showArchiveAction = true
                     )
                 }
             }

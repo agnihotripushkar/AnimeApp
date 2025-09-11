@@ -161,7 +161,9 @@ fun FavoritedAnimeCompact(
                             // Archive action not implemented for this screen
                             Timber.d("Archive clicked for ${anime.id} on favorites screen")
                         },
-                        dismissState = dismissState
+                        dismissState = dismissState,
+                        showStarAction = true,
+                        showArchiveAction = false
                     )
                 }
             }
@@ -229,7 +231,9 @@ fun FavoritedAnimeExpanded(
                             // Archive action not implemented for this screen
                             Timber.d("Archive clicked for ${anime.id} on favorites screen")
                         },
-                        dismissState = dismissState
+                        dismissState = dismissState,
+                        showStarAction = true,
+                        showArchiveAction = false
                     )
                 }
             }
