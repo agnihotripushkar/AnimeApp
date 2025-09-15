@@ -2,7 +2,14 @@
 
 Jetpack Compose App with MVVM architecture. 
 
-Lib used - Koin, Ktor, Paging 3, Coil, DataStore, compose-navigation, SplashScreen
+Lib used - 
+1. Ktor
+2. Koin (DI)
+3. room (DB)
+4. coil
+5. compose-navigation
+6. DataStore
+7. SplashScreen
 
 HomePage
 ![Screenshot_20250910-203439](https://github.com/user-attachments/assets/76cd0684-3861-4b89-9ab4-4233f7e66fb7)
