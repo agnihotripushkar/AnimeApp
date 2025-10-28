@@ -82,7 +82,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.databinding.adapters)
-    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.material3)
     implementation(libs.ui)
     ksp(libs.androidx.room.compiler)
 

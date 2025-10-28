@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.trending.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,10 +54,19 @@ import android.app.Activity
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.text
+import com.devpush.animeapp.features.trending.ui.utils.FabMenu
+import com.devpush.animeapp.features.trending.utils.Constants
+import com.devpush.animeapp.features.trending.utils.FabPositioning
 import com.devpush.animeapp.utils.DevicePosture
 import com.devpush.animeapp.utils.rememberDevicePosture
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@SuppressLint("ContextCastToActivity")
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalMaterial3WindowSizeClassApi::class
+)
 @Composable
 fun TrendingAnimeScreen(
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
@@ -87,7 +97,27 @@ fun TrendingAnimeScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
+        },
+        floatingActionButton = {
+            FabMenu(
+                onClick = { fabItem ->
+                    when (fabItem.text) {
+                        Constants.FabMenuFav -> {
+                            onFavoriteClick()
+                        }
+
+                        Constants.FabMenuArchive -> {
+                            onArchiveClick()
+                        }
+
+                        Constants.FabMenuSettings -> {
+                            onSettingsClick()
+                        }
+                    }
+                }
+            )
         }
+
     )
     { scaffoldPadding ->
         Box(
@@ -130,7 +160,8 @@ fun TrendingAnimeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TrendingAnimeCompact(
     selectedCategory: AnimeCategory,
@@ -185,16 +216,15 @@ fun TrendingAnimeCompact(
                             Text(stringResource(R.string.no_trending_anime_found))
                         }
                     } else {
-                        Box( // Box to contain LazyColumn and FloatingToolbar
-                            Modifier
-                                .fillMaxSize()
+                        Box(
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             if (selectedCategory == AnimeCategory.ALL) {
                                 LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
                                     verticalArrangement = Arrangement.spacedBy(0.dp),
-                                    contentPadding = PaddingValues(bottom = 80.dp) // Padding for FAB visibility
-                                )
-                                {
+                                    contentPadding = FabPositioning.LIST_CONTENT_PADDING
+                                ) {
                                     items(
                                         animeDataList.size,
                                         key = { animeDataList[it].id }
@@ -248,10 +278,10 @@ fun TrendingAnimeCompact(
                                 }
                             } else {
                                 LazyVerticalGrid(
-                                    columns = GridCells.Adaptive(minSize = 180.dp), // Alternative: Adaptive columns
-                                    contentPadding = PaddingValues(8.dp)
-                                )
-                                {
+                                    modifier = Modifier.fillMaxSize(),
+                                    columns = GridCells.Adaptive(minSize = 180.dp),
+                                    contentPadding = FabPositioning.GRID_CONTENT_PADDING
+                                ) {
                                     items(
                                         animeDataList.size,
                                         key = { animeDataList[it].id }
@@ -267,49 +297,8 @@ fun TrendingAnimeCompact(
                                         )
                                     }
                                 }
-
                             }
 
-
-                            HorizontalFloatingToolbar(
-                                expanded = expanded,
-                                floatingActionButton = {
-                                    FloatingToolbarDefaults.VibrantFloatingActionButton(
-                                        onClick = { onSettingsClick() },
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.Settings,
-                                            contentDescription = stringResource(R.string.settings)
-                                        )
-
-                                    }
-                                },
-                                modifier =
-                                    Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .padding(all = 16.dp),
-                                colors = vibrantColors,
-                                content = {
-                                    IconButton(onClick = { onFavoriteClick() }) {
-                                        Icon(
-                                            Icons.Filled.Star,
-                                            contentDescription = stringResource(R.string.favorite)
-                                        )
-                                    }
-//                                    IconButton(onClick = { onBookmarkClick }) {
-//                                        Icon(
-//                                            Icons.Filled.Bookmark,
-//                                            contentDescription = stringResource(R.string.bookmark)
-//                                        )
-//                                    }
-                                    IconButton(onClick = { onArchiveClick() }) {
-                                        Icon(
-                                            Icons.Filled.Archive,
-                                            contentDescription = stringResource(R.string.archive)
-                                        )
-                                    }
-                                }
-                            )
                         }
                     }
                 }
@@ -393,16 +382,15 @@ fun TrendingAnimeExpanded(
                             Text(stringResource(R.string.no_trending_anime_found))
                         }
                     } else {
-                        Box( // Box to contain LazyColumn and FloatingToolbar
-                            Modifier
-                                .fillMaxSize()
+                        Box(
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             if (selectedCategory == AnimeCategory.ALL) {
                                 LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
                                     verticalArrangement = Arrangement.spacedBy(0.dp),
-                                    contentPadding = PaddingValues(bottom = 80.dp) // Padding for FAB visibility
-                                )
-                                {
+                                    contentPadding = FabPositioning.LIST_CONTENT_PADDING
+                                ) {
                                     items(
                                         animeDataList.size,
                                         key = { animeDataList[it].id }
@@ -456,10 +444,10 @@ fun TrendingAnimeExpanded(
                                 }
                             } else {
                                 LazyVerticalGrid(
-                                    columns = GridCells.Adaptive(minSize = 180.dp), // Alternative: Adaptive columns
-                                    contentPadding = PaddingValues(8.dp)
-                                )
-                                {
+                                    modifier = Modifier.fillMaxSize(),
+                                    columns = GridCells.Adaptive(minSize = 180.dp),
+                                    contentPadding = FabPositioning.GRID_CONTENT_PADDING
+                                ) {
                                     items(
                                         animeDataList.size,
                                         key = { animeDataList[it].id }
@@ -475,9 +463,7 @@ fun TrendingAnimeExpanded(
                                         )
                                     }
                                 }
-
                             }
-
 
                             HorizontalFloatingToolbar(
                                 expanded = expanded,
@@ -489,13 +475,11 @@ fun TrendingAnimeExpanded(
                                             Icons.Filled.Settings,
                                             contentDescription = stringResource(R.string.settings)
                                         )
-
                                     }
                                 },
-                                modifier =
-                                    Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .padding(all = 16.dp),
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(16.dp),
                                 colors = vibrantColors,
                                 content = {
                                     IconButton(onClick = { onFavoriteClick() }) {
@@ -504,12 +488,6 @@ fun TrendingAnimeExpanded(
                                             contentDescription = stringResource(R.string.favorite)
                                         )
                                     }
-//                                    IconButton(onClick = { onBookmarkClick }) {
-//                                        Icon(
-//                                            Icons.Filled.Bookmark,
-//                                            contentDescription = stringResource(R.string.bookmark)
-//                                        )
-//                                    }
                                     IconButton(onClick = { onArchiveClick() }) {
                                         Icon(
                                             Icons.Filled.Archive,
