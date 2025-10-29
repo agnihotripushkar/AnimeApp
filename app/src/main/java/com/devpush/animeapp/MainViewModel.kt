@@ -1,4 +1,4 @@
-package com.devpush.animeapp.features.main.ui
+package com.devpush.animeapp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,22 +17,22 @@ class MainViewModel(private val userPreferencesRepository: UserPreferencesReposi
     ViewModel() {
 
     val isOnboardingShown: StateFlow<Boolean?> = userPreferencesRepository.isOnboardingShownFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), null)
 
     private val _isLogin = MutableStateFlow<Boolean?>(null)
     val isLogin: StateFlow<Boolean?> = _isLogin.asStateFlow()
 
     val appTheme: StateFlow<String> = userPreferencesRepository.appThemeFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), "system")
 
     val currentLanguage: StateFlow<String> = userPreferencesRepository.appLanguageFlow
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "en")
+        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), "en")
 
     val isBiometricAuthEnabled: StateFlow<Boolean> =
         userPreferencesRepository.isBiometricAuthEnabledFlow
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
+                started = SharingStarted.Companion.WhileSubscribed(5_000),
                 initialValue = false // Default to false until loaded
             )
 
@@ -41,7 +41,7 @@ class MainViewModel(private val userPreferencesRepository: UserPreferencesReposi
             // We consider initialized if loginStatus is no longer null (meaning it has been loaded)
             // and biometricStatusLoaded is anything (just to ensure the combine has an emission from it).
             var ready = false
-            if (loginStatus == true && biometricStatusLoaded!=null) {
+            if (loginStatus == true && biometricStatusLoaded != null) {
                 ready = true
             }
             if (loginStatus == false) {
@@ -51,7 +51,7 @@ class MainViewModel(private val userPreferencesRepository: UserPreferencesReposi
 
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
+            started = SharingStarted.Companion.WhileSubscribed(5_000L),
             initialValue = false
         )
 
@@ -59,7 +59,7 @@ class MainViewModel(private val userPreferencesRepository: UserPreferencesReposi
         viewModelScope.launch {
             val loginStatusFromRepo = userPreferencesRepository.isLoginFlow.firstOrNull()
             _isLogin.value = loginStatusFromRepo ?: false
-            Timber.tag("MainViewModel").d("Login status loaded: ${_isLogin.value}")
+            Timber.Forest.tag("MainViewModel").d("Login status loaded: ${_isLogin.value}")
         }
     }
 

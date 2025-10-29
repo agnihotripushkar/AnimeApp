@@ -16,7 +16,7 @@ import com.devpush.animeapp.features.auth.ui.login.LoginScreen
 import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
 import com.devpush.animeapp.features.details.ui.DetailsScreen
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeScreen
-import com.devpush.animeapp.features.main.ui.MainViewModel
+import com.devpush.animeapp.MainViewModel
 import com.devpush.animeapp.features.onBoarding.ui.OnBoardingScreen
 import com.devpush.animeapp.features.settings.ui.SettingsScreen
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen

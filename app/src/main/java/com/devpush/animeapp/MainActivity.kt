@@ -1,4 +1,4 @@
-package com.devpush.animeapp.features.main.ui
+package com.devpush.animeapp
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -9,8 +9,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.devpush.animeapp.R
 import com.devpush.animeapp.core.navigation.Navigation
+import com.devpush.animeapp.MainViewModel
 import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import com.devpush.animeapp.utils.applySelectedLanguage
 import kotlinx.coroutines.flow.first
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val savedLanguage = mainViewModel.currentLanguage.first()
             if (currentActivityLanguage != savedLanguage) {
-                Timber.tag("MainActivity").d("Applying initial locale: $savedLanguage")
+                Timber.Forest.tag("MainActivity").d("Applying initial locale: $savedLanguage")
                 applySelectedLanguage(savedLanguage)
                 currentActivityLanguage = savedLanguage
                 // No recreate here, this is for initial setup before UI loads
@@ -53,7 +53,8 @@ class MainActivity : AppCompatActivity() {
             // Apply language and recreate if changed
             LaunchedEffect(selectedLanguage) {
                 if (currentActivityLanguage != null && currentActivityLanguage != selectedLanguage) {
-                    Timber.tag("MainActivity").d("Language changed from $currentActivityLanguage to $selectedLanguage. Recreating.")
+                    Timber.Forest.tag("MainActivity")
+                        .d("Language changed from $currentActivityLanguage to $selectedLanguage. Recreating.")
                     // Update the language for the current context before recreating
                     // This ensures the recreation itself uses the new locale context if possible
                     applySelectedLanguage(selectedLanguage)
@@ -62,7 +63,8 @@ class MainActivity : AppCompatActivity() {
                 } else if (currentActivityLanguage == null) {
                     // This handles the very first composition if onCreate launch didn't run first
                     // or if we want to ensure it's set before AnimeAppTheme composes
-                    Timber.tag("MainActivity").d("LaunchedEffect: Setting initial language: $selectedLanguage")
+                    Timber.Forest.tag("MainActivity")
+                        .d("LaunchedEffect: Setting initial language: $selectedLanguage")
                     applySelectedLanguage(selectedLanguage)
                     currentActivityLanguage = selectedLanguage
                 }
@@ -73,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                 if (isInitialized) {
                     Navigation(mainViewModel = mainViewModel)
                 } else {
-                    Timber.tag("MainActivity")
+                    Timber.Forest.tag("MainActivity")
                         .d("setContent: Showing nothing as still initializing (splash should be visible).")
                 }
             }
