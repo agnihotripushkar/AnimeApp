@@ -9,7 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.devpush.animeapp.core.navigation.Navigation
+import com.devpush.animeapp.core.navigation.NavigationContainer
 import com.devpush.animeapp.MainViewModel
 import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import com.devpush.animeapp.utils.applySelectedLanguage
@@ -71,13 +71,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             AnimeAppTheme(userThemePreference = currentTheme) {
-                val isInitialized by mainViewModel.isInitialized.collectAsState()
-                if (isInitialized) {
-                    Navigation(mainViewModel = mainViewModel)
-                } else {
-                    Timber.Forest.tag("MainActivity")
-                        .d("setContent: Showing nothing as still initializing (splash should be visible).")
-                }
+                NavigationContainer(mainViewModel = mainViewModel)
             }
         }
     }

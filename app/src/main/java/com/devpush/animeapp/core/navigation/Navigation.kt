@@ -23,26 +23,23 @@ import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 
 @Composable
 fun Navigation(
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    startDestination: String? = null
 ) {
     val navHost = rememberNavController()
 
-    val isLogin = mainViewModel.isLogin.collectAsState().value
     val isOnboardingShown = mainViewModel.isOnboardingShown.collectAsState().value
-    val isBiometricEnabled by mainViewModel.isBiometricAuthEnabled.collectAsState()
 
-    val startDestination = remember(isLogin,isBiometricEnabled) {
-        when {
-            isLogin == true && isBiometricEnabled -> NavGraph.BiometricAuth.route // If logged in & biometric, go to biometric
-            isLogin == true && !isBiometricEnabled -> NavGraph.TrendingAnime.route // Logged in, no biometric, go to trending
-            else -> NavGraph.Login.route // Not logged in, go to login
-        }
+    // Use provided startDestination or calculate it (for backward compatibility)
+    val finalStartDestination = startDestination ?: run {
+        val isLogin = mainViewModel.isLogin.collectAsState().value
+        val isBiometricEnabled = mainViewModel.isBiometricAuthEnabled.collectAsState().value
+        NavigationUtils.calculateStartDestination(isLogin, isBiometricEnabled)
     }
-
 
     NavHost(
         navController = navHost,
-        startDestination = startDestination
+        startDestination = finalStartDestination
     ) {
         composable(NavGraph.Login.route) {
             LoginScreen(

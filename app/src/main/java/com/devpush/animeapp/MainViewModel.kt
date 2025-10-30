@@ -3,12 +3,10 @@ package com.devpush.animeapp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.domian.repository.UserPreferencesRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -16,51 +14,87 @@ import timber.log.Timber
 class MainViewModel(private val userPreferencesRepository: UserPreferencesRepository) :
     ViewModel() {
 
-    val isOnboardingShown: StateFlow<Boolean?> = userPreferencesRepository.isOnboardingShownFlow
-        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), null)
+    companion object {
+        private const val TAG = "MainViewModel"
+        private const val SUBSCRIPTION_TIMEOUT = 5_000L
+    }
 
-    private val _isLogin = MutableStateFlow<Boolean?>(null)
-    val isLogin: StateFlow<Boolean?> = _isLogin.asStateFlow()
+    val isOnboardingShown: StateFlow<Boolean?> = userPreferencesRepository.isOnboardingShownFlow
+        .map { value ->
+            Timber.tag(TAG).d("Onboarding shown state loaded: $value")
+            value
+        }
+        .stateIn(scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT),
+            initialValue = null)
+
+    // Refactored to use proper StateFlow pattern directly from repository
+    val isLogin: StateFlow<Boolean?> = userPreferencesRepository.isLoginFlow
+        .map { value ->
+            Timber.tag(TAG).d("Login state loaded: $value")
+            value
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT),
+            initialValue = null // Start with null to indicate loading state
+        )
 
     val appTheme: StateFlow<String> = userPreferencesRepository.appThemeFlow
-        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), "system")
+        .map { value ->
+            Timber.tag(TAG).d("App theme loaded: $value")
+            value
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT), "system")
 
     val currentLanguage: StateFlow<String> = userPreferencesRepository.appLanguageFlow
-        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), "en")
+        .map { value ->
+            Timber.tag(TAG).d("App language loaded: $value")
+            value
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT), "en")
 
-    val isBiometricAuthEnabled: StateFlow<Boolean> =
+    val isBiometricAuthEnabled: StateFlow<Boolean?> =
         userPreferencesRepository.isBiometricAuthEnabledFlow
+            .map { value ->
+                Timber.tag(TAG).d("Biometric auth enabled state loaded: $value")
+                value
+            }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.Companion.WhileSubscribed(5_000),
-                initialValue = false // Default to false until loaded
+                started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT),
+                initialValue = null // Start with null to indicate loading state
             )
 
+    // Fixed isInitialized logic with proper null handling and comprehensive logging
     val isInitialized: StateFlow<Boolean> =
-        combine(_isLogin, isBiometricAuthEnabled) { loginStatus, biometricStatusLoaded ->
-            // We consider initialized if loginStatus is no longer null (meaning it has been loaded)
-            // and biometricStatusLoaded is anything (just to ensure the combine has an emission from it).
-            var ready = false
-            if (loginStatus == true && biometricStatusLoaded != null) {
-                ready = true
+        combine(
+            isLogin,
+            isBiometricAuthEnabled,
+            isOnboardingShown
+        ) { loginStatus, biometricStatus, onboardingStatus ->
+            val allStatesLoaded = loginStatus != null && 
+                                 biometricStatus != null && 
+                                 onboardingStatus != null
+            
+            Timber.tag(TAG).d(
+                "State loading check - Login: $loginStatus, Biometric: $biometricStatus, " +
+                "Onboarding: $onboardingStatus, All loaded: $allStatesLoaded"
+            )
+            
+            if (allStatesLoaded) {
+                Timber.tag(TAG).i("All navigation-critical states loaded successfully")
             }
-            if (loginStatus == false) {
-                ready = true
-            }
-            ready
-
+            
+            allStatesLoaded
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(5_000L),
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT),
             initialValue = false
         )
 
     init {
-        viewModelScope.launch {
-            val loginStatusFromRepo = userPreferencesRepository.isLoginFlow.firstOrNull()
-            _isLogin.value = loginStatusFromRepo ?: false
-            Timber.Forest.tag("MainViewModel").d("Login status loaded: ${_isLogin.value}")
-        }
+        Timber.tag(TAG).d("MainViewModel initialized - starting state loading")
     }
 
     fun saveIsOnboardingShown(value: Boolean) {
