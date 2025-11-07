@@ -73,6 +73,7 @@ fun TrendingAnimeScreen(
     onSettingsClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onFavoriteClick: () -> Unit,
+    onRecommendedClick: () -> Unit,
     viewModel: TrendingAnimeViewModel = koinViewModel()
 ) {
     val windowSize = rememberDevicePosture(
@@ -112,6 +113,10 @@ fun TrendingAnimeScreen(
 
                         Constants.FabMenuSettings -> {
                             onSettingsClick()
+                        }
+
+                        Constants.FabMenuRecommended -> {
+                            onRecommendedClick()
                         }
                     }
                 }
@@ -533,7 +538,8 @@ fun TrendingAnimeScreenPreview() {
             onAnimeClick = { _, _ -> },
             onSettingsClick = {},
             onArchiveClick = {},
-            onFavoriteClick = {}
+            onFavoriteClick = {},
+            onRecommendedClick = {}
         )
     }
 

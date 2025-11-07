@@ -18,6 +18,7 @@ import com.devpush.animeapp.features.details.ui.DetailsScreen
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeScreen
 import com.devpush.animeapp.MainViewModel
 import com.devpush.animeapp.features.onBoarding.ui.OnBoardingScreen
+import com.devpush.animeapp.features.recommendation.RecommendationScreen
 import com.devpush.animeapp.features.settings.ui.SettingsScreen
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 
@@ -117,6 +118,18 @@ fun Navigation(
                 },
                 onFavoriteClick = {
                     navHost.navigate(NavGraph.FavoritedAnime.route)
+                },
+                onRecommendedClick = {
+                    navHost.navigate(NavGraph.RecommendedAnime.route)
+                }
+            )
+        }
+
+        composable(NavGraph.RecommendedAnime.route) {
+            RecommendationScreen(
+                onAnimeClick = { imageUrl, animeId ->
+                    val encodedUrl = Uri.encode(imageUrl)
+                    navHost.navigate("detail_anime/${encodedUrl}/${animeId}")
                 }
             )
         }

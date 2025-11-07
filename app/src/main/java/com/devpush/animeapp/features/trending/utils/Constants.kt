@@ -11,6 +11,7 @@ object Constants {
     const val FabMenuFav = "Favourite"
     const val FabMenuArchive = "Archive"
     const val FabMenuSettings = "Settings"
+    const val FabMenuRecommended = "Recommended"
 }
 
 /**

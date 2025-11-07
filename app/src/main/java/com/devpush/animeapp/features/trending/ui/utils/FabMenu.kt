@@ -77,6 +77,10 @@ val items = listOf(
         text = Constants.FabMenuSettings,
         iconRes = R.drawable.outline_build_24
     ),
+    FabItem(
+        text = Constants.FabMenuRecommended,
+        iconRes = R.drawable.outline_recommend_24
+    ),
 )
 
 data class FabItem(
