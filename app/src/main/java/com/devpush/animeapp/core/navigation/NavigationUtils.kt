@@ -28,8 +28,8 @@ object NavigationUtils {
                 NavGraph.BiometricAuth.route
             }
             isLogin == true && isBiometricEnabled == false -> {
-                Log.d(TAG, "User is logged in without biometric -> TrendingAnime")
-                NavGraph.TrendingAnime.route
+                Log.d(TAG, "User is logged in without biometric -> HomeAnime")
+                NavGraph.HomeAnime.route
             }
             else -> {
                 Log.d(TAG, "User is not logged in (isLogin=$isLogin, isBiometricEnabled=$isBiometricEnabled) -> Login")
@@ -59,8 +59,8 @@ object NavigationUtils {
                 NavGraph.BiometricAuth.route
             }
             isLogin && !isBiometricEnabled -> {
-                Log.d(TAG, "User is logged in without biometric -> TrendingAnime")
-                NavGraph.TrendingAnime.route
+                Log.d(TAG, "User is logged in without biometric -> HomeAnime")
+                NavGraph.HomeAnime.route
             }
             else -> {
                 Log.d(TAG, "User is not logged in -> Login")

@@ -47,14 +47,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devpush.animeapp.R
 import com.devpush.animeapp.features.trending.ui.utils.AnimeCard
 import com.devpush.animeapp.features.trending.ui.utils.AnimePoster
-import com.devpush.animeapp.features.trending.ui.utils.SegmentedToggleButton
 import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import org.koin.androidx.compose.koinViewModel
 import android.app.Activity
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.style.TextOverflow
 import com.devpush.animeapp.features.trending.ui.utils.FabMenu
 import com.devpush.animeapp.features.trending.utils.Constants
 import com.devpush.animeapp.features.trending.utils.FabPositioning
@@ -82,7 +85,6 @@ fun TrendingAnimeScreen(
     )
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
     var expanded by rememberSaveable { mutableStateOf(true) }
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
     // Not used
@@ -90,12 +92,35 @@ fun TrendingAnimeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(R.string.animes)) },
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(text = stringResource(R.string.animes),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                        )
+                        },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                ),
+                navigationIcon = {
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Localized description",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
             )
         },
         floatingActionButton = {
@@ -116,8 +141,11 @@ fun TrendingAnimeScreen(
                     }
                 }
             )
-        }
+        },
+        bottomBar = {
 
+
+        }
     )
     { scaffoldPadding ->
         Box(
@@ -127,8 +155,6 @@ fun TrendingAnimeScreen(
         ) {
             if (windowSize == DevicePosture.EXPANDED_WIDTH) {
                 TrendingAnimeExpanded(
-                    selectedCategory = selectedCategory,
-                    onCategorySelected = { category -> viewModel.onCategorySelected(category) },
                     uiState = uiState,
                     onAnimeClick = onAnimeClick,
                     onStar = { id, isFavorite -> viewModel.starAnime(id, isFavorite) },
@@ -142,8 +168,6 @@ fun TrendingAnimeScreen(
                 )
             } else {
                 TrendingAnimeCompact(
-                    selectedCategory = selectedCategory,
-                    onCategorySelected = { category -> viewModel.onCategorySelected(category) },
                     uiState = uiState,
                     onAnimeClick = onAnimeClick,
                     onStar = { id, isFavorite -> viewModel.starAnime(id, isFavorite) },
@@ -164,8 +188,6 @@ fun TrendingAnimeScreen(
     ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TrendingAnimeCompact(
-    selectedCategory: AnimeCategory,
-    onCategorySelected: (AnimeCategory) -> Unit,
     uiState: TrendingAnimeUiState,
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
     onStar: (id: String, isFavorite: Boolean) -> Unit,
@@ -184,13 +206,6 @@ fun TrendingAnimeCompact(
                 color = MaterialTheme.colorScheme.surfaceVariant
             )
     ) {
-        SegmentedToggleButton(
-            selectedCategory = selectedCategory,
-            onCategorySelected = onCategorySelected,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 18.dp)
-        )
         // Use AnimatedContent to switch between Loading, Success, and Error states
         // Temporarily replaced AnimatedContent with a direct when statement for diagnosis
         Box(modifier = Modifier.weight(1f)) { // Added a Box to maintain similar layout structure as AnimatedContent
@@ -219,64 +234,6 @@ fun TrendingAnimeCompact(
                         Box(
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            if (selectedCategory == AnimeCategory.ALL) {
-                                LazyColumn(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalArrangement = Arrangement.spacedBy(0.dp),
-                                    contentPadding = FabPositioning.LIST_CONTENT_PADDING
-                                ) {
-                                    items(
-                                        animeDataList.size,
-                                        key = { animeDataList[it].id }
-                                    ) { index ->
-                                        val dismissState = rememberSwipeToDismissBoxState(
-                                            confirmValueChange = { direction ->
-                                                when (direction) {
-                                                    SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
-                                                        onArchive(
-                                                            animeDataList[index].id,
-                                                            animeDataList[index].isArchived
-                                                        )
-                                                        true // Allow dismissal
-                                                    }
-
-                                                    SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
-                                                        onStar(
-                                                            animeDataList[index].id,
-                                                            animeDataList[index].isFavorite
-                                                        )
-                                                        true // Allow dismissal
-                                                    }
-
-                                                    SwipeToDismissBoxValue.Settled -> false
-                                                }
-                                            }
-                                        )
-                                        AnimeCard(
-                                            anime = animeDataList[index],
-                                            onClick = {
-                                                onAnimeClick(
-                                                    animeDataList[index].attributes.posterImage.originalUrl,
-                                                    animeDataList[index].id
-                                                )
-                                            },
-                                            onStar = {
-                                                onStar(
-                                                    animeDataList[index].id,
-                                                    animeDataList[index].isFavorite
-                                                )
-                                            },
-                                            onArchive = {
-                                                onArchive(
-                                                    animeDataList[index].id,
-                                                    animeDataList[index].isArchived
-                                                )
-                                            },
-                                            dismissState = dismissState
-                                        )
-                                    }
-                                }
-                            } else {
                                 LazyVerticalGrid(
                                     modifier = Modifier.fillMaxSize(),
                                     columns = GridCells.Adaptive(minSize = 180.dp),
@@ -298,8 +255,6 @@ fun TrendingAnimeCompact(
                                     }
                                 }
                             }
-
-                        }
                     }
                 }
 
@@ -330,8 +285,6 @@ fun TrendingAnimeCompact(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TrendingAnimeExpanded(
-    selectedCategory: AnimeCategory,
-    onCategorySelected: (AnimeCategory) -> Unit,
     uiState: TrendingAnimeUiState,
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
     onStar: (id: String, isFavorite: Boolean) -> Unit,
@@ -350,13 +303,6 @@ fun TrendingAnimeExpanded(
                 color = MaterialTheme.colorScheme.surfaceVariant
             )
     ) {
-        SegmentedToggleButton(
-            selectedCategory = selectedCategory,
-            onCategorySelected = onCategorySelected,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 18.dp)
-        )
         // Use AnimatedContent to switch between Loading, Success, and Error states
         // Temporarily replaced AnimatedContent with a direct when statement for diagnosis
         Box(modifier = Modifier.weight(1f)) { // Added a Box to maintain similar layout structure as AnimatedContent
@@ -385,64 +331,6 @@ fun TrendingAnimeExpanded(
                         Box(
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            if (selectedCategory == AnimeCategory.ALL) {
-                                LazyColumn(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalArrangement = Arrangement.spacedBy(0.dp),
-                                    contentPadding = FabPositioning.LIST_CONTENT_PADDING
-                                ) {
-                                    items(
-                                        animeDataList.size,
-                                        key = { animeDataList[it].id }
-                                    ) { index ->
-                                        val dismissState = rememberSwipeToDismissBoxState(
-                                            confirmValueChange = { direction ->
-                                                when (direction) {
-                                                    SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
-                                                        onArchive(
-                                                            animeDataList[index].id,
-                                                            animeDataList[index].isArchived
-                                                        )
-                                                        true // Allow dismissal
-                                                    }
-
-                                                    SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
-                                                        onStar(
-                                                            animeDataList[index].id,
-                                                            animeDataList[index].isFavorite
-                                                        )
-                                                        true // Allow dismissal
-                                                    }
-
-                                                    SwipeToDismissBoxValue.Settled -> false
-                                                }
-                                            }
-                                        )
-                                        AnimeCard(
-                                            anime = animeDataList[index],
-                                            onClick = {
-                                                onAnimeClick(
-                                                    animeDataList[index].attributes.posterImage.originalUrl,
-                                                    animeDataList[index].id
-                                                )
-                                            },
-                                            onStar = {
-                                                onStar(
-                                                    animeDataList[index].id,
-                                                    animeDataList[index].isFavorite
-                                                )
-                                            },
-                                            onArchive = {
-                                                onArchive(
-                                                    animeDataList[index].id,
-                                                    animeDataList[index].isArchived
-                                                )
-                                            },
-                                            dismissState = dismissState
-                                        )
-                                    }
-                                }
-                            } else {
                                 LazyVerticalGrid(
                                     modifier = Modifier.fillMaxSize(),
                                     columns = GridCells.Adaptive(minSize = 180.dp),
@@ -496,7 +384,6 @@ fun TrendingAnimeExpanded(
                                     }
                                 }
                             )
-                        }
                     }
                 }
 

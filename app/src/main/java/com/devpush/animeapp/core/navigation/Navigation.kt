@@ -1,36 +1,36 @@
 package com.devpush.animeapp.core.navigation
 
+import android.annotation.SuppressLint
 import android.net.Uri
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.devpush.animeapp.MainViewModel
 import com.devpush.animeapp.features.archived.ui.ArchivedAnimeScreen
 import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthScreen
 import com.devpush.animeapp.features.auth.ui.login.LoginScreen
 import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
+import com.devpush.animeapp.features.common.ui.BottomNavbar
 import com.devpush.animeapp.features.details.ui.DetailsScreen
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeScreen
-import com.devpush.animeapp.MainViewModel
 import com.devpush.animeapp.features.onBoarding.ui.OnBoardingScreen
-import com.devpush.animeapp.features.settings.ui.SettingsScreen
-import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
 
 @Composable
 fun Navigation(
     mainViewModel: MainViewModel,
     startDestination: String? = null
 ) {
-    val navHost = rememberNavController()
-
+    val navHostController = rememberNavController()
     val isOnboardingShown = mainViewModel.isOnboardingShown.collectAsState().value
 
-    // Use provided startDestination or calculate it (for backward compatibility)
     val finalStartDestination = startDestination ?: run {
         val isLogin = mainViewModel.isLogin.collectAsState().value
         val isBiometricEnabled = mainViewModel.isBiometricAuthEnabled.collectAsState().value
@@ -38,22 +38,22 @@ fun Navigation(
     }
 
     NavHost(
-        navController = navHost,
+        navController = navHostController,
         startDestination = finalStartDestination
     ) {
         composable(NavGraph.Login.route) {
             LoginScreen(
                 onOpenRegistrationClicked = {
-                    navHost.navigate(NavGraph.Registration.route)
+                    navHostController.navigate(NavGraph.Registration.route)
                 },
                 onLoginSuccessNavigation = {
                     if (isOnboardingShown == true) {
-                        navHost.navigate(NavGraph.TrendingAnime.route) {
+                        navHostController.navigate(NavGraph.HomeAnime.route) {
                             popUpTo(0) { inclusive = true }
                             launchSingleTop = true
                         }
                     } else {
-                        navHost.navigate(NavGraph.OnBoarding.route) {
+                        navHostController.navigate(NavGraph.OnBoarding.route) {
                             popUpTo(NavGraph.Login.route) { inclusive = true }
                             launchSingleTop = true
                         }
@@ -65,13 +65,13 @@ fun Navigation(
         composable(NavGraph.Registration.route) {
             RegistrationScreen(
                 onRegisterSuccessNavigation = {
-                    navHost.navigate(NavGraph.OnBoarding.route) {
+                    navHostController.navigate(NavGraph.OnBoarding.route) {
                         popUpTo(NavGraph.Registration.route) { inclusive = true }
                         launchSingleTop = true
                     }
                 },
                 onLoginClicked = {
-                    navHost.navigate(NavGraph.Login.route){
+                    navHostController.navigate(NavGraph.Login.route) {
                         popUpTo(NavGraph.Registration.route) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -81,7 +81,7 @@ fun Navigation(
 
         composable(NavGraph.OnBoarding.route) {
             OnBoardingScreen(onGetStartedClicked = {
-                navHost.navigate(NavGraph.TrendingAnime.route) {
+                navHostController.navigate(NavGraph.HomeAnime.route) {
                     popUpTo(0) { inclusive = true }
                 }
                 mainViewModel.saveIsOnboardingShown(true)
@@ -91,34 +91,19 @@ fun Navigation(
         composable(NavGraph.BiometricAuth.route) {
             BiometricAuthScreen(
                 onAuthSuccess = {
-                    navHost.navigate(NavGraph.TrendingAnime.route) {
+                    navHostController.navigate(NavGraph.HomeAnime.route) {
                         popUpTo(NavGraph.BiometricAuth.route) { inclusive = true }
                         launchSingleTop = true
                     }
                 },
                 onAuthCancelledOrFailed = { // E.g., user cancels, or too many failed attempts
-                    // Navigate to login, effectively logging them out or requiring re-auth
-                    navHost.navigate(NavGraph.Login.route) { popUpTo(0) { inclusive = true } }
+                    navHostController.navigate(NavGraph.Login.route) { popUpTo(0) { inclusive = true } }
                 }
             )
         }
 
-        composable(NavGraph.TrendingAnime.route) {
-            TrendingAnimeScreen(
-                onAnimeClick = { imageUrl, animeId ->
-                    val encodedUrl = Uri.encode(imageUrl)
-                    navHost.navigate("detail_anime/${encodedUrl}/${animeId}")
-                },
-                onSettingsClick = {
-                    navHost.navigate(NavGraph.Settings.route)
-                },
-                onArchiveClick = {
-                    navHost.navigate(NavGraph.ArchivedAnime.route)
-                },
-                onFavoriteClick = {
-                    navHost.navigate(NavGraph.FavoritedAnime.route)
-                }
-            )
+        composable(NavGraph.HomeAnime.route) {
+            MainScreen()
         }
 
         composable(
@@ -137,15 +122,22 @@ fun Navigation(
             )
         }
 
-        composable(NavGraph.Settings.route) {
-            SettingsScreen(navController = navHost,)
-        }
-
         composable(route = NavGraph.ArchivedAnime.route) {
-            ArchivedAnimeScreen(navController = navHost)
+            ArchivedAnimeScreen(navController = navHostController)
         }
         composable(route = NavGraph.FavoritedAnime.route) {
-            FavoritedAnimeScreen(navController = navHost)
+            FavoritedAnimeScreen(navController = navHostController)
         }
+    }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun MainScreen() {
+    val mainNavController = rememberNavController()
+    Scaffold(
+        bottomBar = { BottomNavbar(navController = mainNavController) }
+    ) {
+        AppNavHost(navController = mainNavController, modifier = Modifier.padding(0.dp))
     }
 }

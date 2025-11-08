@@ -4,6 +4,7 @@ import android.net.Uri
 import com.devpush.animeapp.utils.Constants.ARCHIVED_ANIME_SCREEN
 import com.devpush.animeapp.utils.Constants.BIOMETRIC_AUTH_SCREEN
 import com.devpush.animeapp.utils.Constants.FAVORITED_ANIME_SCREEN
+import com.devpush.animeapp.utils.Constants.HOME_ANIME_SCREEN
 import com.devpush.animeapp.utils.Constants.LOGIN_SCREEN
 import com.devpush.animeapp.utils.Constants.ONBOARDING_SCREEN
 import com.devpush.animeapp.utils.Constants.REGISTRATION_SCREEN
@@ -15,6 +16,7 @@ sealed class NavGraph(val route: String) {
     data object Registration : NavGraph(route = REGISTRATION_SCREEN)
     data object OnBoarding : NavGraph(route = ONBOARDING_SCREEN)
     data object TrendingAnime : NavGraph(route = TRENDING_ANIME_SCREEN)
+    data object HomeAnime : NavGraph(route = HOME_ANIME_SCREEN)
     data object Settings : NavGraph(route = SETTINGS_SCREEN)
     data object BiometricAuth : NavGraph(route = BIOMETRIC_AUTH_SCREEN)
     data object ArchivedAnime : NavGraph(route = ARCHIVED_ANIME_SCREEN)

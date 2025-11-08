@@ -5,6 +5,7 @@ import com.devpush.animeapp.features.auth.ui.AuthViewModel
 import com.devpush.animeapp.features.details.ui.DetailsScreenViewModel
 import com.devpush.animeapp.features.favorited.ui.FavoritedAnimeViewModel
 import com.devpush.animeapp.MainViewModel
+import com.devpush.animeapp.features.home.ui.HomeViewModel
 import com.devpush.animeapp.features.settings.ui.SettingsViewModel
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -13,6 +14,7 @@ import org.koin.dsl.module
 val presentationModule = module {
     viewModel { DetailsScreenViewModel(get()) }
     viewModel { TrendingAnimeViewModel(get()) }
+    viewModel { HomeViewModel(get()) }
     viewModel { AuthViewModel(application = get(), userPreferencesRepository = get(), authRepository = get()) }
     viewModel { MainViewModel(get()) }
     viewModel { SettingsViewModel(get()) }

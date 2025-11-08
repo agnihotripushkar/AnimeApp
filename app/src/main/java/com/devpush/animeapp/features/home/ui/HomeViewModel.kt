@@ -1,23 +1,24 @@
-package com.devpush.animeapp.features.trending.ui
+package com.devpush.animeapp.features.home.ui
 
 import android.content.ContentValues.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.core.network.NetworkResult
 import com.devpush.animeapp.features.trending.domain.repository.TrendingAnimeRepository
+import com.devpush.animeapp.features.trending.ui.AnimeCategory
+import com.devpush.animeapp.features.trending.ui.TrendingAnimeUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : ViewModel() {
+class HomeViewModel(private val repository: TrendingAnimeRepository): ViewModel() {
 
     private var _uiState = MutableStateFlow<TrendingAnimeUiState>(TrendingAnimeUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
     init {
-        fetchTrendingAnimeFromServer()
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAnimeFromDb().collect { animeList ->
                 if (animeList.isNotEmpty()) {
@@ -35,7 +36,7 @@ class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : 
     private fun fetchTrendingAnimeFromServer() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = TrendingAnimeUiState.Loading
-            val apiResult = repository.getTrendingAnime()
+            val apiResult = repository.getAllAnime()
             when (apiResult) {
                 is NetworkResult.Loading -> {
                 }

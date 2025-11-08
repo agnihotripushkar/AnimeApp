@@ -10,6 +10,8 @@ object Constants {
     const val BIOMETRIC_AUTH_SCREEN = "biometric_auth_screen"
     const val ONBOARDING_SCREEN = "onBoarding_screen"
     const val TRENDING_ANIME_SCREEN = "trending_anime_screen"
+
+    const val HOME_ANIME_SCREEN = "home_anime_screen"
     const val SETTINGS_SCREEN = "settings_screen"
     const val DETAIL_ANIME_SCREEN = "detail_anime_screen"
     const val ARCHIVED_ANIME_SCREEN = "archived_anime_screen"
