@@ -1,6 +1,7 @@
-package com.devpush.animeapp.core.navigation
+package com.devpush.animeapp.core.navigation.utils
 
 import android.util.Log
+import com.devpush.animeapp.core.navigation.routes.NavRoute
 
 /**
  * Utility functions for navigation logic
@@ -25,15 +26,15 @@ object NavigationUtils {
         val destination = when {
             isLogin == true && isBiometricEnabled == true -> {
                 Log.d(TAG, "User is logged in with biometric enabled -> BiometricAuth")
-                NavGraph.BiometricAuth.route
+                NavRoute.BiometricAuth.route
             }
             isLogin == true && isBiometricEnabled == false -> {
-                Log.d(TAG, "User is logged in without biometric -> HomeAnime")
-                NavGraph.HomeAnime.route
+                Log.d(TAG, "User is logged in without biometric -> Home")
+                NavRoute.Home.route
             }
             else -> {
                 Log.d(TAG, "User is not logged in (isLogin=$isLogin, isBiometricEnabled=$isBiometricEnabled) -> Login")
-                NavGraph.Login.route
+                NavRoute.Login.route
             }
         }
         
@@ -56,15 +57,15 @@ object NavigationUtils {
         val destination = when {
             isLogin && isBiometricEnabled -> {
                 Log.d(TAG, "User is logged in with biometric enabled -> BiometricAuth")
-                NavGraph.BiometricAuth.route
+                NavRoute.BiometricAuth.route
             }
             isLogin && !isBiometricEnabled -> {
-                Log.d(TAG, "User is logged in without biometric -> HomeAnime")
-                NavGraph.HomeAnime.route
+                Log.d(TAG, "User is logged in without biometric -> Home")
+                NavRoute.Home.route
             }
             else -> {
                 Log.d(TAG, "User is not logged in -> Login")
-                NavGraph.Login.route
+                NavRoute.Login.route
             }
         }
         
