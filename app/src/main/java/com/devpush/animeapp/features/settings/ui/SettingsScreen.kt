@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.settings.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.biometric.BiometricManager
 import androidx.compose.foundation.ScrollState
@@ -34,6 +35,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.devpush.animeapp.R
 import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthStatus
 import com.devpush.animeapp.features.settings.ui.utils.LanguageSelectionDialog
@@ -46,9 +49,12 @@ import com.devpush.animeapp.utils.rememberDevicePosture
 import org.koin.androidx.compose.koinViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@SuppressLint("ContextCastToActivity")
+@OptIn(ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun SettingsScreen(
+    navController: NavController,
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
     settingsViewModel: SettingsViewModel = koinViewModel()
@@ -339,7 +345,9 @@ fun SettingsScreenPreview() {
     ) {
         SettingsScreen(
             onNavigateBack = {},
-            onLogout = {}
+            onLogout = {},
+            navController = TODO(),
+            settingsViewModel = TODO()
         )
     }
 }

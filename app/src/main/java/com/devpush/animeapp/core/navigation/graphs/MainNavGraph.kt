@@ -41,6 +41,7 @@ fun NavGraphBuilder.mainNavGraph(
     // Trending Screen
     composable(NavRoute.Trending.route) {
         TrendingAnimeScreen(
+            navController = navController,
             onAnimeClick = { posterImage, animeId ->
                 navController.navigate(
                     NavRoute.AnimeDetail.createRoute(posterImage ?: "", animeId.toIntOrNull() ?: 0)
@@ -61,6 +62,7 @@ fun NavGraphBuilder.mainNavGraph(
     // Settings Screen
     composable(NavRoute.Settings.route) {
         SettingsScreen(
+            navController = navController,
             onNavigateBack = {
                 navController.navigateUp()
             },

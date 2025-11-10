@@ -58,6 +58,8 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.features.common.ui.BottomNavbar
@@ -76,6 +78,7 @@ import timber.log.Timber
 )
 @Composable
 fun TrendingAnimeScreen(
+    navController: NavController,
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
     onSettingsClick: () -> Unit,
     onArchiveClick: () -> Unit,
@@ -87,7 +90,6 @@ fun TrendingAnimeScreen(
             LocalContext.current as Activity
         )
     )
-    val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var expanded by rememberSaveable { mutableStateOf(true) }
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
@@ -151,7 +153,7 @@ fun TrendingAnimeScreen(
                     Timber.tag("AnimeAppScaffold").d("Bottom nav navigation to: $route")
                     navController.navigate(route) {
                         // Pop up to the start destination to avoid building up a large back stack
-                        popUpTo(navController.graph.startDestinationId) {
+                        popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
                         // Avoid multiple copies of the same destination
@@ -425,19 +427,4 @@ fun TrendingAnimeExpanded(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun TrendingAnimeScreenPreview() {
-    AnimeAppTheme {
-        TrendingAnimeScreen(
-            onAnimeClick = { _, _ -> },
-            onSettingsClick = {},
-            onArchiveClick = {},
-            onFavoriteClick = {}
-        )
-    }
-
 }

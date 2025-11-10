@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.R
@@ -458,9 +459,9 @@ fun HomeScreen(
                     Timber.tag("AnimeAppScaffold").d("Bottom nav navigation to: $route")
                     navController.navigate(route) {
                         // Pop up to the start destination to avoid building up a large back stack
-//                        popUpTo(navController.graph.startDestinationId) {
-//                            saveState = true
-//                        }
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
                         // Avoid multiple copies of the same destination
                         launchSingleTop = true
                         // Restore state when navigating back to a previously visited destination
