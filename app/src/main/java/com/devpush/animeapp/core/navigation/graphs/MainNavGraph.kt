@@ -20,6 +20,7 @@ fun NavGraphBuilder.mainNavGraph(
     // Home Screen
     composable(NavRoute.Home.route) {
         HomeScreen(
+            navController = navController,
             onAnimeClick = { posterImage, animeId ->
                 navController.navigate(
                     NavRoute.AnimeDetail.createRoute(posterImage ?: "", animeId.toIntOrNull() ?: 0)

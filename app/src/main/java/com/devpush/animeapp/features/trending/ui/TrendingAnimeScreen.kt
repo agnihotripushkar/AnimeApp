@@ -58,11 +58,15 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.devpush.animeapp.features.common.ui.BottomNavbar
 import com.devpush.animeapp.features.trending.ui.utils.FabMenu
 import com.devpush.animeapp.features.trending.utils.Constants
 import com.devpush.animeapp.features.trending.utils.FabPositioning
 import com.devpush.animeapp.utils.DevicePosture
 import com.devpush.animeapp.utils.rememberDevicePosture
+import timber.log.Timber
 
 @SuppressLint("ContextCastToActivity")
 @OptIn(
@@ -83,12 +87,10 @@ fun TrendingAnimeScreen(
             LocalContext.current as Activity
         )
     )
-
+    val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var expanded by rememberSaveable { mutableStateOf(true) }
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
-    // Not used
-    val standardColors = FloatingToolbarDefaults.standardFloatingToolbarColors()
 
     Scaffold(
         topBar = {
@@ -143,8 +145,22 @@ fun TrendingAnimeScreen(
             )
         },
         bottomBar = {
-
-
+            BottomNavbar(
+                currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route,
+                onNavigate = { route ->
+                    Timber.tag("AnimeAppScaffold").d("Bottom nav navigation to: $route")
+                    navController.navigate(route) {
+                        // Pop up to the start destination to avoid building up a large back stack
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination
+                        launchSingleTop = true
+                        // Restore state when navigating back to a previously visited destination
+                        restoreState = true
+                    }
+                }
+            )
         }
     )
     { scaffoldPadding ->

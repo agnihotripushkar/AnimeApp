@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.home.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +49,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.R
+import com.devpush.animeapp.core.navigation.routes.NavRoute
+import com.devpush.animeapp.core.navigation.routes.NavRoute.Companion.bottomNavRoutes
+import com.devpush.animeapp.features.common.ui.BottomNavbar
 import com.devpush.animeapp.features.trending.ui.AnimeCategory
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeCompact
 import com.devpush.animeapp.features.trending.ui.TrendingAnimeExpanded
@@ -62,122 +69,37 @@ import com.devpush.animeapp.features.trending.utils.FabPositioning
 import com.devpush.animeapp.utils.DevicePosture
 import com.devpush.animeapp.utils.rememberDevicePosture
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
-@OptIn(ExperimentalMaterial3Api::class,
+@SuppressLint("ContextCastToActivity")
+@OptIn(
+    ExperimentalMaterial3Api::class,
     ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
 fun HomeScreen(
+    navController: NavController,
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
     onSettingsClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
-){
+) {
     val windowSize = rememberDevicePosture(
         windowSizeClass = calculateWindowSizeClass(
             LocalContext.current as Activity
         )
     )
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var expanded by rememberSaveable { mutableStateOf(true) }
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(text = stringResource(R.string.animes),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-//                navigationIcon = {
-//                    IconButton(onClick = { /* do something */ }) {
-//                        Icon(
-//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                            contentDescription = "Localized description",
-//                            tint = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                    }
-//                },
-//                actions = {
-//                    IconButton(onClick = { /* do something */ }) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Menu,
-//                            contentDescription = "Localized description",
-//                            tint = MaterialTheme.colorScheme.onPrimary
-//                        )
-//                    }
-//                },
-            )
-        },
-        floatingActionButton = {
-            FabMenu(
-                onClick = { fabItem ->
-                    when (fabItem.text) {
-                        Constants.FabMenuFav -> {
-                            onFavoriteClick()
-                        }
-
-                        Constants.FabMenuArchive -> {
-                            onArchiveClick()
-                        }
-
-                        Constants.FabMenuSettings -> {
-                            onSettingsClick()
-                        }
-                    }
-                }
-            )
-        }
-    ) { scaffoldPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(scaffoldPadding)
-            ) {
-                if (windowSize == DevicePosture.EXPANDED_WIDTH) {
-                    TrendingAnimeExpanded(
-                        uiState = uiState,
-                        onAnimeClick = onAnimeClick,
-                        onStar = { id, isFavorite -> viewModel.starAnime(id, isFavorite) },
-                        onArchive = { id, isArchived -> viewModel.archiveAnime(id, isArchived) },
-                        expanded = expanded,
-                        onSettingsClick = onSettingsClick,
-                        onFavoriteClick = onFavoriteClick,
-                        onArchiveClick = onArchiveClick,
-                        vibrantColors = vibrantColors,
-                        onRetry = { viewModel.retryFetchTrendingAnime() }
-                    )
-                } else {
-                    TrendingAnimeCompact(
-                        uiState = uiState,
-                        onAnimeClick = onAnimeClick,
-                        onStar = { id, isFavorite -> viewModel.starAnime(id, isFavorite) },
-                        onArchive = { id, isArchived -> viewModel.archiveAnime(id, isArchived) },
-                        expanded = expanded,
-                        onSettingsClick = onSettingsClick,
-                        onFavoriteClick = onFavoriteClick,
-                        onArchiveClick = onArchiveClick,
-                        vibrantColors = vibrantColors,
-                        onRetry = { viewModel.retryFetchTrendingAnime() }
-                    )
-                }
-            }
-        }
-
-
-
-    @OptIn(ExperimentalMaterial3Api::class,
-        ExperimentalMaterial3ExpressiveApi::class)
+    @OptIn(
+        ExperimentalMaterial3Api::class,
+        ExperimentalMaterial3ExpressiveApi::class
+    )
     @Composable
-    fun TrendingAnimeCompact(
+    fun HomeAnimeCompact(
         uiState: TrendingAnimeUiState,
         onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
         onStar: (id: String, isFavorite: Boolean) -> Unit,
@@ -223,63 +145,64 @@ fun HomeScreen(
                         } else {
                             Box(
                                 modifier = Modifier.fillMaxSize()
-                            ) { LazyColumn(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.spacedBy(0.dp),
-                                        contentPadding = FabPositioning.LIST_CONTENT_PADDING
-                                    )
-                                    {
-                                        items(
-                                            animeDataList.size,
-                                            key = { animeDataList[it].id }
-                                        ) { index ->
-                                            val dismissState = rememberSwipeToDismissBoxState(
-                                                confirmValueChange = { direction ->
-                                                    when (direction) {
-                                                        SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
-                                                            onArchive(
-                                                                animeDataList[index].id,
-                                                                animeDataList[index].isArchived
-                                                            )
-                                                            true // Allow dismissal
-                                                        }
-
-                                                        SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
-                                                            onStar(
-                                                                animeDataList[index].id,
-                                                                animeDataList[index].isFavorite
-                                                            )
-                                                            true // Allow dismissal
-                                                        }
-
-                                                        SwipeToDismissBoxValue.Settled -> false
+                            ) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                                    contentPadding = FabPositioning.LIST_CONTENT_PADDING
+                                )
+                                {
+                                    items(
+                                        animeDataList.size,
+                                        key = { animeDataList[it].id }
+                                    ) { index ->
+                                        val dismissState = rememberSwipeToDismissBoxState(
+                                            confirmValueChange = { direction ->
+                                                when (direction) {
+                                                    SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
+                                                        onArchive(
+                                                            animeDataList[index].id,
+                                                            animeDataList[index].isArchived
+                                                        )
+                                                        true // Allow dismissal
                                                     }
+
+                                                    SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
+                                                        onStar(
+                                                            animeDataList[index].id,
+                                                            animeDataList[index].isFavorite
+                                                        )
+                                                        true // Allow dismissal
+                                                    }
+
+                                                    SwipeToDismissBoxValue.Settled -> false
                                                 }
-                                            )
-                                            AnimeCard(
-                                                anime = animeDataList[index],
-                                                onClick = {
-                                                    onAnimeClick(
-                                                        animeDataList[index].attributes.posterImage.originalUrl,
-                                                        animeDataList[index].id
-                                                    )
-                                                },
-                                                onStar = {
-                                                    onStar(
-                                                        animeDataList[index].id,
-                                                        animeDataList[index].isFavorite
-                                                    )
-                                                },
-                                                onArchive = {
-                                                    onArchive(
-                                                        animeDataList[index].id,
-                                                        animeDataList[index].isArchived
-                                                    )
-                                                },
-                                                dismissState = dismissState
-                                            )
-                                        }
+                                            }
+                                        )
+                                        AnimeCard(
+                                            anime = animeDataList[index],
+                                            onClick = {
+                                                onAnimeClick(
+                                                    animeDataList[index].attributes.posterImage.originalUrl,
+                                                    animeDataList[index].id
+                                                )
+                                            },
+                                            onStar = {
+                                                onStar(
+                                                    animeDataList[index].id,
+                                                    animeDataList[index].isFavorite
+                                                )
+                                            },
+                                            onArchive = {
+                                                onArchive(
+                                                    animeDataList[index].id,
+                                                    animeDataList[index].isArchived
+                                                )
+                                            },
+                                            dismissState = dismissState
+                                        )
                                     }
+                                }
                             }
                         }
                     }
@@ -310,7 +233,7 @@ fun HomeScreen(
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
     @Composable
-    fun TrendingAnimeExpanded(
+    fun HomeAnimeExpanded(
         uiState: TrendingAnimeUiState,
         onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
         onStar: (id: String, isFavorite: Boolean) -> Unit,
@@ -358,62 +281,62 @@ fun HomeScreen(
                                 modifier = Modifier.fillMaxSize()
                             )
                             {
-                                    LazyColumn(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.spacedBy(0.dp),
-                                        contentPadding = FabPositioning.LIST_CONTENT_PADDING
-                                    ) {
-                                        items(
-                                            animeDataList.size,
-                                            key = { animeDataList[it].id }
-                                        ) { index ->
-                                            val dismissState = rememberSwipeToDismissBoxState(
-                                                confirmValueChange = { direction ->
-                                                    when (direction) {
-                                                        SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
-                                                            onArchive(
-                                                                animeDataList[index].id,
-                                                                animeDataList[index].isArchived
-                                                            )
-                                                            true // Allow dismissal
-                                                        }
-
-                                                        SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
-                                                            onStar(
-                                                                animeDataList[index].id,
-                                                                animeDataList[index].isFavorite
-                                                            )
-                                                            true // Allow dismissal
-                                                        }
-
-                                                        SwipeToDismissBoxValue.Settled -> false
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                                    contentPadding = FabPositioning.LIST_CONTENT_PADDING
+                                ) {
+                                    items(
+                                        animeDataList.size,
+                                        key = { animeDataList[it].id }
+                                    ) { index ->
+                                        val dismissState = rememberSwipeToDismissBoxState(
+                                            confirmValueChange = { direction ->
+                                                when (direction) {
+                                                    SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
+                                                        onArchive(
+                                                            animeDataList[index].id,
+                                                            animeDataList[index].isArchived
+                                                        )
+                                                        true // Allow dismissal
                                                     }
+
+                                                    SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
+                                                        onStar(
+                                                            animeDataList[index].id,
+                                                            animeDataList[index].isFavorite
+                                                        )
+                                                        true // Allow dismissal
+                                                    }
+
+                                                    SwipeToDismissBoxValue.Settled -> false
                                                 }
-                                            )
-                                            AnimeCard(
-                                                anime = animeDataList[index],
-                                                onClick = {
-                                                    onAnimeClick(
-                                                        animeDataList[index].attributes.posterImage.originalUrl,
-                                                        animeDataList[index].id
-                                                    )
-                                                },
-                                                onStar = {
-                                                    onStar(
-                                                        animeDataList[index].id,
-                                                        animeDataList[index].isFavorite
-                                                    )
-                                                },
-                                                onArchive = {
-                                                    onArchive(
-                                                        animeDataList[index].id,
-                                                        animeDataList[index].isArchived
-                                                    )
-                                                },
-                                                dismissState = dismissState
-                                            )
-                                        }
+                                            }
+                                        )
+                                        AnimeCard(
+                                            anime = animeDataList[index],
+                                            onClick = {
+                                                onAnimeClick(
+                                                    animeDataList[index].attributes.posterImage.originalUrl,
+                                                    animeDataList[index].id
+                                                )
+                                            },
+                                            onStar = {
+                                                onStar(
+                                                    animeDataList[index].id,
+                                                    animeDataList[index].isFavorite
+                                                )
+                                            },
+                                            onArchive = {
+                                                onArchive(
+                                                    animeDataList[index].id,
+                                                    animeDataList[index].isArchived
+                                                )
+                                            },
+                                            dismissState = dismissState
+                                        )
                                     }
+                                }
 
 
                                 HorizontalFloatingToolbar(
@@ -475,4 +398,110 @@ fun HomeScreen(
         }
     }
 
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.animes),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+//                navigationIcon = {
+//                    IconButton(onClick = { /* do something */ }) {
+//                        Icon(
+//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                            contentDescription = "Localized description",
+//                            tint = MaterialTheme.colorScheme.onPrimary
+//                        )
+//                    }
+//                },
+//                actions = {
+//                    IconButton(onClick = { /* do something */ }) {
+//                        Icon(
+//                            imageVector = Icons.Filled.Menu,
+//                            contentDescription = "Localized description",
+//                            tint = MaterialTheme.colorScheme.onPrimary
+//                        )
+//                    }
+//                },
+            )
+        },
+        floatingActionButton = {
+            FabMenu(
+                onClick = { fabItem ->
+                    when (fabItem.text) {
+                        Constants.FabMenuFav -> {
+                            onFavoriteClick()
+                        }
+
+                        Constants.FabMenuArchive -> {
+                            onArchiveClick()
+                        }
+
+                        Constants.FabMenuSettings -> {
+                            onSettingsClick()
+                        }
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            BottomNavbar(
+                currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route,
+                onNavigate = { route ->
+                    Timber.tag("AnimeAppScaffold").d("Bottom nav navigation to: $route")
+                    navController.navigate(route) {
+                        // Pop up to the start destination to avoid building up a large back stack
+//                        popUpTo(navController.graph.startDestinationId) {
+//                            saveState = true
+//                        }
+                        // Avoid multiple copies of the same destination
+                        launchSingleTop = true
+                        // Restore state when navigating back to a previously visited destination
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    ) { scaffoldPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(scaffoldPadding)
+        ) {
+            if (windowSize == DevicePosture.EXPANDED_WIDTH) {
+                HomeAnimeExpanded(
+                    uiState = uiState,
+                    onAnimeClick = onAnimeClick,
+                    onStar = { id, isFavorite -> viewModel.starAnime(id, isFavorite) },
+                    onArchive = { id, isArchived -> viewModel.archiveAnime(id, isArchived) },
+                    expanded = expanded,
+                    onSettingsClick = onSettingsClick,
+                    onFavoriteClick = onFavoriteClick,
+                    onArchiveClick = onArchiveClick,
+                    vibrantColors = vibrantColors,
+                    onRetry = { viewModel.retryFetchTrendingAnime() }
+                )
+            } else {
+                HomeAnimeCompact(
+                    uiState = uiState,
+                    onAnimeClick = onAnimeClick,
+                    onStar = { id, isFavorite -> viewModel.starAnime(id, isFavorite) },
+                    onArchive = { id, isArchived -> viewModel.archiveAnime(id, isArchived) },
+                    expanded = expanded,
+                    onSettingsClick = onSettingsClick,
+                    onFavoriteClick = onFavoriteClick,
+                    onArchiveClick = onArchiveClick,
+                    vibrantColors = vibrantColors,
+                    onRetry = { viewModel.retryFetchTrendingAnime() }
+                )
+            }
+        }
+    }
 }

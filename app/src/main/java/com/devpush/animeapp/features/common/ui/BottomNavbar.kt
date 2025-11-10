@@ -10,7 +10,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.devpush.animeapp.core.navigation.components.BottomNavItem
+import com.devpush.animeapp.core.navigation.model.BottomNavItem
 import com.devpush.animeapp.core.navigation.routes.NavRoute
 
 /**
