@@ -72,11 +72,7 @@ val items = listOf(
     FabItem(
         text = Constants.FabMenuArchive,
         iconRes = R.drawable.outline_archive_24
-    ),
-    FabItem(
-        text = Constants.FabMenuSettings,
-        iconRes = R.drawable.outline_build_24
-    ),
+    )
 )
 
 data class FabItem(

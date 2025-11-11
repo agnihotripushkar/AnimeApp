@@ -1,8 +1,10 @@
 package com.devpush.animeapp.core.navigation.graphs
 
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.devpush.animeapp.core.navigation.routes.NavRoute
 import com.devpush.animeapp.features.home.ui.HomeScreen
 import com.devpush.animeapp.features.settings.ui.SettingsScreen
@@ -19,15 +21,38 @@ fun NavGraphBuilder.mainNavGraph(
 ) {
     // Home Screen
     composable(NavRoute.Home.route) {
+        val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
         HomeScreen(
-            navController = navController,
+            currentRoute = currentRoute,
+            onNavigateToHome = {
+                navController.navigate(NavRoute.Home.route) {
+                    popUpTo(NavRoute.Home.route) { inclusive = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            onNavigateToTrending = {
+                navController.navigate(NavRoute.Trending.route){
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            onNavigateToSettings = {
+                navController.navigate(NavRoute.Settings.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
             onAnimeClick = { posterImage, animeId ->
                 navController.navigate(
                     NavRoute.AnimeDetail.createRoute(posterImage ?: "", animeId.toIntOrNull() ?: 0)
                 )
-            },
-            onSettingsClick = {
-                navController.navigate(NavRoute.Settings.route)
             },
             onArchiveClick = {
                 navController.navigate(NavRoute.Archived.route)
@@ -40,15 +65,34 @@ fun NavGraphBuilder.mainNavGraph(
     
     // Trending Screen
     composable(NavRoute.Trending.route) {
+        val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
         TrendingAnimeScreen(
-            navController = navController,
+            currentRoute = currentRoute,
+            onNavigateToHome = {
+                navController.navigate(NavRoute.Home.route) {
+                    popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            onNavigateToTrending = {
+                navController.navigate(NavRoute.Trending.route) {
+                    popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            onNavigateToSettings = {
+                navController.navigate(NavRoute.Settings.route) {
+                    popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
             onAnimeClick = { posterImage, animeId ->
                 navController.navigate(
                     NavRoute.AnimeDetail.createRoute(posterImage ?: "", animeId.toIntOrNull() ?: 0)
                 )
-            },
-            onSettingsClick = {
-                navController.navigate(NavRoute.Settings.route)
             },
             onArchiveClick = {
                 navController.navigate(NavRoute.Archived.route)
@@ -62,7 +106,6 @@ fun NavGraphBuilder.mainNavGraph(
     // Settings Screen
     composable(NavRoute.Settings.route) {
         SettingsScreen(
-            navController = navController,
             onNavigateBack = {
                 navController.navigateUp()
             },

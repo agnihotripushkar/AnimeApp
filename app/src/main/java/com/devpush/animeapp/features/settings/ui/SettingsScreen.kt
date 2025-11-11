@@ -54,7 +54,6 @@ import org.koin.androidx.compose.koinViewModel
     ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun SettingsScreen(
-    navController: NavController,
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
     settingsViewModel: SettingsViewModel = koinViewModel()
@@ -346,7 +345,6 @@ fun SettingsScreenPreview() {
         SettingsScreen(
             onNavigateBack = {},
             onLogout = {},
-            navController = TODO(),
             settingsViewModel = TODO()
         )
     }

@@ -39,22 +39,30 @@ private val bottomNavItems = listOf(
 
 /**
  * Bottom navigation bar component that displays navigation items.
- * 
+ *
  * @param currentRoute The currently active route
  * @param onNavigate Callback invoked when a navigation item is clicked
  * @param modifier Optional modifier for the navigation bar
  */
 @Composable
 fun BottomNavbar(
-    currentRoute: String?,
-    onNavigate: (String) -> Unit,
+    currentRoute: String,
+    onHomeClick: () -> Unit,
+    onTrendingClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationBar(modifier = modifier) {
         bottomNavItems.forEach { item ->
             NavigationBarItem(
                 selected = currentRoute == item.route,
-                onClick = { onNavigate(item.route) },
+                onClick = {
+                    when (item.route) {
+                        NavRoute.Home.route -> onHomeClick()
+                        NavRoute.Trending.route -> onTrendingClick()
+                        NavRoute.Settings.route -> onSettingsClick()
+                    }
+                },
                 icon = {
                     Icon(
                         item.icon,

@@ -62,6 +62,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.devpush.animeapp.core.navigation.routes.NavRoute
 import com.devpush.animeapp.features.common.ui.BottomNavbar
 import com.devpush.animeapp.features.trending.ui.utils.FabMenu
 import com.devpush.animeapp.features.trending.utils.Constants
@@ -78,9 +79,11 @@ import timber.log.Timber
 )
 @Composable
 fun TrendingAnimeScreen(
-    navController: NavController,
+    currentRoute: String?,
+    onNavigateToHome: () -> Unit,
+    onNavigateToTrending: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
-    onSettingsClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     viewModel: TrendingAnimeViewModel = koinViewModel()
@@ -96,35 +99,36 @@ fun TrendingAnimeScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
-                    Text(text = stringResource(R.string.animes),
+                    Text(
+                        text = stringResource(R.string.animes),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
-                        )
-                        },
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
-                navigationIcon = {
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                },
+//                navigationIcon = {
+//                    IconButton(onClick = { /* do something */ }) {
+//                        Icon(
+//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                            contentDescription = "Localized description",
+//                            tint = MaterialTheme.colorScheme.onPrimary
+//                        )
+//                    }
+//                },
+//                actions = {
+//                    IconButton(onClick = { /* do something */ }) {
+//                        Icon(
+//                            imageVector = Icons.Filled.Menu,
+//                            contentDescription = "Localized description",
+//                            tint = MaterialTheme.colorScheme.onPrimary
+//                        )
+//                    }
+//                },
             )
         },
         floatingActionButton = {
@@ -138,30 +142,16 @@ fun TrendingAnimeScreen(
                         Constants.FabMenuArchive -> {
                             onArchiveClick()
                         }
-
-                        Constants.FabMenuSettings -> {
-                            onSettingsClick()
-                        }
                     }
                 }
             )
         },
         bottomBar = {
             BottomNavbar(
-                currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route,
-                onNavigate = { route ->
-                    Timber.tag("AnimeAppScaffold").d("Bottom nav navigation to: $route")
-                    navController.navigate(route) {
-                        // Pop up to the start destination to avoid building up a large back stack
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        // Avoid multiple copies of the same destination
-                        launchSingleTop = true
-                        // Restore state when navigating back to a previously visited destination
-                        restoreState = true
-                    }
-                }
+                currentRoute = currentRoute ?: NavRoute.Trending.route,
+                onHomeClick = onNavigateToHome,
+                onTrendingClick = onNavigateToTrending,
+                onSettingsClick = onNavigateToSettings
             )
         }
     )
@@ -175,255 +165,19 @@ fun TrendingAnimeScreen(
                 TrendingAnimeExpanded(
                     uiState = uiState,
                     onAnimeClick = onAnimeClick,
-                    onStar = { id, isFavorite -> viewModel.starAnime(id, isFavorite) },
-                    onArchive = { id, isArchived -> viewModel.archiveAnime(id, isArchived) },
                     expanded = expanded,
-                    onSettingsClick = onSettingsClick,
+                    onSettingsClick = onNavigateToSettings,
+                    vibrantColors = vibrantColors,
+                    onRetry = { viewModel.retryFetchTrendingAnime() },
                     onFavoriteClick = onFavoriteClick,
                     onArchiveClick = onArchiveClick,
-                    vibrantColors = vibrantColors,
-                    onRetry = { viewModel.retryFetchTrendingAnime() }
                 )
             } else {
                 TrendingAnimeCompact(
                     uiState = uiState,
                     onAnimeClick = onAnimeClick,
-                    onStar = { id, isFavorite -> viewModel.starAnime(id, isFavorite) },
-                    onArchive = { id, isArchived -> viewModel.archiveAnime(id, isArchived) },
-                    expanded = expanded,
-                    onSettingsClick = onSettingsClick,
-                    onFavoriteClick = onFavoriteClick,
-                    onArchiveClick = onArchiveClick,
-                    vibrantColors = vibrantColors,
                     onRetry = { viewModel.retryFetchTrendingAnime() }
                 )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun TrendingAnimeCompact(
-    uiState: TrendingAnimeUiState,
-    onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
-    onStar: (id: String, isFavorite: Boolean) -> Unit,
-    onArchive: (id: String, isArchived: Boolean) -> Unit,
-    expanded: Boolean,
-    onSettingsClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
-    onArchiveClick: () -> Unit,
-    vibrantColors: androidx.compose.material3.FloatingToolbarColors,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant
-            )
-    ) {
-        // Use AnimatedContent to switch between Loading, Success, and Error states
-        // Temporarily replaced AnimatedContent with a direct when statement for diagnosis
-        Box(modifier = Modifier.weight(1f)) { // Added a Box to maintain similar layout structure as AnimatedContent
-            when (val currentUiState = uiState) { // Used a val for smart casting
-                TrendingAnimeUiState.Loading, TrendingAnimeUiState.Idle -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ContainedLoadingIndicator()
-                    }
-                }
-
-                is TrendingAnimeUiState.Success -> {
-                    val animeDataList = currentUiState.animeList
-                    if (animeDataList.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(stringResource(R.string.no_trending_anime_found))
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                                LazyVerticalGrid(
-                                    modifier = Modifier.fillMaxSize(),
-                                    columns = GridCells.Adaptive(minSize = 180.dp),
-                                    contentPadding = FabPositioning.GRID_CONTENT_PADDING
-                                ) {
-                                    items(
-                                        animeDataList.size,
-                                        key = { animeDataList[it].id }
-                                    ) { index ->
-                                        AnimePoster(
-                                            anime = animeDataList[index],
-                                            onClick = {
-                                                onAnimeClick(
-                                                    animeDataList[index].attributes.posterImage.originalUrl,
-                                                    animeDataList[index].id
-                                                )
-                                            },
-                                        )
-                                    }
-                                }
-                            }
-                    }
-                }
-
-                is TrendingAnimeUiState.Error -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = currentUiState.message // Use currentUiState for smart cast
-                                    ?: stringResource(R.string.an_error_occurred),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(onClick = { onRetry() }) {
-                                Text(stringResource(R.string.retry))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun TrendingAnimeExpanded(
-    uiState: TrendingAnimeUiState,
-    onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
-    onStar: (id: String, isFavorite: Boolean) -> Unit,
-    onArchive: (id: String, isArchived: Boolean) -> Unit,
-    expanded: Boolean,
-    onSettingsClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
-    onArchiveClick: () -> Unit,
-    vibrantColors: androidx.compose.material3.FloatingToolbarColors,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant
-            )
-    ) {
-        // Use AnimatedContent to switch between Loading, Success, and Error states
-        // Temporarily replaced AnimatedContent with a direct when statement for diagnosis
-        Box(modifier = Modifier.weight(1f)) { // Added a Box to maintain similar layout structure as AnimatedContent
-            when (val currentUiState = uiState) { // Used a val for smart casting
-                TrendingAnimeUiState.Loading, TrendingAnimeUiState.Idle -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ContainedLoadingIndicator()
-                    }
-                }
-
-                is TrendingAnimeUiState.Success -> {
-                    val animeDataList = currentUiState.animeList
-                    if (animeDataList.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(stringResource(R.string.no_trending_anime_found))
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                                LazyVerticalGrid(
-                                    modifier = Modifier.fillMaxSize(),
-                                    columns = GridCells.Adaptive(minSize = 180.dp),
-                                    contentPadding = FabPositioning.GRID_CONTENT_PADDING
-                                ) {
-                                    items(
-                                        animeDataList.size,
-                                        key = { animeDataList[it].id }
-                                    ) { index ->
-                                        AnimePoster(
-                                            anime = animeDataList[index],
-                                            onClick = {
-                                                onAnimeClick(
-                                                    animeDataList[index].attributes.posterImage.originalUrl,
-                                                    animeDataList[index].id
-                                                )
-                                            },
-                                        )
-                                    }
-                                }
-                            }
-
-                            HorizontalFloatingToolbar(
-                                expanded = expanded,
-                                floatingActionButton = {
-                                    FloatingToolbarDefaults.VibrantFloatingActionButton(
-                                        onClick = { onSettingsClick() },
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.Settings,
-                                            contentDescription = stringResource(R.string.settings)
-                                        )
-                                    }
-                                },
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(16.dp),
-                                colors = vibrantColors,
-                                content = {
-                                    IconButton(onClick = { onFavoriteClick() }) {
-                                        Icon(
-                                            Icons.Filled.Star,
-                                            contentDescription = stringResource(R.string.favorite)
-                                        )
-                                    }
-                                    IconButton(onClick = { onArchiveClick() }) {
-                                        Icon(
-                                            Icons.Filled.Archive,
-                                            contentDescription = stringResource(R.string.archive)
-                                        )
-                                    }
-                                }
-                            )
-                    }
-                }
-
-                is TrendingAnimeUiState.Error -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = currentUiState.message // Use currentUiState for smart cast
-                                    ?: stringResource(R.string.an_error_occurred),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(onClick = { onRetry() }) {
-                                Text(stringResource(R.string.retry))
-                            }
-                        }
-                    }
-                }
             }
         }
     }
