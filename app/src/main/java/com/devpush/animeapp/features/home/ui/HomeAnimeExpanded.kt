@@ -1,5 +1,12 @@
 package com.devpush.animeapp.features.home.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,7 +65,16 @@ fun HomeAnimeExpanded(
         // Use AnimatedContent to switch between Loading, Success, and Error states
         // Temporarily replaced AnimatedContent with a direct when statement for diagnosis
         Box(modifier = Modifier.weight(1f)) { // Added a Box to maintain similar layout structure as AnimatedContent
-            when (val currentUiState = uiState) { // Used a val for smart casting
+        AnimatedContent(
+            targetState = uiState,
+            transitionSpec = {
+                (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.92f, animationSpec = tween(300))).togetherWith(
+                    fadeOut(animationSpec = tween(300))
+                )
+            },
+            label = "Content State Transition"
+        ) { currentUiState ->
+            when (currentUiState) {
                 TrendingAnimeUiState.Loading, TrendingAnimeUiState.Idle -> {
                     Box(
                         modifier = Modifier
@@ -117,6 +133,7 @@ fun HomeAnimeExpanded(
                                         }
                                     )
                                     AnimeCard(
+                                        modifier = Modifier.animateItem(),
                                         anime = animeDataList[index],
                                         onClick = {
                                             onAnimeClick(
@@ -187,6 +204,7 @@ fun HomeAnimeExpanded(
                     }
                 }
             }
+        }
         }
     }
 }
