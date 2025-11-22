@@ -10,15 +10,12 @@ object Constants {
     const val TAG = "TrendingAnime"
     const val FabMenuFav = "Favourite"
     const val FabMenuArchive = "Archive"
-    const val FabMenuSettings = "Settings"
 }
 
 /**
  * Constants for FAB positioning across different layouts
  */
 object FabPositioning {
-    // Standard margins from screen edges
-    val FAB_MARGIN = 16.dp
     
     // Content padding to prevent overlap with FAB
     val CONTENT_BOTTOM_PADDING = 80.dp

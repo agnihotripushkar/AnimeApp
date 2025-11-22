@@ -9,15 +9,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.MainViewModel
+import com.devpush.animeapp.core.navigation.utils.NavigationUtils
 import timber.log.Timber
 
 /**
- * NavigationContainer wraps the Navigation component and manages loading states.
- * 
+ * NavigationContainer wraps the navigation system and manages loading states.
+ *
  * This component ensures that navigation only renders when all authentication
  * states are fully loaded, preventing screen flashing and timing issues.
- * 
+ *
  * @param mainViewModel The main view model containing authentication states
  */
 @Composable
@@ -28,34 +30,33 @@ fun NavigationContainer(
     val isLogin by mainViewModel.isLogin.collectAsState()
     val isBiometricEnabled by mainViewModel.isBiometricAuthEnabled.collectAsState()
     val isOnboardingShown by mainViewModel.isOnboardingShown.collectAsState()
-    
-    Timber.tag("NavigationContainer").d(
-        "NavigationContainer state - isInitialized: $isInitialized, " +
-        "isLogin: $isLogin, isBiometricEnabled: $isBiometricEnabled, " +
-        "isOnboardingShown: $isOnboardingShown"
-    )
-    
+
     if (isInitialized) {
         // All states are loaded, safe to render navigation
-        Timber.tag("NavigationContainer").d("All states loaded, rendering Navigation component")
-        
+        Timber.tag("NavigationContainer").d("All states loaded, rendering AnimeAppScaffold")
+
         // Calculate start destination using the helper function
         // States are guaranteed to be non-null when isInitialized is true
         val startDestination = NavigationUtils.calculateStartDestination(
             isLogin = isLogin!!,
             isBiometricEnabled = isBiometricEnabled!!
         )
-        
+
         Timber.tag("NavigationContainer").d("Start destination calculated: $startDestination")
-        
-        Navigation(
+
+        // Create navController at this level to be passed to AnimeAppScaffold
+        val navController = rememberNavController()
+
+        UnifiedNavHost(
+            navController = navController,
             mainViewModel = mainViewModel,
             startDestination = startDestination
         )
+
     } else {
         // States are still loading, show loading indicator
         Timber.tag("NavigationContainer").d("States still loading, showing loading indicator")
-        
+
         LoadingScreen()
     }
 }

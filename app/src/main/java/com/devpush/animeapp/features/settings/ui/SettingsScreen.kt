@@ -1,5 +1,6 @@
 package com.devpush.animeapp.features.settings.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.biometric.BiometricManager
 import androidx.compose.foundation.ScrollState
@@ -35,9 +36,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavHostController
 import com.devpush.animeapp.R
-import com.devpush.animeapp.core.navigation.NavGraph
 import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthStatus
 import com.devpush.animeapp.features.settings.ui.utils.LanguageSelectionDialog
 import com.devpush.animeapp.features.settings.ui.utils.SettingsItem
@@ -49,10 +49,13 @@ import com.devpush.animeapp.utils.rememberDevicePosture
 import org.koin.androidx.compose.koinViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@SuppressLint("ContextCastToActivity")
+@OptIn(ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun SettingsScreen(
-    navController: NavController,
+    onNavigateBack: () -> Unit,
+    onLogout: () -> Unit,
     settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
     val windowSize = rememberDevicePosture(
@@ -94,7 +97,7 @@ fun SettingsScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back_button_desc),
@@ -111,7 +114,7 @@ fun SettingsScreen(
                     scrollState = scrollState,
                     settingsViewModel = settingsViewModel,
                     isBiometricAuthEnabled = isBiometricAuthEnabled,
-                    navController = navController,
+                    onLogout = onLogout,
                     currentTheme = currentTheme,
                     showThemeDialog = showThemeDialog,
                     onShowThemeDialogChange = { showThemeDialog = it },
@@ -124,7 +127,7 @@ fun SettingsScreen(
                     scrollState = scrollState,
                     settingsViewModel = settingsViewModel,
                     isBiometricAuthEnabled = isBiometricAuthEnabled,
-                    navController = navController,
+                    onLogout = onLogout,
                     currentTheme = currentTheme,
                     showThemeDialog = showThemeDialog,
                     onShowThemeDialogChange = { showThemeDialog = it },
@@ -142,7 +145,7 @@ fun SettingsCompact(
     scrollState: ScrollState,
     settingsViewModel: SettingsViewModel,
     isBiometricAuthEnabled: Boolean,
-    navController: NavController,
+    onLogout: () -> Unit,
     currentTheme: String,
     showThemeDialog: Boolean,
     onShowThemeDialogChange: (Boolean) -> Unit,
@@ -177,9 +180,7 @@ fun SettingsCompact(
             showArrow = true,
             onClick = {
                 settingsViewModel.performLogout()
-                navController.navigate(NavGraph.Login.route) {
-                    popUpTo(0) { inclusive = true }
-                }
+                onLogout()
             }
         )
 
@@ -242,7 +243,7 @@ fun SettingsExpanded(
     scrollState: ScrollState,
     settingsViewModel: SettingsViewModel,
     isBiometricAuthEnabled: Boolean,
-    navController: NavController,
+    onLogout: () -> Unit,
     currentTheme: String,
     showThemeDialog: Boolean,
     onShowThemeDialogChange: (Boolean) -> Unit,
@@ -277,9 +278,7 @@ fun SettingsExpanded(
             showArrow = true,
             onClick = {
                 settingsViewModel.performLogout()
-                navController.navigate(NavGraph.Login.route) {
-                    popUpTo(0) { inclusive = true }
-                }
+                onLogout()
             }
         )
 
@@ -343,6 +342,10 @@ fun SettingsScreenPreview() {
     AnimeAppTheme(
         userThemePreference = "Dark",
     ) {
-        SettingsScreen(rememberNavController())
+        SettingsScreen(
+            onNavigateBack = {},
+            onLogout = {},
+            settingsViewModel = TODO()
+        )
     }
 }

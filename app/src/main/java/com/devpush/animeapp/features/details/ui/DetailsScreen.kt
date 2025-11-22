@@ -74,6 +74,7 @@ import org.koin.androidx.compose.koinViewModel
 fun DetailsScreen(
     id: Int,
     coverImage: String?,
+    onNavigateBack: () -> Unit,
     viewModel: DetailsScreenViewModel = koinViewModel()
 ) {
     LaunchedEffect(key1 = true) {

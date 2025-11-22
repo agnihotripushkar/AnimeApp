@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.devpush.animeapp.R
 import com.devpush.animeapp.data.local.entities.AnimeDataEntity
 import com.devpush.animeapp.features.trending.ui.utils.AnimeCard
@@ -46,7 +45,7 @@ import com.devpush.animeapp.utils.rememberDevicePosture
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun FavoritedAnimeScreen(
-    navController: NavController,
+    onNavigateBack: () -> Unit,
     onAnimeClick: (animeId: String) -> Unit = { Timber.d("Anime card clicked: $it") },
     viewModel: FavoritedAnimeViewModel = koinViewModel()
 ) {
@@ -67,7 +66,7 @@ fun FavoritedAnimeScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back_button_desc),

@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.graphicsLayer
+import kotlin.math.absoluteValue
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -143,12 +146,34 @@ fun OnBoardingTabletCompact(
     ) {
         HorizontalPager(
             state = pagerState,
+            contentPadding = PaddingValues(horizontal = 32.dp),
+            pageSpacing = 16.dp,
             modifier = modifier
                 .fillMaxWidth()
                 .weight(0.8f)
-                .padding(horizontal = 16.dp)
         ) { page ->
-            OnBoardingItem(onBoardList[page], style = style)
+            Box(
+                modifier = Modifier
+                    .graphicsLayer {
+                        val pageOffset = (
+                            (pagerState.currentPage - page) + pagerState
+                                .currentPageOffsetFraction
+                            ).absoluteValue
+
+                        alpha = androidx.compose.ui.util.lerp(
+                            start = 0.5f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        )
+                        scaleY = androidx.compose.ui.util.lerp(
+                            start = 0.85f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        )
+                    }
+            ) {
+                OnBoardingItem(onBoardList[page], style = style)
+            }
         }
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -228,12 +253,34 @@ fun OnBoardingCompact(
     ) {
         HorizontalPager(
             state = pagerState,
+            contentPadding = PaddingValues(horizontal = 32.dp),
+            pageSpacing = 16.dp,
             modifier = modifier
                 .fillMaxWidth()
                 .weight(0.8f)
-                .padding(horizontal = 16.dp)
         ) { page ->
-            OnBoardingItem(onBoardList[page])
+            Box(
+                modifier = Modifier
+                    .graphicsLayer {
+                        val pageOffset = (
+                            (pagerState.currentPage - page) + pagerState
+                                .currentPageOffsetFraction
+                            ).absoluteValue
+
+                        alpha = androidx.compose.ui.util.lerp(
+                            start = 0.5f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        )
+                        scaleY = androidx.compose.ui.util.lerp(
+                            start = 0.85f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        )
+                    }
+            ) {
+                OnBoardingItem(onBoardList[page])
+            }
         }
         Row(
             horizontalArrangement = Arrangement.Center,
