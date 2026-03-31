@@ -27,7 +27,7 @@ ksp = "2.0.0-1.0.21"
 kotlinCoroutines = "1.8.0"
 databindingAdapters = "8.10.1"
 composeMaterial3 = "1.5.0-beta03"
-ui = "1.8.2"
+ui = "1.10.6"
 biometric ="1.4.0-alpha02"
 material3 = "1.5.0-alpha06"
 
