@@ -29,7 +29,7 @@ databindingAdapters = "8.10.1"
 composeMaterial3 = "1.5.0-beta03"
 ui = "1.8.2"
 biometric ="1.4.0-alpha02"
-material3 = "1.5.0-alpha06"
+material3 = "1.5.0-alpha17"
 
 [libraries]
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
