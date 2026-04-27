@@ -2,13 +2,15 @@ package com.devpush.animeapp.core.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.devpush.animeapp.MainViewModel
 import com.devpush.animeapp.core.navigation.utils.NavigationUtils
@@ -65,14 +67,15 @@ fun NavigationContainer(
  * Loading screen displayed while authentication states are being loaded.
  * This prevents any content screens from being shown prematurely.
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LoadingScreen() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator(
-            color = MaterialTheme.colorScheme.primary
+        ContainedLoadingIndicator(
+            modifier = Modifier.size(48.dp)
         )
     }
 }

@@ -26,7 +26,9 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,8 +38,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,9 +60,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devpush.animeapp.R
-import com.devpush.animeapp.features.auth.ui.AuthViewModel
-import com.devpush.animeapp.features.auth.ui.utils.Separator
+import com.devpush.animeapp.core.presentation.ObserveAsEvents
 import com.devpush.animeapp.ui.theme.AnimeAppTheme
 import com.devpush.animeapp.ui.theme.PrimaryPink
 import com.devpush.animeapp.ui.theme.PrimaryPinkBlended
@@ -75,119 +75,83 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun LoginScreen(
-    modifier: Modifier = Modifier,
+fun LoginRoot(
     onOpenRegistrationClicked: () -> Unit,
-    onLoginSuccessNavigation: () -> Unit,
-    viewModel: AuthViewModel = koinViewModel()
+    onLoginSuccess: () -> Unit,
+    viewModel: LoginViewModel = koinViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is LoginEvent.LoginSuccess -> onLoginSuccess()
+        }
+    }
+
+    LoginScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        onOpenRegistrationClicked = onOpenRegistrationClicked
+    )
+}
+
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
+fun LoginScreen(
+    state: LoginState,
+    onAction: (LoginAction) -> Unit,
+    onOpenRegistrationClicked: () -> Unit
 ) {
     val windowSize = rememberDevicePosture(
-        windowSizeClass = calculateWindowSizeClass(
-            LocalContext.current as Activity
-        )
+        windowSizeClass = calculateWindowSizeClass(LocalContext.current as Activity)
     )
-
-    val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
     var passwordVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(keyboardHeight) {
-        coroutineScope.launch {
-            scrollState.scrollBy(keyboardHeight.toFloat())
-        }
+    androidx.compose.runtime.LaunchedEffect(keyboardHeight) {
+        coroutineScope.launch { scrollState.scrollBy(keyboardHeight.toFloat()) }
     }
 
-    LaunchedEffect(uiState.isLoginSuccess) {
-        if (uiState.isLoginSuccess) {
-            onLoginSuccessNavigation()
-            viewModel.onLoginHandled() // Reset the flag in ViewModel
-        }
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (windowSize) {
-            DevicePosture.PHONE_COMPACT -> {
-                LoginScreenCompact(
-                    modifier = modifier,
-                    onOpenRegistrationClicked = onOpenRegistrationClicked,
-                    onLoginSuccessNavigation = onLoginSuccessNavigation,
-                    viewModel = viewModel,
-                    uiState = uiState,
-                    passwordVisible = passwordVisible,
-                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
-                )
-            }
-
-            DevicePosture.TABLET_COMPACT_PORTRAIT -> {
-                //TODO Handle Tablet vertical Orientation
-                LoginScreenCompact(
-                    modifier = modifier,
-                    onOpenRegistrationClicked = onOpenRegistrationClicked,
-                    onLoginSuccessNavigation = onLoginSuccessNavigation,
-                    viewModel = viewModel,
-                    uiState = uiState,
-                    passwordVisible = passwordVisible,
-                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
-                )
-            }
-            DevicePosture.MEDIUM_WIDTH ->{
-                LoginScreenCompact(
-                    modifier = modifier,
-                    onOpenRegistrationClicked = onOpenRegistrationClicked,
-                    onLoginSuccessNavigation = onLoginSuccessNavigation,
-                    viewModel = viewModel,
-                    uiState = uiState,
-                    passwordVisible = passwordVisible,
-                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
-                )
-            }
             DevicePosture.EXPANDED_WIDTH -> {
                 LoginScreenExpanded(
-                    modifier = modifier,
+                    state = state,
+                    onAction = onAction,
                     onOpenRegistrationClicked = onOpenRegistrationClicked,
-                    onLoginSuccessNavigation = onLoginSuccessNavigation,
-                    viewModel = viewModel,
-                    uiState = uiState,
                     passwordVisible = passwordVisible,
                     onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
                 )
             }
-        }
-        if (windowSize == DevicePosture.EXPANDED_WIDTH) {
-
-        } else {
-
+            else -> {
+                LoginScreenCompact(
+                    state = state,
+                    onAction = onAction,
+                    onOpenRegistrationClicked = onOpenRegistrationClicked,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChanged = { passwordVisible = !passwordVisible }
+                )
+            }
         }
     }
 }
 
 @Composable
 fun LoginScreenCompact(
-    modifier: Modifier = Modifier,
+    state: LoginState,
+    onAction: (LoginAction) -> Unit,
     onOpenRegistrationClicked: () -> Unit,
-    onLoginSuccessNavigation: () -> Unit,
-    viewModel: AuthViewModel,
-    uiState: LoginUiState,
     passwordVisible: Boolean,
     onPasswordVisibilityChanged: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .background(
-                Brush.verticalGradient(
-                    0f to PrimaryPinkBlended,
-                    1f to PrimaryPink
-                )
-            )
+            .background(Brush.verticalGradient(0f to PrimaryPinkBlended, 1f to PrimaryPink))
             .imePadding()
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -195,11 +159,8 @@ fun LoginScreenCompact(
         Image(
             painterResource(R.drawable.img_coder_m),
             contentDescription = "Login Image",
-            modifier = Modifier
-                .size(280.dp)
-                .padding(top = 32.dp, bottom = 16.dp)
+            modifier = Modifier.size(280.dp).padding(top = 32.dp, bottom = 16.dp)
         )
-
         Text(
             text = stringResource(R.string.welcome_back),
             modifier = Modifier.padding(bottom = 4.dp),
@@ -207,18 +168,16 @@ fun LoginScreenCompact(
             fontSize = 16.sp,
             color = Color.White
         )
-
         Text(
             text = stringResource(R.string.please_login),
             modifier = Modifier.padding(bottom = 24.dp),
             fontWeight = FontWeight.Bold,
             color = Color.White,
-            fontSize = 30.sp,
+            fontSize = 30.sp
         )
-
         LoginForm(
-            viewModel = viewModel,
-            uiState = uiState,
+            state = state,
+            onAction = onAction,
             passwordVisible = passwordVisible,
             onPasswordVisibilityChanged = onPasswordVisibilityChanged,
             onOpenRegistrationClicked = onOpenRegistrationClicked
@@ -228,45 +187,30 @@ fun LoginScreenCompact(
 
 @Composable
 fun LoginScreenExpanded(
-    modifier: Modifier = Modifier,
+    state: LoginState,
+    onAction: (LoginAction) -> Unit,
     onOpenRegistrationClicked: () -> Unit,
-    onLoginSuccessNavigation: () -> Unit,
-    viewModel: AuthViewModel,
-    uiState: LoginUiState,
     passwordVisible: Boolean,
     onPasswordVisibilityChanged: () -> Unit
 ) {
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    0f to PrimaryPinkBlended,
-                    1f to PrimaryPink
-                )
-            )
+            .background(Brush.verticalGradient(0f to PrimaryPinkBlended, 1f to PrimaryPink))
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .fillMaxHeight(),
+            modifier = Modifier.fillMaxWidth(0.5f).fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Image(
                 painterResource(R.drawable.img_coder_m),
                 contentDescription = "Login Image",
-                modifier = Modifier
-                    .size(380.dp)
-                    .padding(top = 32.dp, bottom = 16.dp)
+                modifier = Modifier.size(380.dp).padding(top = 32.dp, bottom = 16.dp)
             )
         }
         Column(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .fillMaxHeight()
-                .imePadding()
-                .padding(end = 12.dp),
+            modifier = Modifier.fillMaxWidth(0.9f).fillMaxHeight().imePadding().padding(end = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -277,18 +221,16 @@ fun LoginScreenExpanded(
                 fontSize = 16.sp,
                 color = Color.White
             )
-
             Text(
                 text = stringResource(R.string.please_login),
                 modifier = Modifier.padding(bottom = 24.dp),
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                fontSize = 30.sp,
+                fontSize = 30.sp
             )
-
             LoginForm(
-                viewModel = viewModel,
-                uiState = uiState,
+                state = state,
+                onAction = onAction,
                 passwordVisible = passwordVisible,
                 onPasswordVisibilityChanged = onPasswordVisibilityChanged,
                 onOpenRegistrationClicked = onOpenRegistrationClicked
@@ -297,164 +239,96 @@ fun LoginScreenExpanded(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LoginForm(
-    viewModel: AuthViewModel,
-    uiState: LoginUiState,
+    state: LoginState,
+    onAction: (LoginAction) -> Unit,
     passwordVisible: Boolean,
     onPasswordVisibilityChanged: () -> Unit,
     onOpenRegistrationClicked: () -> Unit
 ) {
     OutlinedTextField(
-        value = uiState.email,
-        onValueChange = { viewModel.onEmailChanged(it) },
+        value = state.email,
+        onValueChange = { onAction(LoginAction.EmailChanged(it)) },
         label = { Text(stringResource(R.string.you_email)) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Email,
-            imeAction = ImeAction.Next
-        ),
-        isError = uiState.emailError != null,
-        supportingText = {
-            uiState.emailError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-        },
-        leadingIcon = {
-            Icon(
-                painterResource(id = R.drawable.ic_person), // Ensure this drawable exists
-                contentDescription = "Email Icon"
-            )
-        },
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.White.copy(alpha = 0.1f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.1f),
-            disabledContainerColor = Color.White.copy(alpha = 0.05f),
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedLeadingIconColor = Color.White,
-            unfocusedLeadingIconColor = Color.White.copy(alpha = 0.7f),
-            errorTextColor = MaterialTheme.colorScheme.error,
-            cursorColor = Color.White,
-            focusedLabelColor = Color.White,
-            unfocusedLabelColor = Color.White.copy(alpha = 0.7f)
-        )
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+        isError = state.emailError != null,
+        supportingText = { state.emailError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
+        leadingIcon = { Icon(painterResource(id = R.drawable.ic_person), contentDescription = "Email Icon") },
+        colors = textFieldColors()
     )
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    // --- Password TextField ---
     OutlinedTextField(
-        value = uiState.password,
-        onValueChange = { viewModel.onPasswordChanged(it) },
+        value = state.password,
+        onValueChange = { onAction(LoginAction.PasswordChanged(it)) },
         label = { Text(stringResource(R.string.your_password)) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
-        visualTransformation = if (passwordVisible) VisualTransformation.None
-        else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ),
-        isError = uiState.passwordError != null,
-        supportingText = {
-            uiState.passwordError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-        },
-        leadingIcon = {
-            Icon(
-                painterResource(id = R.drawable.ic_key), // Ensure this drawable exists
-                contentDescription = "Password Icon"
-            )
-        },
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+        isError = state.passwordError != null,
+        supportingText = { state.passwordError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
+        leadingIcon = { Icon(painterResource(id = R.drawable.ic_key), contentDescription = "Password Icon") },
         trailingIcon = {
-            val image =
-                if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-            val description = if (passwordVisible) "Hide password" else "Show password"
-            IconButton(onClick = { onPasswordVisibilityChanged() }) {
-                Icon(
-                    imageVector = image,
-                    contentDescription = description,
-                    tint = Color.White.copy(alpha = 0.7f)
-                )
+            val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+            IconButton(onClick = onPasswordVisibilityChanged) {
+                Icon(imageVector = image, contentDescription = null, tint = Color.White.copy(alpha = 0.7f))
             }
         },
-
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.White.copy(alpha = 0.1f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.1f),
-            disabledContainerColor = Color.White.copy(alpha = 0.05f),
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedLeadingIconColor = Color.White,
-            unfocusedLeadingIconColor = Color.White.copy(alpha = 0.7f),
-            errorTextColor = MaterialTheme.colorScheme.error,
-            cursorColor = Color.White,
-            focusedLabelColor = Color.White,
-            unfocusedLabelColor = Color.White.copy(alpha = 0.7f)
-        )
+        colors = textFieldColors()
     )
 
-    // --- General Login Error ---
-    uiState.generalLoginError?.let {
+    state.generalError?.let {
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = it,
-            color = MaterialTheme.colorScheme.error,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Text(text = it, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
     }
-
 
     Spacer(modifier = Modifier.height(32.dp))
 
-    Button(
-        onClick = { viewModel.loginUser() },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
-        enabled = !uiState.isLoading,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryPinkDark,
-            contentColor = Color.White
-        )
-    ) {
-        if (uiState.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                color = Color.White,
-                strokeWidth = 2.dp
-            )
-        } else {
-            Text(text = stringResource(R.string.login), fontSize = 16.sp)
+    ButtonGroup(modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = { onAction(LoginAction.Submit) },
+            modifier = Modifier.weight(1f).height(50.dp),
+            enabled = !state.isLoading,
+            colors = ButtonDefaults.buttonColors(containerColor = PrimaryPinkDark, contentColor = Color.White)
+        ) {
+            if (state.isLoading) ContainedLoadingIndicator(modifier = Modifier.size(48.dp))
+            else Text(text = stringResource(R.string.login), fontSize = 16.sp)
+        }
+        Button(
+            onClick = onOpenRegistrationClicked,
+            modifier = Modifier.weight(1f).height(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = PrimaryPinkLight, contentColor = Color.White)
+        ) {
+            Text(text = stringResource(R.string.register_here), fontSize = 16.sp)
         }
     }
-
-    Separator(
-        modifier = Modifier.padding(vertical = 16.dp)
-    )
-
-    // --- Register Button ---
-    Button(
-        onClick = onOpenRegistrationClicked,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryPinkLight,
-            contentColor = Color.White
-        )
-    ) {
-        Text(text = stringResource(R.string.register_here), fontSize = 16.sp)
-    }
 }
+
+@Composable
+private fun textFieldColors() = TextFieldDefaults.colors(
+    focusedContainerColor = Color.White.copy(alpha = 0.1f),
+    unfocusedContainerColor = Color.White.copy(alpha = 0.1f),
+    disabledContainerColor = Color.White.copy(alpha = 0.05f),
+    focusedTextColor = Color.White,
+    unfocusedTextColor = Color.White,
+    focusedLeadingIconColor = Color.White,
+    unfocusedLeadingIconColor = Color.White.copy(alpha = 0.7f),
+    errorTextColor = MaterialTheme.colorScheme.error,
+    cursorColor = Color.White,
+    focusedLabelColor = Color.White,
+    unfocusedLabelColor = Color.White.copy(alpha = 0.7f)
+)
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoginScreenPreview() {
     AnimeAppTheme {
-        LoginScreen(
-            onOpenRegistrationClicked = {},
-            onLoginSuccessNavigation = {}
-        )
+        LoginScreen(state = LoginState(), onAction = {}, onOpenRegistrationClicked = {})
     }
 }

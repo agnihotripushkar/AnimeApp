@@ -15,8 +15,9 @@ import com.devpush.animeapp.core.navigation.routes.NavRoute
 
 /**
  * Bottom navigation items for the main app screens.
+ * Internal so it can be reused by [WideNavigationRailBar].
  */
-private val bottomNavItems = listOf(
+internal val bottomNavItems = listOf(
     BottomNavItem(
         route = NavRoute.Home.route,
         label = "Home",

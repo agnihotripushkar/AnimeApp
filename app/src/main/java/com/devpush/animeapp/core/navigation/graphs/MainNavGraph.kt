@@ -6,9 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.devpush.animeapp.core.navigation.routes.NavRoute
-import com.devpush.animeapp.features.home.ui.HomeScreen
+import com.devpush.animeapp.features.home.ui.HomeRoot
 import com.devpush.animeapp.features.settings.ui.SettingsScreen
-import com.devpush.animeapp.features.trending.ui.TrendingAnimeScreen
+import com.devpush.animeapp.features.trending.ui.TrendingAnimeRoot
 
 /**
  * Extension function for NavGraphBuilder that defines all main navigation destinations.
@@ -22,7 +22,7 @@ fun NavGraphBuilder.mainNavGraph(
     // Home Screen
     composable(NavRoute.Home.route) {
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-        HomeScreen(
+        HomeRoot(
             currentRoute = currentRoute,
             onNavigateToHome = {
                 navController.navigate(NavRoute.Home.route) {
@@ -66,25 +66,31 @@ fun NavGraphBuilder.mainNavGraph(
     // Trending Screen
     composable(NavRoute.Trending.route) {
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-        TrendingAnimeScreen(
+        TrendingAnimeRoot(
             currentRoute = currentRoute,
             onNavigateToHome = {
                 navController.navigate(NavRoute.Home.route) {
-                    popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
                     launchSingleTop = true
                     restoreState = true
                 }
             },
             onNavigateToTrending = {
                 navController.navigate(NavRoute.Trending.route) {
-                    popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
                     launchSingleTop = true
                     restoreState = true
                 }
             },
             onNavigateToSettings = {
                 navController.navigate(NavRoute.Settings.route) {
-                    popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
                     launchSingleTop = true
                     restoreState = true
                 }
@@ -105,9 +111,29 @@ fun NavGraphBuilder.mainNavGraph(
     
     // Settings Screen
     composable(NavRoute.Settings.route) {
+        val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
         SettingsScreen(
+            currentRoute = currentRoute,
             onNavigateBack = {
                 navController.navigateUp()
+            },
+            onNavigateToHome = {
+                navController.navigate(NavRoute.Home.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            onNavigateToTrending = {
+                navController.navigate(NavRoute.Trending.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
             },
             onLogout = {
                 navController.navigate(NavRoute.Login.route) {

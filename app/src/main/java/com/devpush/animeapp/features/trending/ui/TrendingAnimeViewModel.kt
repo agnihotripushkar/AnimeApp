@@ -3,126 +3,109 @@ package com.devpush.animeapp.features.trending.ui
 import android.content.ContentValues.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devpush.animeapp.R
 import com.devpush.animeapp.core.network.NetworkResult
+import com.devpush.animeapp.core.presentation.UiText
 import com.devpush.animeapp.features.trending.domain.repository.TrendingAnimeRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class TrendingAnimeViewModel(private val repository: TrendingAnimeRepository) : ViewModel() {
 
-    private var _uiState = MutableStateFlow<TrendingAnimeUiState>(TrendingAnimeUiState.Idle)
-    val uiState = _uiState.asStateFlow()
+    private val _state = MutableStateFlow(TrendingAnimeState())
+    val state = _state.asStateFlow()
+
+    private val _events = Channel<TrendingAnimeEvent>()
+    val events = _events.receiveAsFlow()
 
     init {
-        fetchTrendingAnimeFromServer()
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAnimeFromDb().collect { animeList ->
                 if (animeList.isNotEmpty()) {
-                    _uiState.value = TrendingAnimeUiState.Success(animeList)
-                } else {
-                    if (_uiState.value !is TrendingAnimeUiState.Error && _uiState.value !is TrendingAnimeUiState.Loading) {
-                        _uiState.value =
-                            TrendingAnimeUiState.Success(emptyList())
-                    }
+                    _state.update { it.copy(animeList = animeList, isLoading = false, error = null) }
+                } else if (!_state.value.isLoading && _state.value.error == null) {
+                    fetchFromServer()
                 }
             }
         }
     }
 
-    private fun fetchTrendingAnimeFromServer() {
+    fun onAction(action: TrendingAnimeAction) {
+        when (action) {
+            is TrendingAnimeAction.Retry -> fetchFromServer()
+            is TrendingAnimeAction.StarAnime -> starAnime(action.animeId, action.isCurrentlyFavorite)
+            is TrendingAnimeAction.ArchiveAnime -> archiveAnime(action.animeId, action.isCurrentlyArchived)
+        }
+    }
+
+    private fun fetchFromServer() {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.value = TrendingAnimeUiState.Loading
-            val apiResult = repository.getTrendingAnime()
-            when (apiResult) {
-                is NetworkResult.Loading -> {
-                }
-
+            _state.update { it.copy(isLoading = true, error = null) }
+            when (val result = repository.getTrendingAnime()) {
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Success -> {
-                    val animeDataList = apiResult.data.toModel()
-                    if (animeDataList.isEmpty() &&
-                        (_uiState.value as? TrendingAnimeUiState.Success)?.animeList?.isEmpty() == true) {
-                        _uiState.value = TrendingAnimeUiState.Success(emptyList())
-                    }
-                    else{
-                        repository.saveAnime(animeDataList)
+                    val list = result.data.toModel()
+                    if (list.isNotEmpty()) {
+                        repository.saveAnime(list)
+                    } else if (_state.value.animeList.isEmpty()) {
+                        _state.update { it.copy(isLoading = false) }
                     }
                 }
-
                 is NetworkResult.Error -> {
-                    Timber.tag(TAG)
-                        .e(
-                            apiResult.exception,
-                            "fetchTrendingAnimeFromServer failed: ${apiResult.message}"
-                        )
-                    if ((_uiState.value as? TrendingAnimeUiState.Success)?.animeList?.isEmpty() != false) {
-                        _uiState.value =
-                            TrendingAnimeUiState.Error(apiResult.message, apiResult.exception)
+                    Timber.tag(TAG).e(result.exception, "fetchFromServer: ${result.message}")
+                    if (_state.value.animeList.isEmpty()) {
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                error = result.message?.let { msg -> UiText.DynamicString(msg) }
+                                    ?: UiText.StringResource(R.string.an_error_occurred)
+                            )
+                        }
                     } else {
-                        Timber.tag(TAG).w(
-                            apiResult.exception,
-                            "fetchTrendingAnimeFromServer failed but showing stale data: ${apiResult.message}"
-                        )
-
+                        _state.update { it.copy(isLoading = false) }
+                        Timber.tag(TAG).w(result.exception, "fetch failed, showing stale data")
                     }
                 }
             }
         }
     }
 
-    fun retryFetchTrendingAnime() {
-        fetchTrendingAnimeFromServer()
-    }
-
-    fun starAnime(animeId: String, isCurrentlyFavorite: Boolean) {
-        // Optimistically update the UI
-        val currentState = _uiState.value
-        if (currentState is TrendingAnimeUiState.Success) {
-            val updatedList = currentState.animeList.map { anime ->
-                if (anime.id == animeId) {
-                    anime.copy(isFavorite = !isCurrentlyFavorite)
-                } else {
-                    anime
+    private fun starAnime(animeId: String, isCurrentlyFavorite: Boolean) {
+        _state.update { current ->
+            current.copy(
+                animeList = current.animeList.map { anime ->
+                    if (anime.id == animeId) anime.copy(isFavorite = !isCurrentlyFavorite) else anime
                 }
-            }
-            _uiState.value = TrendingAnimeUiState.Success(updatedList)
+            )
         }
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.updateFavoriteStatus(animeId, !isCurrentlyFavorite)
-                Timber.tag(TAG).d("Toggled favorite status for anime: %s to %s", animeId, !isCurrentlyFavorite)
             } catch (e: Exception) {
-                Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
-                // Optionally, revert UI update or notify the user
-                // For now, we'll rely on the database flow to correct any discrepancies eventually
+                Timber.tag(TAG).e(e, "Failed to toggle favorite for $animeId")
             }
         }
     }
 
-    fun archiveAnime(animeId: String, isCurrentlyArchived: Boolean) {
-        // Optimistically update the UI
-        val currentState = _uiState.value
-        if (currentState is TrendingAnimeUiState.Success) {
-            val updatedList = currentState.animeList.map { anime ->
-                if (anime.id == animeId) {
-                    anime.copy(isArchived = !isCurrentlyArchived)
-                } else {
-                    anime
+    private fun archiveAnime(animeId: String, isCurrentlyArchived: Boolean) {
+        _state.update { current ->
+            current.copy(
+                animeList = current.animeList.map { anime ->
+                    if (anime.id == animeId) anime.copy(isArchived = !isCurrentlyArchived) else anime
                 }
-            }
-            _uiState.value = TrendingAnimeUiState.Success(updatedList)
+            )
         }
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.updateArchivedStatus(animeId, !isCurrentlyArchived)
-                Timber.tag(TAG).d("Toggled archived status for anime: %s to %s", animeId, !isCurrentlyArchived)
             } catch (e: Exception) {
-                Timber.tag(TAG).e(e, "Failed to toggle archived status for anime: %s", animeId)
-                // Optionally, notify the UI about the error
+                Timber.tag(TAG).e(e, "Failed to toggle archived for $animeId")
             }
         }
     }

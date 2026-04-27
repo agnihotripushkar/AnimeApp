@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import com.devpush.animeapp.MainViewModel
 import com.devpush.animeapp.core.navigation.routes.NavRoute
 import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthScreen
-import com.devpush.animeapp.features.auth.ui.login.LoginScreen
+import com.devpush.animeapp.features.auth.ui.login.LoginRoot
 import com.devpush.animeapp.features.auth.ui.signup.RegistrationScreen
 import com.devpush.animeapp.features.onBoarding.ui.OnBoardingScreen
 
@@ -27,11 +27,11 @@ fun NavGraphBuilder.authNavGraph(
     composable(NavRoute.Login.route) {
         val isOnboardingShown by mainViewModel.isOnboardingShown.collectAsState()
         
-        LoginScreen(
+        LoginRoot(
             onOpenRegistrationClicked = {
                 navController.navigate(NavRoute.Registration.route)
             },
-            onLoginSuccessNavigation = {
+            onLoginSuccess = {
                 val destination = if (isOnboardingShown == true) {
                     NavRoute.Home.route
                 } else {

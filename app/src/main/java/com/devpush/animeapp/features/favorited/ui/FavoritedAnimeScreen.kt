@@ -23,8 +23,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devpush.animeapp.core.presentation.ObserveAsEvents
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -55,7 +56,13 @@ fun FavoritedAnimeScreen(
         )
     )
 
-    val uiState by viewModel.uiState.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is FavoritedEvent.NavigateToDetail -> onAnimeClick(event.animeId)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -84,16 +91,14 @@ fun FavoritedAnimeScreen(
             if (windowSize == DevicePosture.EXPANDED_WIDTH) {
                 FavoritedAnimeExpanded(
                     modifier = Modifier.padding(innerPadding),
-                    onAnimeClick = onAnimeClick,
-                    viewModel = viewModel,
-                    uiState = uiState
+                    onAction = viewModel::onAction,
+                    state = state
                 )
             } else {
                 FavoritedAnimeCompact(
                     modifier = Modifier.padding(innerPadding),
-                    onAnimeClick = onAnimeClick,
-                    viewModel = viewModel,
-                    uiState = uiState
+                    onAction = viewModel::onAction,
+                    state = state
                 )
             }
         }
@@ -104,9 +109,8 @@ fun FavoritedAnimeScreen(
 @Composable
 fun FavoritedAnimeCompact(
     modifier: Modifier,
-    onAnimeClick: (animeId: String) -> Unit,
-    viewModel: FavoritedAnimeViewModel,
-    uiState: FavoritedAnimeUiState
+    onAction: (FavoritedAction) -> Unit,
+    state: FavoritedState
 ) {
     Column(
         modifier = modifier
@@ -116,11 +120,11 @@ fun FavoritedAnimeCompact(
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (uiState.isLoading) {
+        if (state.isLoading) {
             ContainedLoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else if (uiState.error != null) {
-            Text("Error: ${uiState.error}")
-        } else if (uiState.animes.isEmpty()) {
+        } else if (state.error != null) {
+            Text("Error: ${state.error}")
+        } else if (state.animeList.isEmpty()) {
             Text(stringResource(R.string.no_favorited_animes_yet))
         } else {
             LazyColumn(
@@ -128,7 +132,7 @@ fun FavoritedAnimeCompact(
                 contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp), // Adjusted padding
                 verticalArrangement = Arrangement.spacedBy(0.dp) // AnimeCard might have internal padding
             ) {
-                items(uiState.animes, key = { anime -> anime.id })
+                items(state.animeList, key = { anime -> anime.id })
                 { anime: AnimeDataEntity ->
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { direction ->
@@ -137,10 +141,7 @@ fun FavoritedAnimeCompact(
 
 
                                 SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
-                                    viewModel.starAnime(
-                                        anime.id,
-                                        anime.isFavorite
-                                    )
+                                    onAction(FavoritedAction.ToggleFavorite(anime.id, anime.isFavorite))
                                     false // Prevent immediate dismissal
                                 }
 
@@ -150,11 +151,11 @@ fun FavoritedAnimeCompact(
                     )
                     AnimeCard(
                         anime = anime,
-                        onClick = { onAnimeClick(anime.id) },
+                        onClick = { onAction(FavoritedAction.AnimeClick(anime.id)) },
                         onStar = {
                             // On this screen, "starring" effectively means "unfavorite"
                             // anime.isFavorite should be true here
-                            viewModel.toggleFavoriteStatus(anime.id, anime.isFavorite)
+                            onAction(FavoritedAction.ToggleFavorite(anime.id, anime.isFavorite))
                         },
                         onArchive = {
                             // Archive action not implemented for this screen
@@ -174,9 +175,8 @@ fun FavoritedAnimeCompact(
 @Composable
 fun FavoritedAnimeExpanded(
     modifier: Modifier,
-    onAnimeClick: (animeId: String) -> Unit,
-    viewModel: FavoritedAnimeViewModel,
-    uiState: FavoritedAnimeUiState
+    onAction: (FavoritedAction) -> Unit,
+    state: FavoritedState
 ) {
     Column(
         modifier = modifier
@@ -186,11 +186,11 @@ fun FavoritedAnimeExpanded(
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (uiState.isLoading) {
+        if (state.isLoading) {
             ContainedLoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else if (uiState.error != null) {
-            Text("Error: ${uiState.error}")
-        } else if (uiState.animes.isEmpty()) {
+        } else if (state.error != null) {
+            Text("Error: ${state.error}")
+        } else if (state.animeList.isEmpty()) {
             Text(stringResource(R.string.no_favorited_animes_yet))
         } else {
             LazyColumn(
@@ -198,7 +198,7 @@ fun FavoritedAnimeExpanded(
                 contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp), // Adjusted padding
                 verticalArrangement = Arrangement.spacedBy(0.dp) // AnimeCard might have internal padding
             ) {
-                items(uiState.animes, key = { anime -> anime.id })
+                items(state.animeList, key = { anime -> anime.id })
                 { anime: AnimeDataEntity ->
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { direction ->
@@ -207,10 +207,7 @@ fun FavoritedAnimeExpanded(
 
 
                                 SwipeToDismissBoxValue.StartToEnd -> { // Swiped Right (Star)
-                                    viewModel.starAnime(
-                                        anime.id,
-                                        anime.isFavorite
-                                    )
+                                    onAction(FavoritedAction.ToggleFavorite(anime.id, anime.isFavorite))
                                     false // Prevent immediate dismissal
                                 }
 
@@ -220,11 +217,11 @@ fun FavoritedAnimeExpanded(
                     )
                     AnimeCard(
                         anime = anime,
-                        onClick = { onAnimeClick(anime.id) },
+                        onClick = { onAction(FavoritedAction.AnimeClick(anime.id)) },
                         onStar = {
                             // On this screen, "starring" effectively means "unfavorite"
                             // anime.isFavorite should be true here
-                            viewModel.toggleFavoriteStatus(anime.id, anime.isFavorite)
+                            onAction(FavoritedAction.ToggleFavorite(anime.id, anime.isFavorite))
                         },
                         onArchive = {
                             // Archive action not implemented for this screen

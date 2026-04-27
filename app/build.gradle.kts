@@ -44,6 +44,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs += listOf(
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi"
+        )
     }
     buildFeatures {
         compose = true
@@ -53,6 +56,10 @@ android {
     androidResources {
         generateLocaleConfig = true
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 dependencies {
@@ -72,7 +79,7 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.bundles.ktor)
     implementation(libs.coil.compose)
-    implementation(libs.androidx.material3.android)
+    implementation(libs.coil.network.okhttp)
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
@@ -81,14 +88,14 @@ dependencies {
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.databinding.adapters)
     implementation(libs.androidx.material3)
-    implementation(libs.ui)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.biometric)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.property)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

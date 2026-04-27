@@ -5,11 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.features.favorited.domain.repository.FavoriteRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -17,52 +21,39 @@ class FavoritedAnimeViewModel(
     private val repository: FavoriteRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<FavoritedAnimeUiState> =
-        repository.getFavoriteAnimes()
-            .map { animeList -> FavoritedAnimeUiState(isLoading = false, animes = animeList) }
-            .catch { e ->
-                Timber.e(e, "Error fetching favorite animes")
-                emit(
-                    FavoritedAnimeUiState(
-                        isLoading = false,
-                        error = e.localizedMessage ?: "An error occurred"
-                    )
-                )
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = FavoritedAnimeUiState(isLoading = true)
-            )
+    private val _state = MutableStateFlow(FavoritedState(isLoading = true))
+    val state = _state.asStateFlow()
 
-    fun starAnime(animeId: String, isCurrentlyFavorite: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                repository.updateFavoriteStatus(animeId, !isCurrentlyFavorite)
-                Timber.tag(TAG).d("Toggled favorite status for anime: %s to %s", animeId, !isCurrentlyFavorite)
-            } catch (e: Exception) {
-                Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
-                // Optionally, notify the UI about the error
+    private val _events = Channel<FavoritedEvent>()
+    val events = _events.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            repository.getFavoriteAnimes()
+                .map { animeList -> FavoritedState(isLoading = false, animeList = animeList) }
+                .catch { e ->
+                    Timber.e(e, "Error fetching favorite animes")
+                    emit(FavoritedState(isLoading = false, error = e.localizedMessage ?: "An error occurred"))
+                }
+                .collect { newState -> _state.value = newState }
+        }
+    }
+
+    fun onAction(action: FavoritedAction) {
+        when (action) {
+            is FavoritedAction.ToggleFavorite -> toggleFavorite(action.animeId, action.isCurrentlyFavorite)
+            is FavoritedAction.AnimeClick -> viewModelScope.launch {
+                _events.send(FavoritedEvent.NavigateToDetail(action.animeId))
             }
         }
     }
 
-    fun toggleFavoriteStatus(animeId: String, isCurrentlyFavorite: Boolean) {
+    private fun toggleFavorite(animeId: String, isCurrentlyFavorite: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Since this screen only shows favorites, toggling means un-favoriting.
-                // Or, if it's a general toggle, then it works as is.
-                // For this context, !isCurrentlyFavorite will typically be false.
-                //repository.updateFavoriteStatus(animeId, !isCurrentlyFavorite)
-                Timber.d(
-                    "Toggled favorite status for anime: %s to %s",
-                    animeId,
-                    !isCurrentlyFavorite
-                )
+                repository.updateFavoriteStatus(animeId, !isCurrentlyFavorite)
             } catch (e: Exception) {
-                Timber.e(e, "Failed to toggle favorite status for anime: %s", animeId)
-                // Optionally, update UI state with error
-                // _uiState.value = _uiState.value.copy(error = "Failed to update favorite status")
+                Timber.tag(TAG).e(e, "Failed to toggle favorite for $animeId")
             }
         }
     }

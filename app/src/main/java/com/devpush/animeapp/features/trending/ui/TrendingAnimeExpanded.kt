@@ -29,76 +29,77 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.devpush.animeapp.R
+import com.devpush.animeapp.core.presentation.UiText
 import com.devpush.animeapp.features.trending.ui.utils.AnimePoster
 import com.devpush.animeapp.features.trending.utils.FabPositioning
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TrendingAnimeExpanded(
-    uiState: TrendingAnimeUiState,
+    state: TrendingAnimeState,
+    onAction: (TrendingAnimeAction) -> Unit,
     onAnimeClick: (posterImage: String?, animeId: String) -> Unit,
     expanded: Boolean,
     onSettingsClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onArchiveClick: () -> Unit,
-    vibrantColors: androidx.compose.material3.FloatingToolbarColors,
-    onRetry: () -> Unit
-)
-{
+    vibrantColors: androidx.compose.material3.FloatingToolbarColors
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant
-            )
+            .background(color = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        // Use AnimatedContent to switch between Loading, Success, and Error states
-        // Temporarily replaced AnimatedContent with a direct when statement for diagnosis
-        Box(modifier = Modifier.weight(1f)) { // Added a Box to maintain similar layout structure as AnimatedContent
-            when (val currentUiState = uiState) { // Used a val for smart casting
-                TrendingAnimeUiState.Loading, TrendingAnimeUiState.Idle -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+        Box(modifier = Modifier.weight(1f)) {
+            when {
+                state.isLoading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         ContainedLoadingIndicator()
                     }
                 }
-
-                is TrendingAnimeUiState.Success -> {
-                    val animeDataList = currentUiState.animeList
-                    if (animeDataList.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(stringResource(R.string.no_trending_anime_found))
+                state.error != null -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = when (val e = state.error) {
+                                    is UiText.DynamicString -> e.value
+                                    is UiText.StringResource -> stringResource(e.id)
+                                    else -> "Unknown error"
+                                },
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = { onAction(TrendingAnimeAction.Retry) }) {
+                                Text(stringResource(R.string.retry))
+                            }
                         }
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize()
+                    }
+                }
+                state.animeList.isEmpty() -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(stringResource(R.string.no_trending_anime_found))
+                    }
+                }
+                else -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        LazyVerticalGrid(
+                            modifier = Modifier.fillMaxSize(),
+                            columns = GridCells.Adaptive(minSize = 180.dp),
+                            contentPadding = FabPositioning.GRID_CONTENT_PADDING
                         ) {
-                            LazyVerticalGrid(
-                                modifier = Modifier.fillMaxSize(),
-                                columns = GridCells.Adaptive(minSize = 180.dp),
-                                contentPadding = FabPositioning.GRID_CONTENT_PADDING
-                            ) {
-                                items(
-                                    animeDataList.size,
-                                    key = { animeDataList[it].id }
-                                ) { index ->
-                                    AnimePoster(
-                                        anime = animeDataList[index],
-                                        onClick = {
-                                            onAnimeClick(
-                                                animeDataList[index].attributes.posterImage.originalUrl,
-                                                animeDataList[index].id
-                                            )
-                                        },
-                                    )
-                                }
+                            items(
+                                state.animeList.size,
+                                key = { state.animeList[it].id }
+                            ) { index ->
+                                AnimePoster(
+                                    anime = state.animeList[index],
+                                    onClick = {
+                                        onAnimeClick(
+                                            state.animeList[index].attributes.posterImage.originalUrl,
+                                            state.animeList[index].id
+                                        )
+                                    }
+                                )
                             }
                         }
 
@@ -106,12 +107,9 @@ fun TrendingAnimeExpanded(
                             expanded = expanded,
                             floatingActionButton = {
                                 FloatingToolbarDefaults.VibrantFloatingActionButton(
-                                    onClick = { onSettingsClick() },
+                                    onClick = onSettingsClick
                                 ) {
-                                    Icon(
-                                        Icons.Filled.Settings,
-                                        contentDescription = stringResource(R.string.settings)
-                                    )
+                                    Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings))
                                 }
                             },
                             modifier = Modifier
@@ -119,40 +117,14 @@ fun TrendingAnimeExpanded(
                                 .padding(16.dp),
                             colors = vibrantColors,
                             content = {
-                                IconButton(onClick = { onFavoriteClick() }) {
-                                    Icon(
-                                        Icons.Filled.Star,
-                                        contentDescription = stringResource(R.string.favorite)
-                                    )
+                                IconButton(onClick = onFavoriteClick) {
+                                    Icon(Icons.Filled.Star, contentDescription = stringResource(R.string.favorite))
                                 }
-                                IconButton(onClick = { onArchiveClick() }) {
-                                    Icon(
-                                        Icons.Filled.Archive,
-                                        contentDescription = stringResource(R.string.archive)
-                                    )
+                                IconButton(onClick = onArchiveClick) {
+                                    Icon(Icons.Filled.Archive, contentDescription = stringResource(R.string.archive))
                                 }
                             }
                         )
-                    }
-                }
-
-                is TrendingAnimeUiState.Error -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = currentUiState.message // Use currentUiState for smart cast
-                                    ?: stringResource(R.string.an_error_occurred),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(onClick = { onRetry() }) {
-                                Text(stringResource(R.string.retry))
-                            }
-                        }
                     }
                 }
             }

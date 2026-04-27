@@ -6,7 +6,9 @@ import androidx.biometric.BiometricManager
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,10 +25,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import com.devpush.animeapp.core.navigation.routes.NavRoute
+import com.devpush.animeapp.features.common.ui.BottomNavbar
+import com.devpush.animeapp.features.common.ui.WideNavigationRailBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devpush.animeapp.core.presentation.ObserveAsEvents
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,7 +60,10 @@ import org.koin.androidx.compose.koinViewModel
     ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun SettingsScreen(
+    currentRoute: String?,
     onNavigateBack: () -> Unit,
+    onNavigateToHome: () -> Unit,
+    onNavigateToTrending: () -> Unit,
     onLogout: () -> Unit,
     settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
@@ -73,65 +82,86 @@ fun SettingsScreen(
         }
 
     var showThemeDialog by remember { mutableStateOf(false) }
-    val currentTheme by settingsViewModel.appTheme.collectAsState()
     var showLanguageDialog by remember { mutableStateOf(false) }
-    val currentLanguage by settingsViewModel.appLanguage.collectAsState()
-    val isBiometricAuthEnabled by settingsViewModel.isBiometricAuthEnabled.collectAsState()
-
+    
+    val state by settingsViewModel.state.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(Unit) {
-        if (canAuthenticate) {
-            settingsViewModel.updateAuthStatus(BiometricAuthStatus.IDLE) // Reset status
-        } else {
-            settingsViewModel.updateAuthStatus(BiometricAuthStatus.NOT_AVAILABLE)
+    ObserveAsEvents(settingsViewModel.events) { event ->
+        when (event) {
+            is SettingsEvent.NavigateToLogin -> onLogout()
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.settings)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button_desc),
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                }
-            )
+    LaunchedEffect(Unit) {
+        if (canAuthenticate) {
+            settingsViewModel.onAction(SettingsAction.UpdateAuthStatus(BiometricAuthStatus.IDLE)) // Reset status
+        } else {
+            settingsViewModel.onAction(SettingsAction.UpdateAuthStatus(BiometricAuthStatus.NOT_AVAILABLE))
         }
-    ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            if (windowSize == DevicePosture.EXPANDED_WIDTH) {
+    }
+
+    if (windowSize == DevicePosture.EXPANDED_WIDTH) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.settings)) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                )
+            }
+        ) { paddingValues ->
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                WideNavigationRailBar(
+                    currentRoute = currentRoute ?: NavRoute.Settings.route,
+                    onHomeClick = onNavigateToHome,
+                    onTrendingClick = onNavigateToTrending,
+                    onSettingsClick = {}
+                )
                 SettingsExpanded(
                     scrollState = scrollState,
-                    settingsViewModel = settingsViewModel,
-                    isBiometricAuthEnabled = isBiometricAuthEnabled,
-                    onLogout = onLogout,
-                    currentTheme = currentTheme,
+                    onAction = settingsViewModel::onAction,
+                    state = state,
                     showThemeDialog = showThemeDialog,
                     onShowThemeDialogChange = { showThemeDialog = it },
-                    currentLanguage = currentLanguage,
                     showLanguageDialog = showLanguageDialog,
                     onShowLanguageDialogChange = { showLanguageDialog = it }
                 )
-            } else {
+            }
+        }
+    } else {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.settings)) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                )
+            },
+            bottomBar = {
+                BottomNavbar(
+                    currentRoute = currentRoute ?: NavRoute.Settings.route,
+                    onHomeClick = onNavigateToHome,
+                    onTrendingClick = onNavigateToTrending,
+                    onSettingsClick = {}
+                )
+            }
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
                 SettingsCompact(
                     scrollState = scrollState,
-                    settingsViewModel = settingsViewModel,
-                    isBiometricAuthEnabled = isBiometricAuthEnabled,
-                    onLogout = onLogout,
-                    currentTheme = currentTheme,
+                    onAction = settingsViewModel::onAction,
+                    state = state,
                     showThemeDialog = showThemeDialog,
                     onShowThemeDialogChange = { showThemeDialog = it },
-                    currentLanguage = currentLanguage,
                     showLanguageDialog = showLanguageDialog,
                     onShowLanguageDialogChange = { showLanguageDialog = it }
                 )
@@ -143,13 +173,10 @@ fun SettingsScreen(
 @Composable
 fun SettingsCompact(
     scrollState: ScrollState,
-    settingsViewModel: SettingsViewModel,
-    isBiometricAuthEnabled: Boolean,
-    onLogout: () -> Unit,
-    currentTheme: String,
+    onAction: (SettingsAction) -> Unit,
+    state: SettingsState,
     showThemeDialog: Boolean,
     onShowThemeDialogChange: (Boolean) -> Unit,
-    currentLanguage: String,
     showLanguageDialog: Boolean,
     onShowLanguageDialogChange: (Boolean) -> Unit
 ) {
@@ -172,15 +199,14 @@ fun SettingsCompact(
         SettingsItem(title = stringResource(R.string.change_password_title), showArrow = true)
         SettingsSwitchItem(
             title = stringResource(R.string.settings_biometric_auth_toggle_title),
-            checked = isBiometricAuthEnabled,
-            onCheckedChange = { settingsViewModel.setBiometricAuthEnabled(it) }
+            checked = state.isBiometricAuthEnabled,
+            onCheckedChange = { onAction(SettingsAction.SetBiometricEnabled(it)) }
         )
         SettingsItem(
             title = stringResource(R.string.logout_title),
             showArrow = true,
             onClick = {
-                settingsViewModel.performLogout()
-                onLogout()
+                onAction(SettingsAction.Logout)
             }
         )
 
@@ -194,13 +220,13 @@ fun SettingsCompact(
         )
         SettingsItem(
             title = stringResource(R.string.theme_selection_title),
-            subtitle = currentTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
+            subtitle = state.appTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
             showArrow = true,
             onClick = { onShowThemeDialogChange(true) }
         )
         SettingsItem(
             title = stringResource(R.string.app_language_title),
-            subtitle = currentLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
+            subtitle = state.appLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
             showArrow = true,
             onClick = { onShowLanguageDialogChange(true) }
         )
@@ -220,18 +246,18 @@ fun SettingsCompact(
 
     if (showThemeDialog) {
         ThemeSelectionDialog(
-            currentTheme = currentTheme,
+            currentTheme = state.appTheme,
             onThemeSelected = { theme ->
-                settingsViewModel.setAppTheme(theme)
+                onAction(SettingsAction.SetTheme(theme))
             },
             onDismiss = { onShowThemeDialogChange(false) }
         )
     }
     if (showLanguageDialog) {
         LanguageSelectionDialog(
-            currentLanguage = currentLanguage,
+            currentLanguage = state.appLanguage,
             onLanguageSelected = { lang ->
-                settingsViewModel.setAppLanguage(lang)
+                onAction(SettingsAction.SetLanguage(lang))
             },
             onDismiss = { onShowLanguageDialogChange(false) }
         )
@@ -241,13 +267,10 @@ fun SettingsCompact(
 @Composable
 fun SettingsExpanded(
     scrollState: ScrollState,
-    settingsViewModel: SettingsViewModel,
-    isBiometricAuthEnabled: Boolean,
-    onLogout: () -> Unit,
-    currentTheme: String,
+    onAction: (SettingsAction) -> Unit,
+    state: SettingsState,
     showThemeDialog: Boolean,
     onShowThemeDialogChange: (Boolean) -> Unit,
-    currentLanguage: String,
     showLanguageDialog: Boolean,
     onShowLanguageDialogChange: (Boolean) -> Unit
 ) {
@@ -270,15 +293,14 @@ fun SettingsExpanded(
         SettingsItem(title = stringResource(R.string.change_password_title), showArrow = true)
         SettingsSwitchItem(
             title = stringResource(R.string.settings_biometric_auth_toggle_title),
-            checked = isBiometricAuthEnabled,
-            onCheckedChange = { settingsViewModel.setBiometricAuthEnabled(it) }
+            checked = state.isBiometricAuthEnabled,
+            onCheckedChange = { onAction(SettingsAction.SetBiometricEnabled(it)) }
         )
         SettingsItem(
             title = stringResource(R.string.logout_title),
             showArrow = true,
             onClick = {
-                settingsViewModel.performLogout()
-                onLogout()
+                onAction(SettingsAction.Logout)
             }
         )
 
@@ -292,13 +314,13 @@ fun SettingsExpanded(
         )
         SettingsItem(
             title = stringResource(R.string.theme_selection_title),
-            subtitle = currentTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
+            subtitle = state.appTheme.let { theme -> theme.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } + if (theme == "system") " (Default)" else "" },
             showArrow = true,
             onClick = { onShowThemeDialogChange(true) }
         )
         SettingsItem(
             title = stringResource(R.string.app_language_title),
-            subtitle = currentLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
+            subtitle = state.appLanguage.let { langCode -> if (langCode == "es") "Español" else "English" },
             showArrow = true,
             onClick = { onShowLanguageDialogChange(true) }
         )
@@ -318,18 +340,18 @@ fun SettingsExpanded(
 
     if (showThemeDialog) {
         ThemeSelectionDialog(
-            currentTheme = currentTheme,
+            currentTheme = state.appTheme,
             onThemeSelected = { theme ->
-                settingsViewModel.setAppTheme(theme)
+                onAction(SettingsAction.SetTheme(theme))
             },
             onDismiss = { onShowThemeDialogChange(false) }
         )
     }
     if (showLanguageDialog) {
         LanguageSelectionDialog(
-            currentLanguage = currentLanguage,
+            currentLanguage = state.appLanguage,
             onLanguageSelected = { lang ->
-                settingsViewModel.setAppLanguage(lang)
+                onAction(SettingsAction.SetLanguage(lang))
             },
             onDismiss = { onShowLanguageDialogChange(false) }
         )
@@ -343,7 +365,10 @@ fun SettingsScreenPreview() {
         userThemePreference = "Dark",
     ) {
         SettingsScreen(
+            currentRoute = null,
             onNavigateBack = {},
+            onNavigateToHome = {},
+            onNavigateToTrending = {},
             onLogout = {},
             settingsViewModel = TODO()
         )

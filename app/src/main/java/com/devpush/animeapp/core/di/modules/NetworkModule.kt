@@ -4,8 +4,8 @@ import com.devpush.animeapp.BuildConfig
 import com.devpush.animeapp.utils.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.android.Android
-import io.ktor.client.engine.android.AndroidEngineConfig
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.okhttp.OkHttpConfig
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -25,7 +25,7 @@ val networkKoinModule = module {
 
 private fun provideKtorClient(): HttpClient {
 
-    val ktorClient = HttpClient(Android) {
+    val ktorClient = HttpClient(OkHttp) {
         enableLogging(this)
         install(HttpTimeout) {
             requestTimeoutMillis = Constants.TIMEOUT
@@ -49,7 +49,7 @@ private fun provideKtorClient(): HttpClient {
     return ktorClient
 }
 
-private fun enableLogging(httpClientConfig: HttpClientConfig<AndroidEngineConfig>) {
+private fun enableLogging(httpClientConfig: HttpClientConfig<OkHttpConfig>) {
     httpClientConfig.install(Logging) {
         logger = object : Logger {
 

@@ -57,9 +57,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import com.devpush.animeapp.core.presentation.ObserveAsEvents
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.devpush.animeapp.R
 import com.devpush.animeapp.data.local.entities.AnimeDataEntity
 import com.devpush.animeapp.features.details.data.remote.responsebody.GenreData
@@ -78,7 +79,7 @@ fun DetailsScreen(
     viewModel: DetailsScreenViewModel = koinViewModel()
 ) {
     LaunchedEffect(key1 = true) {
-        viewModel.fetchAnime(id)
+        viewModel.onAction(DetailsAction.LoadAnime(id))
     }
 
     val windowSize = rememberDevicePosture(
@@ -87,15 +88,27 @@ fun DetailsScreen(
         )
     )
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val detailsListState = rememberLazyListState()
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
-    when (val state = uiState) {
-        is DetailsScreenUiState.Success -> {
-            val anime: AnimeDataEntity? = state.animeData
-            if (anime != null) {
-                Scaffold(
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is DetailsEvent.NavigateBack -> onNavigateBack()
+        }
+    }
+
+    if (state.isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            ContainedLoadingIndicator()
+        }
+    } else if (state.error != null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = state.error!!)
+        }
+    } else if (state.animeData != null) {
+        val anime = state.animeData!!
+        Scaffold(
                     floatingActionButton = {
                         val fabMenuItems =
                             listOf(
@@ -176,25 +189,9 @@ fun DetailsScreen(
                         }
                     }
                 }
-            } else {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = stringResource(R.string.anime_not_found))
-                }
-            }
-        }
-
-        is DetailsScreenUiState.Error -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = state.message ?: stringResource(R.string.an_error_occurred))
-            }
-
-        }
-
-        DetailsScreenUiState.Loading, DetailsScreenUiState.Idle -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                ContainedLoadingIndicator()
-            }
-
+    } else {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = stringResource(R.string.anime_not_found))
         }
     }
 }

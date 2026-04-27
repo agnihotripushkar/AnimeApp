@@ -5,11 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.animeapp.features.archived.domain.repository.ArchivedRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -17,52 +18,39 @@ class ArchivedAnimeViewModel(
     private val archivedRepository: ArchivedRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<ArchivedAnimeUiState> =
-        archivedRepository.getArchivedAnimes()
-            .map { animeList -> ArchivedAnimeUiState(isLoading = false, animes = animeList) }
-            .catch { e ->
-                Timber.e(e, "Error fetching Archived animes")
-                emit(
-                    ArchivedAnimeUiState(
-                        isLoading = false,
-                        error = e.localizedMessage ?: "An error occurred"
-                    )
-                )
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = ArchivedAnimeUiState(isLoading = true)
-            )
+    private val _state = MutableStateFlow(ArchivedState(isLoading = true))
+    val state = _state.asStateFlow()
 
-    fun archiveAnime(animeId: String, isCurrentlyArchived: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                archivedRepository.updateArchivedStatus(animeId, !isCurrentlyArchived)
-            } catch (e: Exception) {
-                Timber.tag(TAG).e(e, "Failed to toggle favorite status for anime: %s", animeId)
-                // Optionally, notify the UI about the error
+    private val _events = Channel<ArchivedEvent>()
+    val events = _events.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            archivedRepository.getArchivedAnimes()
+                .map { animeList -> ArchivedState(isLoading = false, animeList = animeList) }
+                .catch { e ->
+                    Timber.e(e, "Error fetching archived animes")
+                    emit(ArchivedState(isLoading = false, error = e.localizedMessage ?: "An error occurred"))
+                }
+                .collect { newState -> _state.value = newState }
+        }
+    }
+
+    fun onAction(action: ArchivedAction) {
+        when (action) {
+            is ArchivedAction.ToggleArchive -> toggleArchive(action.animeId, action.isCurrentlyArchived)
+            is ArchivedAction.AnimeClick -> viewModelScope.launch {
+                _events.send(ArchivedEvent.NavigateToDetail(action.animeId))
             }
         }
     }
 
-
-    fun toggleArchivedStatus(animeId: String, isCurrentlyArchived: Boolean) {
+    private fun toggleArchive(animeId: String, isCurrentlyArchived: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Since this screen only shows favorites, toggling means un-favoriting.
-                // Or, if it's a general toggle, then it works as is.
-                // For this context, !isCurrentlyFavorite will typically be false.
-                //repository.updateFavoriteStatus(animeId, !isCurrentlyFavorite)
-                Timber.d(
-                    "Toggled favorite status for anime: %s to %s",
-                    animeId,
-                    !isCurrentlyArchived
-                )
+                archivedRepository.updateArchivedStatus(animeId, !isCurrentlyArchived)
             } catch (e: Exception) {
-                Timber.e(e, "Failed to toggle favorite status for anime: %s", animeId)
-                // Optionally, update UI state with error
-                // _uiState.value = _uiState.value.copy(error = "Failed to update favorite status")
+                Timber.tag(TAG).e(e, "Failed to toggle archived for $animeId")
             }
         }
     }

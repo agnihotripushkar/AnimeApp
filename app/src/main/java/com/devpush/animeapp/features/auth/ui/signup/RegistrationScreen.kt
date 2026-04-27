@@ -26,7 +26,9 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,8 +60,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.devpush.animeapp.R
-import com.devpush.animeapp.features.auth.ui.AuthViewModel
-import com.devpush.animeapp.features.auth.ui.utils.Separator
+import com.devpush.animeapp.features.auth.ui.signup.RegistrationViewModel
+import com.devpush.animeapp.features.auth.ui.signup.RegistrationState
+import com.devpush.animeapp.features.auth.ui.signup.RegistrationAction
+import com.devpush.animeapp.features.auth.ui.signup.RegistrationEvent
+import com.devpush.animeapp.core.presentation.ObserveAsEvents
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devpush.animeapp.ui.theme.PrimaryViolet
 import com.devpush.animeapp.ui.theme.PrimaryVioletDark
 import com.devpush.animeapp.ui.theme.PrimaryVioletLight
@@ -74,7 +80,7 @@ fun RegistrationScreen(
     modifier: Modifier = Modifier,
     onRegisterSuccessNavigation: () -> Unit,
     onLoginClicked: () -> Unit,
-    viewModel: AuthViewModel = koinViewModel()
+    viewModel: RegistrationViewModel = koinViewModel()
 ) {
     val windowSize = rememberDevicePosture(
         windowSizeClass = calculateWindowSizeClass(
@@ -82,7 +88,7 @@ fun RegistrationScreen(
         )
     )
 
-    val uiState by viewModel.registrationUiState.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
@@ -98,10 +104,9 @@ fun RegistrationScreen(
         }
     }
 
-    LaunchedEffect(uiState.isRegistrationSuccess) {
-        if (uiState.isRegistrationSuccess) {
-            onRegisterSuccessNavigation()
-            viewModel.onRegistrationHandled() // Reset the flag
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is RegistrationEvent.RegistrationSuccess -> onRegisterSuccessNavigation()
         }
     }
 
@@ -115,8 +120,8 @@ fun RegistrationScreen(
                     modifier = modifier,
                     onRegisterSuccessNavigation = onRegisterSuccessNavigation,
                     onLoginClicked = onLoginClicked,
-                    viewModel = viewModel,
-                    uiState = uiState,
+                    onAction = viewModel::onAction,
+                    state = state,
                     passwordVisible = passwordVisible,
                     onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
                     confirmPasswordVisible = confirmPasswordVisible,
@@ -130,8 +135,8 @@ fun RegistrationScreen(
                     modifier = modifier,
                     onRegisterSuccessNavigation = onRegisterSuccessNavigation,
                     onLoginClicked = onLoginClicked,
-                    viewModel = viewModel,
-                    uiState = uiState,
+                    onAction = viewModel::onAction,
+                    state = state,
                     passwordVisible = passwordVisible,
                     onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
                     confirmPasswordVisible = confirmPasswordVisible,
@@ -143,8 +148,8 @@ fun RegistrationScreen(
                     modifier = modifier,
                     onRegisterSuccessNavigation = onRegisterSuccessNavigation,
                     onLoginClicked = onLoginClicked,
-                    viewModel = viewModel,
-                    uiState = uiState,
+                    onAction = viewModel::onAction,
+                    state = state,
                     passwordVisible = passwordVisible,
                     onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
                     confirmPasswordVisible = confirmPasswordVisible,
@@ -156,8 +161,8 @@ fun RegistrationScreen(
                     modifier = modifier,
                     onRegisterSuccessNavigation = onRegisterSuccessNavigation,
                     onLoginClicked = onLoginClicked,
-                    viewModel = viewModel,
-                    uiState = uiState,
+                    onAction = viewModel::onAction,
+                    state = state,
                     passwordVisible = passwordVisible,
                     onPasswordVisibilityChanged = { passwordVisible = !passwordVisible },
                     confirmPasswordVisible = confirmPasswordVisible,
@@ -173,8 +178,8 @@ fun RegistrationScreenCompact(
     modifier: Modifier = Modifier,
     onRegisterSuccessNavigation: () -> Unit,
     onLoginClicked: () -> Unit,
-    viewModel: AuthViewModel,
-    uiState: RegistrationUiState,
+    onAction: (RegistrationAction) -> Unit,
+    state: RegistrationState,
     passwordVisible: Boolean,
     onPasswordVisibilityChanged: () -> Unit,
     confirmPasswordVisible: Boolean,
@@ -219,8 +224,8 @@ fun RegistrationScreenCompact(
         )
 
         RegistrationForm(
-            viewModel = viewModel,
-            uiState = uiState,
+            onAction = onAction,
+            state = state,
             passwordVisible = passwordVisible,
             onPasswordVisibilityChanged = onPasswordVisibilityChanged,
             confirmPasswordVisible = confirmPasswordVisible,
@@ -235,8 +240,8 @@ fun RegistrationScreenExpanded(
     modifier: Modifier = Modifier,
     onRegisterSuccessNavigation: () -> Unit,
     onLoginClicked: () -> Unit,
-    viewModel: AuthViewModel,
-    uiState: RegistrationUiState,
+    onAction: (RegistrationAction) -> Unit,
+    state: RegistrationState,
     passwordVisible: Boolean,
     onPasswordVisibilityChanged: () -> Unit,
     confirmPasswordVisible: Boolean,
@@ -291,8 +296,8 @@ fun RegistrationScreenExpanded(
             )
 
             RegistrationForm(
-                viewModel = viewModel,
-                uiState = uiState,
+                onAction = onAction,
+                state = state,
                 passwordVisible = passwordVisible,
                 onPasswordVisibilityChanged = onPasswordVisibilityChanged,
                 confirmPasswordVisible = confirmPasswordVisible,
@@ -303,10 +308,11 @@ fun RegistrationScreenExpanded(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RegistrationForm(
-    viewModel: AuthViewModel,
-    uiState: RegistrationUiState,
+    onAction: (RegistrationAction) -> Unit,
+    state: RegistrationState,
     passwordVisible: Boolean,
     onPasswordVisibilityChanged: () -> Unit,
     confirmPasswordVisible: Boolean,
@@ -315,8 +321,8 @@ fun RegistrationForm(
 ) {
     // --- Email TextField ---
     OutlinedTextField(
-        value = uiState.email,
-        onValueChange = { viewModel.onRegistrationEmailChanged(it) },
+        value = state.email,
+        onValueChange = { onAction(RegistrationAction.EmailChanged(it)) },
         label = { Text(stringResource(R.string.you_email)) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
@@ -324,9 +330,9 @@ fun RegistrationForm(
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next
         ),
-        isError = uiState.emailError != null,
+        isError = state.emailError != null,
         supportingText = {
-            uiState.emailError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            state.emailError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         },
         leadingIcon = {
             Icon(
@@ -353,8 +359,8 @@ fun RegistrationForm(
 
     // --- Password TextField ---
     OutlinedTextField(
-        value = uiState.password,
-        onValueChange = { viewModel.onRegistrationPasswordChanged(it) },
+        value = state.password,
+        onValueChange = { onAction(RegistrationAction.PasswordChanged(it)) },
         label = { Text(stringResource(R.string.your_password)) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
@@ -363,9 +369,9 @@ fun RegistrationForm(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Next
         ),
-        isError = uiState.passwordError != null,
+        isError = state.passwordError != null,
         supportingText = {
-            uiState.passwordError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            state.passwordError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         },
         leadingIcon = {
             Icon(
@@ -398,8 +404,8 @@ fun RegistrationForm(
 
     // --- Confirm Password TextField ---
     OutlinedTextField(
-        value = uiState.confirmPassword,
-        onValueChange = { viewModel.onConfirmPasswordChanged(it) },
+        value = state.confirmPassword,
+        onValueChange = { onAction(RegistrationAction.ConfirmPasswordChanged(it)) },
         label = { Text(stringResource(R.string.confirm_password_hint)) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
@@ -408,9 +414,9 @@ fun RegistrationForm(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done // Last field
         ),
-        isError = uiState.confirmPasswordError != null,
+        isError = state.confirmPasswordError != null,
         supportingText = {
-            uiState.confirmPasswordError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            state.confirmPasswordError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         },
         leadingIcon = {
             Icon(
@@ -440,7 +446,7 @@ fun RegistrationForm(
     )
 
     // --- General Registration Error ---
-    uiState.generalRegistrationError?.let {
+    state.generalError?.let {
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = it,
@@ -452,39 +458,39 @@ fun RegistrationForm(
 
     Spacer(modifier = Modifier.height(32.dp))
 
-    Button(
-        onClick = { viewModel.registerUser() },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
-        enabled = !uiState.isLoading,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryVioletDark,
-            contentColor = Color.White,
-            disabledContainerColor = PrimaryVioletDark.copy(alpha = 0.5f) // Visual cue for disabled
-        )
+    ButtonGroup(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        if (uiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
-        } else {
-            Text(text = stringResource(R.string.create_an_account))
+        Button(
+            onClick = { onAction(RegistrationAction.Submit) },
+            modifier = Modifier
+                .weight(1f)
+                .height(50.dp),
+            enabled = !state.isLoading,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = PrimaryVioletDark,
+                contentColor = Color.White,
+                disabledContainerColor = PrimaryVioletDark.copy(alpha = 0.5f)
+            )
+        ) {
+            if (state.isLoading) {
+                ContainedLoadingIndicator(modifier = Modifier.size(48.dp))
+            } else {
+                Text(text = stringResource(R.string.create_an_account))
+            }
         }
-    }
 
-    Separator(
-        modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
-    )
-
-    Button(
-        onClick = onLoginClicked,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryVioletLight,
-            contentColor = Color.White
-        )
-    ) {
-        Text(text = stringResource(R.string.login_instead))
+        Button(
+            onClick = onLoginClicked,
+            modifier = Modifier
+                .weight(1f)
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = PrimaryVioletLight,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = stringResource(R.string.login_instead))
+        }
     }
 }

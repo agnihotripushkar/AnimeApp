@@ -14,8 +14,9 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devpush.animeapp.core.presentation.ObserveAsEvents
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,21 +28,33 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.devpush.animeapp.R
-import com.devpush.animeapp.features.auth.ui.AuthViewModel
+import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthViewModel
+import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthEvent
+import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthAction
+import com.devpush.animeapp.features.auth.ui.biometric.BiometricAuthStatus
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BiometricAuthScreen(
-    viewModel: AuthViewModel = koinViewModel(),
+    viewModel: BiometricAuthViewModel = koinViewModel(),
     onAuthSuccess: () -> Unit,
     onAuthCancelledOrFailed: () -> Unit // For now, a single callback for cancel/failure
 ) {
 
     val context = LocalContext.current
     val activity = context as? FragmentActivity
-    val authStatus by viewModel.authStatus.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val authStatus = state.authStatus
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is BiometricAuthEvent.NavigateToHome -> onAuthSuccess()
+            is BiometricAuthEvent.NavigateToLogin -> onAuthCancelledOrFailed()
+            is BiometricAuthEvent.NavigateToOnboarding -> onAuthSuccess() // Or whatever logic
+        }
+    }
 
     var showBiometricPrompt by remember { mutableStateOf(false) }
     // Use a state to track if the initial check has been done
@@ -56,10 +69,10 @@ fun BiometricAuthScreen(
     LaunchedEffect(Unit) {
         if (!initialCheckDone) {
             if (canAuthenticate && activity != null) {
-                viewModel.updateAuthStatus(BiometricAuthStatus.IDLE) // Reset status
+                viewModel.onAction(BiometricAuthAction.StatusChanged(BiometricAuthStatus.IDLE)) // Reset status
                 showBiometricPrompt = true
             } else {
-                viewModel.updateAuthStatus(BiometricAuthStatus.NOT_AVAILABLE)
+                viewModel.onAction(BiometricAuthAction.StatusChanged(BiometricAuthStatus.NOT_AVAILABLE))
             }
             initialCheckDone = true
         }
@@ -74,19 +87,17 @@ fun BiometricAuthScreen(
                     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                         super.onAuthenticationSucceeded(result)
                         Timber.d("Biometric authentication succeeded")
-                        viewModel.updateAuthStatus(BiometricAuthStatus.SUCCESS)
-                        onAuthSuccess()
+                        viewModel.onAction(BiometricAuthAction.StatusChanged(BiometricAuthStatus.SUCCESS))
                     }
 
                     override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                         super.onAuthenticationError(errorCode, errString)
                         Timber.e("Biometric authentication error: $errorCode - $errString")
                         if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
-                            viewModel.updateAuthStatus(BiometricAuthStatus.CANCELLED)
+                            viewModel.onAction(BiometricAuthAction.StatusChanged(BiometricAuthStatus.CANCELLED))
                         } else {
-                            viewModel.updateAuthStatus(BiometricAuthStatus.ERROR)
+                            viewModel.onAction(BiometricAuthAction.StatusChanged(BiometricAuthStatus.ERROR))
                         }
-                        onAuthCancelledOrFailed() // Navigate away or show error
                     }
 
                     override fun onAuthenticationFailed() {
@@ -110,7 +121,7 @@ fun BiometricAuthScreen(
         if (showBiometricPrompt && biometricPrompt != null) {
             Timber.d("Showing biometric prompt")
             biometricPrompt.authenticate(promptInfo)
-            viewModel.updateAuthStatus(BiometricAuthStatus.PROMPT_SHOWN)
+            viewModel.onAction(BiometricAuthAction.StatusChanged(BiometricAuthStatus.PROMPT_SHOWN))
             showBiometricPrompt = false // Reset trigger
         }
     }
@@ -131,7 +142,7 @@ fun BiometricAuthScreen(
                     if (canAuthenticate && activity != null) {
                         showBiometricPrompt = true
                     } else {
-                        viewModel.updateAuthStatus(BiometricAuthStatus.NOT_AVAILABLE)
+                        viewModel.onAction(BiometricAuthAction.StatusChanged(BiometricAuthStatus.NOT_AVAILABLE))
                     }
                 }) {
                     Text(stringResource(R.string.biometric_retry_button))

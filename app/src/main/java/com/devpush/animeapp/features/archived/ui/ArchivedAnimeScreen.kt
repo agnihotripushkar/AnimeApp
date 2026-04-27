@@ -23,8 +23,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devpush.animeapp.core.presentation.ObserveAsEvents
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -59,7 +60,14 @@ fun ArchivedAnimeScreen(
         )
     )
 
-    val uiState by viewModel.uiState.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is ArchivedEvent.NavigateToDetail -> onAnimeClick(event.animeId)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,16 +95,14 @@ fun ArchivedAnimeScreen(
             if (windowSize == DevicePosture.EXPANDED_WIDTH) {
                 ArchivedAnimeExpanded(
                     modifier = Modifier.padding(innerPadding),
-                    onAnimeClick = onAnimeClick,
-                    viewModel = viewModel,
-                    uiState = uiState
+                    onAction = viewModel::onAction,
+                    state = state
                 )
             } else {
                 ArchivedAnimeCompact(
                     modifier = Modifier.padding(innerPadding),
-                    onAnimeClick = onAnimeClick,
-                    viewModel = viewModel,
-                    uiState = uiState
+                    onAction = viewModel::onAction,
+                    state = state
                 )
             }
         }
@@ -107,9 +113,8 @@ fun ArchivedAnimeScreen(
 @Composable
 fun ArchivedAnimeCompact(
     modifier: Modifier,
-    onAnimeClick: (animeId: String) -> Unit,
-    viewModel: ArchivedAnimeViewModel,
-    uiState: ArchivedAnimeUiState
+    onAction: (ArchivedAction) -> Unit,
+    state: ArchivedState
 ) {
     Column(
         modifier = modifier
@@ -120,11 +125,11 @@ fun ArchivedAnimeCompact(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (uiState.isLoading) {
+        if (state.isLoading) {
             ContainedLoadingIndicator()
-        } else if (uiState.error != null) {
-            Text("Error: ${uiState.error}")
-        } else if (uiState.animes.isEmpty()) {
+        } else if (state.error != null) {
+            Text("Error: ${state.error}")
+        } else if (state.animeList.isEmpty()) {
             Text(stringResource(R.string.no_archived_animes_yet))
         } else {
             LazyColumn(
@@ -132,17 +137,14 @@ fun ArchivedAnimeCompact(
                 contentPadding = PaddingValues(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(uiState.animes,
+                items(state.animeList,
                     key = { anime -> anime.id }
                 ) { anime: AnimeDataEntity ->
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { direction ->
                             when (direction) {
                                 SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
-                                    viewModel.archiveAnime(
-                                        anime.id,
-                                        anime.isArchived
-                                    )
+                                    onAction(ArchivedAction.ToggleArchive(anime.id, anime.isArchived))
                                     false // Prevent immediate dismissal
                                 }
 
@@ -154,14 +156,14 @@ fun ArchivedAnimeCompact(
                     )
                     AnimeCard(
                         anime = anime,
-                        onClick = { onAnimeClick(anime.id) },
+                        onClick = { onAction(ArchivedAction.AnimeClick(anime.id)) },
                         onStar = {
                             // Star action not implemented for this screen
                             Timber.d("Star clicked for ${anime.id} on Archived screen")
 
                         },
                         onArchive = {
-                            viewModel.toggleArchivedStatus(anime.id, anime.isArchived)
+                            onAction(ArchivedAction.ToggleArchive(anime.id, anime.isArchived))
 
                         },
                         dismissState = dismissState,
@@ -178,9 +180,8 @@ fun ArchivedAnimeCompact(
 @Composable
 fun ArchivedAnimeExpanded(
     modifier: Modifier,
-    onAnimeClick: (animeId: String) -> Unit,
-    viewModel: ArchivedAnimeViewModel,
-    uiState: ArchivedAnimeUiState
+    onAction: (ArchivedAction) -> Unit,
+    state: ArchivedState
 ) {
     Column(
         modifier = modifier
@@ -191,11 +192,11 @@ fun ArchivedAnimeExpanded(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (uiState.isLoading) {
+        if (state.isLoading) {
             ContainedLoadingIndicator()
-        } else if (uiState.error != null) {
-            Text("Error: ${uiState.error}")
-        } else if (uiState.animes.isEmpty()) {
+        } else if (state.error != null) {
+            Text("Error: ${state.error}")
+        } else if (state.animeList.isEmpty()) {
             Text(stringResource(R.string.no_archived_animes_yet))
         } else {
             LazyColumn(
@@ -203,17 +204,14 @@ fun ArchivedAnimeExpanded(
                 contentPadding = PaddingValues(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(uiState.animes,
+                items(state.animeList,
                     key = { anime -> anime.id }
                 ) { anime: AnimeDataEntity ->
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { direction ->
                             when (direction) {
                                 SwipeToDismissBoxValue.EndToStart -> { // Swiped Left (Archive)
-                                    viewModel.archiveAnime(
-                                        anime.id,
-                                        anime.isArchived
-                                    )
+                                    onAction(ArchivedAction.ToggleArchive(anime.id, anime.isArchived))
                                     false // Prevent immediate dismissal
                                 }
 
@@ -225,14 +223,14 @@ fun ArchivedAnimeExpanded(
                     )
                     AnimeCard(
                         anime = anime,
-                        onClick = { onAnimeClick(anime.id) },
+                        onClick = { onAction(ArchivedAction.AnimeClick(anime.id)) },
                         onStar = {
                             // Star action not implemented for this screen
                             Timber.d("Star clicked for ${anime.id} on Archived screen")
 
                         },
                         onArchive = {
-                            viewModel.toggleArchivedStatus(anime.id, anime.isArchived)
+                            onAction(ArchivedAction.ToggleArchive(anime.id, anime.isArchived))
 
                         },
                         dismissState = dismissState,
